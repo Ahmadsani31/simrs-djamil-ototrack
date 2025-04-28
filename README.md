@@ -101,7 +101,6 @@ API_URL=https://api.example.com
 |:------------:|:----------------:|:-----------:|:--------------:|
 | ![Login](https://via.placeholder.com/200x400.png?text=Login) | ![Register](https://via.placeholder.com/200x400.png?text=Register) | ![Home](https://via.placeholder.com/200x400.png?text=Home) | ![Profile](https://via.placeholder.com/200x400.png?text=Profile) |
 
-*(You can update screenshots later!)*
 
 ---
 

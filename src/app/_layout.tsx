@@ -7,6 +7,7 @@ import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect } from 'react';
 import { Alert, BackHandler } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,8 +56,10 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style="auto" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }

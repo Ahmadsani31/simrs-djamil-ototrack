@@ -7,6 +7,7 @@ export default function KendaraanScreen() {
   return (
     <View className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
+      <View className="p-3">
       <Text className="text-8xl font-bold">Screen Kendaraan</Text>
       <Button
         title="Back"
@@ -14,6 +15,8 @@ export default function KendaraanScreen() {
           router.back();
         }}
       />
+      </View>
+  
     </View>
   );
 }

@@ -1,7 +1,12 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { todoService } from '@/services/api';
+import { MaterialIcons } from '@expo/vector-icons';
+import { ModalRN } from '@/components/ModalRN';
+import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
+import BarcodeScanner from '@/components/BarcodeScanner';
+import { useFocusEffect, useNavigation } from 'expo-router';
 
 interface Todo {
   id: string;
@@ -104,6 +109,7 @@ const sampleData: VehicleData[] = [
 
 
 export default function Home() {
+  const navigation = useNavigation();
   const { logout } = useAuthStore();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -123,16 +129,18 @@ export default function Home() {
     // fetchTodos();
   }, []);
 
-  const ItemLoad = (data: VehicleData) => (
-    sampleData.push({
-      id: '1',
-      vehicleName: 'Toyota Avanza',
-      userName: 'Ahmad Sani',
-      departureTime: '08:00',
-      returnTime: '17:00',
-      date: '2025-04-28',
-    },)
-  );
+  useFocusEffect(
+    // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
+    useCallback(() => {
+      // Invoked whenever the route is focused.
+
+      // Return function is invoked whenever the route gets out of focus.
+      return () => {
+        bottomSheetRef.current?.close();
+      };
+    }, [])
+   )
+
 
   if (loading) {
     return (
@@ -143,68 +151,162 @@ export default function Home() {
   }
 
   const [refreshing, setRefreshing] = useState(false);
+
   const onRefresh = () => {
     setRefreshing(true);
     sampleData.push({
       id: '12',
-      vehicleName: 'Toyota Avanza',
+      vehicleName: '12 Toyota Avanza',
       userName: 'Ahmad Sani',
       departureTime: '08:00',
       returnTime: '17:00',
       date: '2025-04-28',
     },)
     setInterval(() => {
-    setRefreshing(false);
-      
+      setRefreshing(false);
+
     }, 1000);
   };
+  const [camera, setCamera] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // callbacks
+  const handleClosePress = useCallback(() => {
+    bottomSheetRef.current?.close();
+    setCamera(false);
+
+  }, []);
+
+  const handleSnapPress = useCallback(() => {
+    setCamera(true);
+    bottomSheetRef.current?.expand();
+  }, []);
+
+
+  const handleScan = (data: string) => {
+    console.log('Scanned data:', data);
+    setCamera(false);
+    bottomSheetRef.current?.close();
+    // router.push({
+    //   pathname: '/(protected)/kendaraan/detail',
+    //   params: { data: data },
+    // });
+    // toast.success('Barcode Scan Success')
+    // Alert.alert('Scan Success', `Scanned data: ${data}`, [
+    //   { text: 'OK', onPress: () => console.log('OK Pressed') },
+    // ]);
+  };
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
 
   return (
-    <View className="flex-1 bg-slate-300">
-      <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <View className="flex-row justify-between items-center p-4">
-        <Text className="text-xl font-bold">Todo List</Text>
-        <TouchableOpacity
-          onPress={logout}
-          className="bg-red-500 px-3 py-1 rounded"
-        >
-          <Text className="text-white">Logout</Text>
-        </TouchableOpacity>
-      </View>
+    <>
+      <View className="flex-1 bg-slate-300">
+        <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
+        <View className='p-2'>
 
-      <FlatList
-        data={sampleData}
-        style={{ flexGrow: 0, padding: 15 }}
-        keyExtractor={(item) => item.id}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        renderItem={({ item }) => (
-          <View className="bg-white p-4 rounded-lg shadow mb-2">
-            <View className='flex-row items-center justify-between'>
-              <Text className={`text-2xl font-bold text-black`}>
-                {item.vehicleName}
-              </Text>
-              <Text className='text-secondary text-sm'>
-                {item.date}
-              </Text>
+          <View className='p-3'>
+            <View className='mb-4'>
+              <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
+              <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
+
             </View>
-            <Text className='font-medium text-lg'>
-              {item.userName}
-            </Text>
-            <View className='flex-row items-center justify-around mt-4'>
-              <Text className="text-black bg-blue-300 p-2 rounded-lg">Jam Berangkat: {item.departureTime}</Text>
-              <Text className="text-black bg-amber-300 p-2 rounded-lg">Jam Pulang: {item.returnTime}</Text>
+            <TouchableOpacity onPress={handleSnapPress}
+              className="flex-row items-center justify-center bg-[#077A7D] py-3 px-6 rounded-lg"
+            >
+              <MaterialIcons name="qr-code-scanner" size={24} color="white" />
+              <Text className="text-white font-bold ml-2">Scan Barcode</Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+        <View className="flex-row justify-between items-center px-4 mt-5 mb-2">
+          <Text className="text-lg font-bold">List Pemakaianan</Text>
+        </View>
+
+        <FlatList
+          data={sampleData}
+          style={{ flexGrow: 0, paddingLeft:15,paddingRight:15 }}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          stickyHeaderIndices={[0]}
+          ListHeaderComponent={
+            <View className='p-2 bg-blue-300 mb-2 rounded-lg'>
+              <TextInput className='border border-gray-300 rounded-md bg-gray-200 p-4'
+                placeholder="Search"
+              />
             </View>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View className="flex-1 justify-center items-center bg-white p-5 mt-8">
-            <Text>No todos found</Text>
-          </View>
-        }
-      />
-      <View className='h-16' />
-    </View>
+          }
+          renderItem={({ item }) => (
+            <View className="bg-white p-4 rounded-lg shadow mb-2">
+              <View className='flex-row items-center justify-between'>
+                <Text className={`text-2xl font-bold text-black`}>
+                  {item.vehicleName}
+                </Text>
+                <Text className='text-secondary text-sm'>
+                  {item.date}
+                </Text>
+              </View>
+              <Text className='font-medium text-lg'>
+                {item.userName}
+              </Text>
+              <View className='flex-row items-center justify-around mt-4'>
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                  <Text className="text-black bg-blue-300 p-2 rounded-lg">Jam Berangkat: {item.departureTime}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Text className="text-black bg-amber-300 p-2 rounded-lg">Jam Pulang: {item.returnTime}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          ListEmptyComponent={
+            <View className="flex-1 justify-center items-center bg-white p-5 mt-8">
+              <Text>No todos found</Text>
+            </View>
+          }
+        />
+        <View className='h-24' />
+        <ModalRN
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+        >
+          <ModalRN.Header><Text>Title</Text></ModalRN.Header>
+          <ModalRN.Content><Text>Content</Text></ModalRN.Content>
+          <ModalRN.Footer>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text className='bg-red-500 p-3 items-center rounded-lg text-white'>Close</Text>
+            </TouchableOpacity>
+          </ModalRN.Footer>
+        </ModalRN>
+
+      </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={['100%']}
+        index={-1}
+        enablePanDownToClose={true}
+        animationConfigs={animationConfigs}
+      >
+        <BottomSheetView className='flex-1 items-center bg-slate-300 justify-center'>
+          {camera && <BarcodeScanner
+            onScan={handleScan}
+            onClose={() => handleClosePress()}
+          />}
+
+        </BottomSheetView>
+      </BottomSheet>
+    </>
   );
 }

@@ -100,8 +100,7 @@ function AnimatedTabButton({ icon, label, accessibilityState, onPress }: any) {
       style={{
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 30,
+        bottom:40
       }}
     >
       <View style={{ width: 50, height: 50, alignItems: 'center', justifyContent: 'center' }} className={`${focused ? 'pt-0' : 'pt-4'} bg-[#BEE4D0] w-full rounded-full absolute`}>

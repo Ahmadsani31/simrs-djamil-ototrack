@@ -42,8 +42,8 @@ A **React Native (Expo)** app using:
 1. **Clone this repository:**
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/Ahmadsani31/expo-zustand-reactnative.git
+cd expo-zustand-reactnative
 ```
 
 2. **Install dependencies:**
@@ -61,7 +61,7 @@ npm run start
 or
 
 ```bash
-expo start
+npx run start
 ```
 
 4. **Environment Variables (optional):**
@@ -69,10 +69,10 @@ expo start
 Create a `.env` file if you want to configure your API URL:
 
 ```bash
-API_URL=https://api.example.com
+EXPO_PUBLIC_API_URL=https://api.example.com
 ```
 
-(You need to modify `lib/api.ts` to use `process.env.API_URL`.)
+(You need to modify `services/api.ts` to use `process.env.EXPO_PUBLIC_API_URL`.)
 
 ---
 

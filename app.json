@@ -47,7 +47,10 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.nama.zustand_app",
+      "minSdkVersion": 29,
+      "targetSdkVersion": 34
     },
     "newArchEnabled": true
   }

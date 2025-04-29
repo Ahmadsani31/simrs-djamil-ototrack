@@ -1,19 +1,56 @@
-import { Slot, SplashScreen, Stack } from 'expo-router';
+import { router, Slot, SplashScreen, Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
 
 import '../../global.css';
 import Loader from '@/components/Loader';
+import { useEffect } from 'react';
+import { Alert, BackHandler } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  
+
   const { isLoading } = useAutoLogin();
 
+  useEffect(() => {
+    const backAction = () => {
+      if (router.canGoBack()) {
+        // Kalau masih bisa mundur (ada history), cukup back saja
+        router.back();
+      } else {
+        // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
+        Alert.alert(
+          'Konfirmasi Keluar',
+          'Apakah Anda yakin ingin keluar dari aplikasi?',
+          [
+            {
+              text: 'Tidak',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Ya',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ]
+        );
+      }
+
+      return true; // <- Wajib! Supaya sistem back tidak langsung nutup
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [router]);
+
   if (isLoading) {
-    return <Loader/>;
+    return <Loader />;
   }
 
   return (

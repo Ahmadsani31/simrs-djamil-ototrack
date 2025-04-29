@@ -2,7 +2,9 @@ import { LoginData, RegisterData } from '@/types/types';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'http://192.168.1.10:8080/api/v1'; // Replace with your API URL
+const API_URL = process.env.EXPO_PUBLIC_API_URL // Replace with your API URL
+
+
 
 const api = axios.create({
   baseURL: API_URL,
@@ -37,13 +39,12 @@ api.interceptors.response.use(
 export const authService = {
   login: async (data:LoginData) => {
     console.log('Login function called with data:', JSON.stringify(data));
-    
     const response = await api.post('/login', data);
-    return response.data.data;
+    return response.data;
   },
   register: async (data:RegisterData) => {
     const response = await api.post('/register', data);
-    return response.data;
+    return response.data.data;
   },
   getProfile: async () => {
     const response = await api.get('/user');

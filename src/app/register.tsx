@@ -1,19 +1,42 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, useAnimatedValue, Animated } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
+import Input from '@/components/Input';
+import ButtonCostum from '@/components/ButtonCostum';
+import * as yup from 'yup';
+import { Entypo, Feather } from '@expo/vector-icons';
+import { Formik } from 'formik';
+import { RegisterData } from '@/types/types';
+import ViewError from '@/components/ViewError';
+
+const validationSchema = yup.object().shape({
+  name: yup.string().min(3, 'Minimal 3 karakter').required('Nama harus diisi'),
+  email: yup.string().email('email tidak valid').required('Email harus diisi'),
+  password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
+  password_confirmation: yup.string()
+    .oneOf([yup.ref('password')], 'Konfirmasi password tidak cocok')
+    .required('Konfirmasi password wajib diisi')
+});
 
 export default function RegisterScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const fadeAnim = useAnimatedValue(0);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, []);
   const { register, isLoading, error } = useAuthStore();
 
-  const handleRegister = async () => {
+  const [showPassword, setShowPassword] = useState(true);
+
+  const handleRegister = async (data: RegisterData) => {
     try {
-      await register({name, email, password,confirmPassword});
+      await register(data);
       router.replace('/(protected)'); // Redirect to the protected tabs after registration);
     } catch (error) {
       Alert.alert('Error', error as string);
@@ -21,51 +44,84 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 justify-center p-4 bg-white">
-      <Text className="text-2xl font-bold text-center mb-6">Register</Text>
-      
-      {error && <Text className="text-red-500 mb-4 text-center">{error}</Text>}
-      
-      <TextInput
-        className="border border-gray-300 rounded p-3 mb-4"
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      
-      <TextInput
-        className="border border-gray-300 rounded p-3 mb-4"
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      
-      <TextInput
-        className="border border-gray-300 rounded p-3 mb-6"
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      
-      <TouchableOpacity
-        className="bg-blue-500 p-3 rounded items-center"
-        onPress={handleRegister}
-        disabled={isLoading}
+    <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
+      <View className="absolute bg-teal-500 h-80 w-80 top-0 left-0 rounded-full shadow-lg -translate-x-52 -translate-y-52" />
+      <View className="absolute bg-teal-500 h-80 w-80 top-0 right-0 rounded-full shadow-lg translate-x-36 translate-y-12" />
+      <Animated.View
+        style={{ opacity: fadeAnim, zIndex: 10 }}
       >
-        <Text className="text-white font-medium">
-          {isLoading ? 'Loading...' : 'Register'}
-        </Text>
-      </TouchableOpacity>
-      
+        <View className='z-10 bg-white p-4 rounded-lg'>
+          <Text className="text-2xl font-bold text-center mb-6">Register</Text>
+
+          {error && <ViewError plaintext={error} />}
+          <Formik
+            initialValues={{ name: '', email: '', password: '', password_confirmation: '' }}
+            validationSchema={validationSchema}
+            onSubmit={async (values) => handleRegister(values)}
+          >
+            {({ handleChange, handleSubmit, values, errors, touched }) => (
+              <>
+                <Input
+                  label="Full Name"
+                  placeholder="Enter your name"
+                  value={values.name}
+                  onChangeText={handleChange('name')}
+                  error={touched.name ? errors.name : undefined}
+                  className='bg-gray-200'
+                />
+
+                <Input
+                  label="Email"
+                  placeholder="Enter your email"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  error={touched.email ? errors.email : undefined}
+                  className='bg-gray-200'
+                />
+
+                <Input
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={values.password}
+                  onChangeText={handleChange('password')}
+                  secureTextEntry={showPassword}
+                  error={touched.password ? errors.password : undefined}
+                  className='bg-gray-200'
+                />
+                <View className='relative'>
+                  <Input
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={values.password_confirmation}
+                    onChangeText={handleChange('password_confirmation')}
+                    secureTextEntry={showPassword}
+                    error={touched.password_confirmation ? errors.password_confirmation : undefined}
+                    className='bg-gray-200'
+                  />
+                  <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
+                  </TouchableOpacity>
+                </View>
+
+                <ButtonCostum
+                  classname="bg-indigo-500"
+                  title="Register"
+                  onPress={handleSubmit}
+                  loading={isLoading}
+                  variant="primary"
+                />
+              </>
+            )}
+          </Formik>
+        </View>
+      </Animated.View>
       <View className="mt-4 flex-row justify-center">
         <Text>Already have an account? </Text>
         <Link href="/login" replace className="text-blue-500">
           Login
         </Link>
       </View>
+      <View className="absolute bg-teal-500 h-40 w-40 bottom-0 left-0 rounded-full shadow-lg translate-x-16 translate-y-20" />
     </SafeAreaView>
   );
 }

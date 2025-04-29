@@ -2,16 +2,19 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { authService } from '../services/api';
 import { LoginData, RegisterData, User } from '@/types/types';
+import { Alert } from 'react-native';
 
 interface AuthState {
   token: string | null;
   user: User | null;
   isLoading: boolean;
   error: string | null;
+  errorLogin: string | null;
+  errorRegister: string | null;
   setToken: (token: string) => Promise<void>;
   setUser: (user: User) => void;
-  login: (data:LoginData) => Promise<void>;
-  register: (data:RegisterData) => Promise<void>;
+  login: (data: LoginData) => Promise<boolean>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -21,6 +24,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
   error: null,
+  errorLogin: null,
+  errorRegister: null,
 
   setToken: async (token) => {
     await SecureStore.setItemAsync('token', token);
@@ -29,39 +34,44 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setUser: (user) => set({ user }),
 
-  login: async (data:LoginData) => {
+  login: async (data: LoginData) => {
     console.log('Login function called with data:', JSON.stringify(data));
-    
-    set({ isLoading: true, error: null });
+
+    set({ isLoading: true, errorLogin: null });
+
     try {
-      const { token, user } = await authService.login(data);
+      const response = await authService.login(data);
+      const token = response.data.token;
+      const user = response.data.user;
 
       console.log('Login successful:', token, user);
-      
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
+      return true;
     } catch (error: any) {
-      console.log('auth store error:', error);
-      
-      set({ 
-        error: error.response?.data?.message || 'Login failed', 
-        isLoading: false 
+      Alert.alert('Error', error.message as string);
+      console.log('Login error:', JSON.stringify(error.message));
+      set({
+        errorLogin: error.response?.data?.message || 'Login failed',
+        isLoading: false,
       });
-      throw error;
+      return false;
     }
   },
 
-  register: async (data:RegisterData) => {
-    set({ isLoading: true, error: null });
+  register: async (data: RegisterData) => {
+    console.log('Register function called with data:', JSON.stringify(data));
+    set({ isLoading: true, errorRegister: null });
     try {
       const { token, user } = await authService.register(data);
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
     } catch (error: any) {
-      set({ 
-        error: error.response?.data?.message || 'Registration failed', 
-        isLoading: false 
+      console.log('Register error:', JSON.stringify(error));
+      set({
+        errorRegister: error.response?.data?.message || 'Registration failed',
+        isLoading: false,
       });
       throw error;
     }
@@ -80,7 +90,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         const user = await authService.getProfile();
 
         console.log('Check auth successful:', token, user);
-        
+
         set({ token, user, isLoading: false });
       } else {
         set({ isLoading: false });

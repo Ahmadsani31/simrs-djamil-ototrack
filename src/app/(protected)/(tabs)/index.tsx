@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import { useEffect, useState } from 'react';
 import { todoService } from '@/services/api';
@@ -102,6 +102,7 @@ const sampleData: VehicleData[] = [
 ];
 
 
+
 export default function Home() {
   const { logout } = useAuthStore();
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -122,6 +123,17 @@ export default function Home() {
     // fetchTodos();
   }, []);
 
+  const ItemLoad = (data: VehicleData) => (
+    sampleData.push({
+      id: '1',
+      vehicleName: 'Toyota Avanza',
+      userName: 'Ahmad Sani',
+      departureTime: '08:00',
+      returnTime: '17:00',
+      date: '2025-04-28',
+    },)
+  );
+
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -129,6 +141,23 @@ export default function Home() {
       </View>
     );
   }
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    sampleData.push({
+      id: '12',
+      vehicleName: 'Toyota Avanza',
+      userName: 'Ahmad Sani',
+      departureTime: '08:00',
+      returnTime: '17:00',
+      date: '2025-04-28',
+    },)
+    setInterval(() => {
+    setRefreshing(false);
+      
+    }, 1000);
+  };
 
   return (
     <View className="flex-1 bg-slate-300">
@@ -145,8 +174,11 @@ export default function Home() {
 
       <FlatList
         data={sampleData}
-        style={{ flexGrow: 0,padding:15 }}
+        style={{ flexGrow: 0, padding: 15 }}
         keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={({ item }) => (
           <View className="bg-white p-4 rounded-lg shadow mb-2">
             <View className='flex-row items-center justify-between'>
@@ -172,7 +204,7 @@ export default function Home() {
           </View>
         }
       />
-      <View className='h-16'/>
+      <View className='h-16' />
     </View>
   );
 }

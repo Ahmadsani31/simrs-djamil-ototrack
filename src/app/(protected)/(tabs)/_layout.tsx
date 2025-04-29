@@ -14,14 +14,14 @@ export default function TabsLayout() {
           tabBarStyle: {
             position: 'absolute',
             bottom: 20,
-            height: 20,
+            height: 25,
             marginLeft: 20,
             marginRight: 20,
             borderRadius: 20,
             backgroundColor: '#06202B',
             shadowRadius: 10,
             borderTopWidth: 0,
-            shadowOffset: { width: 0, height: 10 },
+            shadowOffset: { width: 0, height: 200 },
           },
           headerStyle: {
             backgroundColor: '#60B5FF',

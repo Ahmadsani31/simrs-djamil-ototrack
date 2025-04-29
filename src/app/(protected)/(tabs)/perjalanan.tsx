@@ -1,4 +1,4 @@
-import { Button, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useContext, useRef, useState } from "react";
 import Input from "@/components/Input";
@@ -11,39 +11,47 @@ import { Image } from "expo-image";
 export default function PerjalananScreen() {
   const router = useRouter();
 
-  const [kegiatan, setKegiatan] = useState<String>('')
+  const [kegiatan, setKegiatan] = useState<tring>('')
   const [modalVisible, setModalVisible] = useState(false);
 
   const cameraRef = useRef<CameraView | null>(null);
-  const [uri, setUri] = useState<JSON | null>(null);
+  const [uri, setUri] = useState<String | null>(null);
 
   const takePicture = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({imageType:"png",base64:true});
+    const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
     console.log('photo', photo?.uri);
-    setUri(photo?.uri);
+    setUri(photo?.uri ?? null);
     setModalVisible(false)
   };
-
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
+  const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
   return (
+
     <View className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <View className="m-4 p-4 bg-white rounded-lg">
-        <View className="items-center mb-3">
-          <Text className="text-3xl font-bold">Nama Kendaraan</Text>
-          <Text className="font-medium">BA Nomor</Text>
-        </View>
+      <KeyboardAvoidingView  className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
+        <ScrollView style={{marginBottom:80}}>
+          <View className="m-4 p-4 bg-white rounded-lg">
+            <View className="items-center mb-3">
+              <Text className="text-3xl font-bold">Nama Kendaraan</Text>
+              <Text className="font-medium">BA Nomor</Text>
+            </View>
 
-        {uri && <Image
-        
-          source={{ uri }}
-          className="ob"
-          contentFit="contain"
-          style={{  aspectRatio: 1 }}
-        />}
+            {uri && <View className="w-full rounded-lg bg-black mb-4">
+              <Image
+                source={{ uri }}
+                contentFit="contain"
+                style={{ aspectRatio: 1, resizeMode: 'contain' }}
+              />
+            </View>}
 
-        <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value="" onChangeText={setKegiatan} />
-        <ButtonCostum classname="bg-blue-500" title="Open Camera" onPress={() => setModalVisible(true)} />
-      </View>
+            <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={kegiatan} onChangeText={setKegiatan} />
+            <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value="" onChangeText={setKegiatan} />
+            <ButtonCostum classname="bg-blue-500" title="Open Camera" onPress={() => setModalVisible(true)} />
+            <ButtonCostum classname="bg-indigo-500" title="Submit"/>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
       <Modal
         visible={modalVisible}
         animationType="fade"
@@ -54,23 +62,15 @@ export default function PerjalananScreen() {
             flex: 1,
             width: "100%",
           }} ratio={"4:3"} facing="back" ref={cameraRef} >
-            {/* <View className="absolute flex-row bottom-10 justify-center">
-              <ButtonCostum classname="bg-stone-500 " title="close" />
-              <ButtonCostum classname="bg-red-500 " title="close" onPress={() => setModalVisible(false)} />
-            </View> */}
-            <View style={styles.shutterContainer}>
-              <Pressable>
-                <AntDesign name="picture" size={32} color="white" />
 
-              </Pressable>
-              <Pressable onPress={takePicture}>
-                {({ pressed }) => (
+            <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <AntDesign name="closecircleo" size={42} color="red" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={takePicture}>
                   <View
                     style={[
                       styles.shutterBtn,
-                      {
-                        opacity: pressed ? 0.5 : 1,
-                      },
                     ]}
                   >
                     <View
@@ -82,49 +82,20 @@ export default function PerjalananScreen() {
                       ]}
                     />
                   </View>
-                )}
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </CameraView>
 
-          {/* <CameraView className="flex-1" facing={'front'}>
-            <View className="w-full m-96 bg-black/50">
-              <TouchableOpacity onPress={()=>setModalVisible(false)}>
-                <Text style={{
-                  fontSize: 24,
-                  fontWeight: 'bold',
-                  color: 'white',
-                }}>Flip Camera</Text>
-              </TouchableOpacity>
-            </View>
-          </CameraView> */}
+
         </View>
       </Modal>
     </View>
+
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  camera: {
-    flex: 1,
-    width: "100%",
-  },
-  shutterContainer: {
-    position: "absolute",
-    bottom: 44,
-    left: 0,
-    width: "100%",
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 30,
-  },
+
   shutterBtn: {
     backgroundColor: "transparent",
     borderWidth: 5,

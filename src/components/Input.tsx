@@ -1,6 +1,8 @@
 import React from 'react';
 import { TextInput, Text, View } from 'react-native';
 
+// const inputMode = enum('decimal', 'email', 'none', 'numeric', 'search', 'tel', 'text', 'url')
+
 interface InputProps {
   label?: string;
   placeholder: string;
@@ -9,6 +11,7 @@ interface InputProps {
   secureTextEntry?: boolean;
   error?: string;
   className?: string;
+  inputMode?: any;
 }
 
 export default function Input({
@@ -18,7 +21,8 @@ export default function Input({
   onChangeText,
   secureTextEntry = false,
   error,
-  className
+  className,
+  inputMode = 'text'
 }: InputProps) {
 
   return (
@@ -30,6 +34,7 @@ export default function Input({
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
+        inputMode={inputMode}
       />
       {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
     </View>

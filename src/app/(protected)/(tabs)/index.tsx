@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { ModalRN } from '@/components/ModalRN';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
-import { useFocusEffect, useNavigation } from 'expo-router';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 
 interface Todo {
   id: string;
@@ -189,14 +189,21 @@ export default function Home() {
     console.log('Scanned data:', data);
     setCamera(false);
     bottomSheetRef.current?.close();
-    // router.push({
-    //   pathname: '/(protected)/kendaraan/detail',
-    //   params: { data: data },
-    // });
+
     // toast.success('Barcode Scan Success')
-    // Alert.alert('Scan Success', `Scanned data: ${data}`, [
-    //   { text: 'OK', onPress: () => console.log('OK Pressed') },
-    // ]);
+    Alert.alert('Scan Successfully', 'Tekan OK untuk menlanjutkan proses..', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      { text: 'OK', onPress: () => {
+        router.push({
+          pathname: '/(protected)/detail',
+          params: { data: data },
+        });
+      } },
+    ]);
   };
 
   const animationConfigs = useBottomSheetSpringConfigs({

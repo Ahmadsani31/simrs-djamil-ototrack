@@ -56,6 +56,7 @@ export default function ProtectedLayout() {
                 <Stack.Screen
                     name="detail"
                     options={{
+                        headerShown: false,
                     }}
                 />
 

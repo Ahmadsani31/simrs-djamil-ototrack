@@ -1,116 +1,203 @@
-import { Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Input from "@/components/Input";
 import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
 import { CameraMode, CameraView } from "expo-camera";
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
-import { Image } from "expo-image";
-import ModalCamera from "@/components/ModalCamera";
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location'
 
 export default function PerjalananScreen() {
   const router = useRouter();
+  const mapRef = useRef<MapView>(null);
 
-  const [kegiatan, setKegiatan] = useState<string>('')
-  const [modalVisible, setModalVisible] = useState(false);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [locationArray, setLocationArray] = useState<Location.LocationObjectCoords[]>([]);
+  const [watcher, setWatcher] = useState<Location.LocationSubscription | null>(null);
 
-  // const cameraRef = useRef<CameraView | null>(null);
-  const [uri, setUri] = useState<String | null>(null);
+  const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading.....');
+  const [locationServicesEnabled, setLocationServicesEnabled] = useState(false)
 
-  // const takePicture = async () => {
-  //   const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
-  //   console.log('photo', photo?.uri);
-  //   setUri(photo?.uri ?? null);
-  //   setModalVisible(false)
-  // };
+  useEffect(() => {
+    checkIfLocationEnabled();
+    getCurrentLocation();
+  }, [])
+
+  //check if location is enable or not
+  const checkIfLocationEnabled = async () => {
+    let enabled = await Location.hasServicesEnabledAsync();       //returns true or false
+    if (!enabled) {                     //if not enable 
+      Alert.alert('Location not enabled', 'Please enable your Location', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+    } else {
+      setLocationServicesEnabled(enabled)         //store true into state
+    }
+  }
+
+  //get current location
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();  //used for the pop up box where we give permission to use location 
+    console.log(status);
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Allow the app to use the location services', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+    }
+
+    //get current position lat and long
+    const { coords } = await Location.getCurrentPositionAsync();
+
+    console.log('coords', coords)
+
+    if (coords) {
+      const { latitude, longitude } = coords;
+      console.log(latitude, longitude);
+
+      //provide lat and long to get the the actual address
+      let responce = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude
+      });
+      console.log('responce', responce);
+      //loop on the responce to get the actual result
+      for (let item of responce) {
+        let address = `(${item.postalCode}), ${item.formattedAddress}, ${item.district},  ${item.city},${item.subregion},${item.region}`
+        setDisplayCurrentAddress(address)
+      }
+    }
+  }
+
+
+
+  const startTracking = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Izin lokasi ditolak');
+      return;
+    }
+
+    const subscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 3000,
+        distanceInterval: 1,
+      },
+      (loc) => {
+        console.log('Lokasi diperbarui:', loc.coords);
+        setLocationArray((prev) => [...prev, loc.coords]);
+        setLocation(loc);
+      }
+    );
+
+    setWatcher(subscription);
+  };
+
+  const stopTracking = () => {
+    if (watcher) {
+      watcher.remove();
+      setWatcher(null);
+      console.log('Tracking dihentikan');
+    }
+  };
+
+  const [zoomLevel, setZoomLevel] = useState(0.01); 
+
+  const handleZoom = (type: 'in' | 'out') => {
+    const newDelta = type === 'in' ? zoomLevel / 2 : zoomLevel * 2;
+    setZoomLevel(newDelta);
+
+    mapRef.current?.animateToRegion({
+      latitude: -6.2,
+      longitude: 106.8,
+      latitudeDelta: newDelta,
+      longitudeDelta: newDelta,
+    }, 500);
+  };
+
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
   return (
 
     <View className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <KeyboardAvoidingView  className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-        <ScrollView style={{marginBottom:80}}>
+      <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
+        <ScrollView style={{ marginBottom: 80 }}>
           <View className="m-4 p-4 bg-white rounded-lg">
-            <View className="items-center mb-3">
-              <Text className="text-3xl font-bold">Nama Kendaraan</Text>
-              <Text className="font-medium">BA Nomor</Text>
+            <View className="items-center text-center mb-3">
+              <Text className="text-3xl font-bold">Live Location Tracking</Text>
             </View>
+            <View className="p-2 items-center">
+              <Text className="text-center">{displayCurrentAddress}</Text>
+            </View>
+            <ButtonCostum classname="bg-indigo-500" title="Start Tracking" onPress={startTracking} />
+            <ButtonCostum classname="bg-red-500" title="Stop Tracking" onPress={stopTracking} />
 
-            {uri && <View className="w-full rounded-lg bg-black mb-4">
-              <Image
-                source={{ uri }}
-                contentFit="contain"
-                style={{ aspectRatio: 1, resizeMode: 'contain' }}
-              />
-            </View>}
+            {locationArray.length === 0 ? (
+              <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
+            ) : (
+              <ScrollView style={{height:100}}>
+                {locationArray.map((coord, index) => (
+                  <View key={index} style={styles.coordItem}>
+                    <Text style={styles.coordText}>
+                      #{index + 1}: Lat {coord.latitude.toFixed(6)}, Lng {coord.longitude.toFixed(6)}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
 
-            <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={kegiatan} onChangeText={setKegiatan} />
-            <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value="" onChangeText={setKegiatan} />
-            <ButtonCostum classname="bg-blue-500" title="Open Camera" onPress={() => setModalVisible(true)} />
-            <ButtonCostum classname="bg-indigo-500" title="Submit"/>
           </View>
+          {location && (
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              initialRegion={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: zoomLevel,
+          longitudeDelta: zoomLevel,
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                }}
+                title="Your Position"
+              />
+            </MapView>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
-      <ModalCamera visible={modalVisible} onClose={()=> setModalVisible(false)} setUriImage={(e)=> setUri(e)}/>
-      {/* <Modal
-        visible={modalVisible}
-        animationType="fade"
-      >
-
-        <View className="flex-1 bg-slate-600 justify-center items-center ">
-          <CameraView style={{
-            flex: 1,
-            width: "100%",
-          }} ratio={"4:3"} facing="back" ref={cameraRef} >
-
-            <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <AntDesign name="closecircleo" size={42} color="red" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={takePicture}>
-                  <View
-                    style={[
-                      styles.shutterBtn,
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.shutterBtnInner,
-                        {
-                          backgroundColor: "white",
-                        },
-                      ]}
-                    />
-                  </View>
-              </TouchableOpacity>
-            </View>
-          </CameraView>
-
-
-        </View>
-      </Modal> */}
     </View>
 
   );
 }
-
-// const styles = StyleSheet.create({
-
-//   shutterBtn: {
-//     backgroundColor: "transparent",
-//     borderWidth: 5,
-//     borderColor: "white",
-//     width: 85,
-//     height: 85,
-//     borderRadius: 45,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   shutterBtnInner: {
-//     width: 70,
-//     height: 70,
-//     borderRadius: 50,
-//   },
-// });
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  buttonContainer: { flexDirection: 'row', gap: 10, marginBottom: 20 },
+  coordsBox: {
+    marginTop: 10,
+    padding: 16,
+    backgroundColor: '#eee',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  coordText: { fontSize: 16, fontWeight: '500' },
+  coordItem: { paddingVertical: 6, borderBottomWidth: 1, borderColor: '#ccc' },
+  map: { marginTop: 20, width: '100%', height: '60%' },
+});

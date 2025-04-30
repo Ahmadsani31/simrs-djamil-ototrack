@@ -1,7 +1,8 @@
-import { CameraView } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useRef, useState } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
+import ButtonCostum from './ButtonCostum';
 
 interface InputProps {
   visible: boolean;
@@ -14,58 +15,69 @@ export default function ModalCamera({
   onClose,
   setUriImage,
 }: InputProps) {
+  const [permission, requestPermission] = useCameraPermissions();
 
   const cameraRef = useRef<CameraView | null>(null);
 
   const takePicture = async () => {
     const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
-    console.log('photo', photo?.uri);
+    console.log('photo modal', photo?.uri);
     setUriImage(photo?.uri ?? null);
     onClose();
   };
 
   return (
-    <View>
+    <>
       <Modal
         visible={visible}
         animationType="fade"
       >
-
         <View className="flex-1 bg-slate-600 justify-center items-center ">
-          <CameraView
-            style={{
-              flex: 1,
-              width: "100%",
-            }}
-            ratio={"4:3"}
-            facing="front"
-            ref={cameraRef} >
+          {permission?.granted ? (
+            <CameraView
+              style={{
+                flex: 1,
+                width: "100%",
+              }}
+              mirror={true}
+              ratio={"4:3"}
+              facing="front"
+              ref={cameraRef} >
 
-            <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">
-              <TouchableOpacity onPress={onClose}>
-                <AntDesign name="closecircleo" size={42} color="red" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={takePicture}>
-                <View
-                  style={[
-                    styles.shutterBtn,
-                  ]}
-                >
+              <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">
+                <TouchableOpacity onPress={onClose}>
+                  <AntDesign name="closecircleo" size={42} color="red" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={takePicture}>
                   <View
                     style={[
-                      styles.shutterBtnInner,
-                      {
-                        backgroundColor: "white",
-                      },
+                      styles.shutterBtn,
                     ]}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </CameraView>
+                  >
+                    <View
+                      style={[
+                        styles.shutterBtnInner,
+                        {
+                          backgroundColor: "white",
+                        },
+                      ]}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </CameraView>
+          ) :
+              <View className='flex-1 w-full items-center justify-center bg-white'>
+                <Text className='font-bold text-2xl'>Permissions needed!</Text>
+                <Text className='font-medium text-xl bg-slate-300 p-3 m-8 text-center rounded-lg'>We need your permission to show the camera please click bottom <Text className='font-bold'>grant permission</Text>  and Allow this App</Text>
+                <ButtonCostum classname='bg-black' onPress={() => requestPermission()} title="grant permission" />
+                <ButtonCostum classname='bg-red-500' onPress={onClose} title="close" />
+              </View>
+            }
+
         </View>
       </Modal>
-    </View>
+    </>
   );
 }
 

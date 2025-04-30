@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { todoService } from '@/services/api';
@@ -7,6 +7,7 @@ import { ModalRN } from '@/components/ModalRN';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
+import { dataPemakaian } from '@/data/Example';
 
 interface Todo {
   id: string;
@@ -23,90 +24,8 @@ type VehicleData = {
   date: string;
 };
 
-const sampleData: VehicleData[] = [
-  {
-    id: '1',
-    vehicleName: 'Toyota Avanza',
-    userName: 'Ahmad Sani',
-    departureTime: '08:00',
-    returnTime: '17:00',
-    date: '2025-04-28',
-  },
-  {
-    id: '2',
-    vehicleName: 'Honda Brio',
-    userName: 'Budi Santoso',
-    departureTime: '09:00',
-    returnTime: '16:30',
-    date: '2025-04-28',
-  },
-  {
-    id: '3',
-    vehicleName: 'Suzuki Ertiga',
-    userName: 'Citra Lestari',
-    departureTime: '07:30',
-    returnTime: '18:00',
-    date: '2025-04-28',
-  },
-  {
-    id: '4',
-    vehicleName: 'Daihatsu Xenia',
-    userName: 'Dewi Anggraini',
-    departureTime: '10:00',
-    returnTime: '15:30',
-    date: '2025-04-28',
-  },
-  {
-    id: '5',
-    vehicleName: 'Mitsubishi Xpander',
-    userName: 'Eko Prasetyo',
-    departureTime: '06:45',
-    returnTime: '17:15',
-    date: '2025-04-28',
-  },
-  {
-    id: '6',
-    vehicleName: 'Nissan Livina',
-    userName: 'Fitriani',
-    departureTime: '08:30',
-    returnTime: '17:45',
-    date: '2025-04-28',
-  },
-  {
-    id: '7',
-    vehicleName: 'Kia Seltos',
-    userName: 'Gilang Mahardika',
-    departureTime: '09:15',
-    returnTime: '18:00',
-    date: '2025-04-28',
-  },
-  {
-    id: '8',
-    vehicleName: 'Hyundai Stargazer',
-    userName: 'Hana Putri',
-    departureTime: '07:00',
-    returnTime: '16:00',
-    date: '2025-04-28',
-  },
-  {
-    id: '9',
-    vehicleName: 'Wuling Almaz',
-    userName: 'Irwan Saputra',
-    departureTime: '08:15',
-    returnTime: '17:30',
-    date: '2025-04-28',
-  },
-  {
-    id: '10',
-    vehicleName: 'Mazda CX-5',
-    userName: 'Joko Widodo',
-    departureTime: '09:45',
-    returnTime: '19:00',
-    date: '2025-04-28',
-  },
-];
 
-
+const { height } = Dimensions.get('window');
 
 export default function Home() {
   const { logout } = useAuthStore();
@@ -153,7 +72,7 @@ export default function Home() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    sampleData.push({
+    dataPemakaian.push({
       id: '12',
       vehicleName: '12 Toyota Avanza',
       userName: 'Ahmad Sani',
@@ -218,9 +137,8 @@ export default function Home() {
     <>
       <View className="flex-1 bg-slate-300">
         <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-        <View className='p-2'>
+        <View className='p-4'>
 
-          <View className='p-3'>
             <View className='mb-4'>
               <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
               <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
@@ -232,16 +150,13 @@ export default function Home() {
               <MaterialIcons name="qr-code-scanner" size={24} color="white" />
               <Text className="text-white font-bold ml-2">Scan Barcode</Text>
             </TouchableOpacity>
-          </View>
-
-        </View>
-        <View className="flex-row justify-between items-center px-4 mt-5 mb-2">
+          <View className="flex-row justify-between items-center px-4 mt-5 mb-2">
           <Text className="text-lg font-bold">List Pemakaianan</Text>
         </View>
 
         <FlatList
-          data={sampleData}
-          style={{ flexGrow: 0, paddingLeft:15,paddingRight:15 }}
+          data={dataPemakaian}
+          style={{height:(height-320)}}
           keyExtractor={(item) => item.id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -283,7 +198,8 @@ export default function Home() {
             </View>
           }
         />
-        <View className='h-24' />
+        </View>
+   
         <ModalRN
           visible={modalVisible}
           onClose={() => setModalVisible(false)}

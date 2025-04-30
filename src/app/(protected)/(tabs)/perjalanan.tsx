@@ -113,20 +113,6 @@ export default function PerjalananScreen() {
     }
   };
 
-  const [zoomLevel, setZoomLevel] = useState(0.01); 
-
-  const handleZoom = (type: 'in' | 'out') => {
-    const newDelta = type === 'in' ? zoomLevel / 2 : zoomLevel * 2;
-    setZoomLevel(newDelta);
-
-    mapRef.current?.animateToRegion({
-      latitude: -6.2,
-      longitude: 106.8,
-      latitudeDelta: newDelta,
-      longitudeDelta: newDelta,
-    }, 500);
-  };
-
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
   return (
@@ -148,7 +134,7 @@ export default function PerjalananScreen() {
             {locationArray.length === 0 ? (
               <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
             ) : (
-              <ScrollView style={{height:100}}>
+              <ScrollView style={{ height: 100 }}>
                 {locationArray.map((coord, index) => (
                   <View key={index} style={styles.coordItem}>
                     <Text style={styles.coordText}>
@@ -161,25 +147,33 @@ export default function PerjalananScreen() {
 
           </View>
           {location && (
-            <MapView
-              ref={mapRef}
-              style={styles.map}
-              initialRegion={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: zoomLevel,
-          longitudeDelta: zoomLevel,
-              }}
-            >
-              <Marker
-                coordinate={{
+            <View className="flex-1 h-96">
+              <MapView
+                scrollEnabled={true}   // nonaktifkan drag
+                zoomEnabled={true}     // nonaktifkan zoom
+                rotateEnabled={true}   // nonaktifkan rotasi
+                pitchEnabled={true}    // nonaktifkan 3D
+                ref={mapRef}
+                style={styles.map}
+                initialRegion={{
                   latitude: location.coords.latitude,
                   longitude: location.coords.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
-                title="Your Position"
-              />
-            </MapView>
+              >
+                <Marker
+                  coordinate={{
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                  }}
+                  title="Your Position"
+                />
+              </MapView>
+
+            </View>
           )}
+
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -199,5 +193,13 @@ const styles = StyleSheet.create({
   },
   coordText: { fontSize: 16, fontWeight: '500' },
   coordItem: { paddingVertical: 6, borderBottomWidth: 1, borderColor: '#ccc' },
-  map: { marginTop: 20, width: '100%', height: '60%' },
+  map: { marginTop: 20, width: '100%', height: '100%' },
+  controls: {
+    position: 'absolute',
+    bottom: 30,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
 });

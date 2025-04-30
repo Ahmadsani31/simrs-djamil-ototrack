@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Dimensions, Animated, useAnimatedValue } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Dimensions, StyleSheet } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
@@ -11,23 +11,45 @@ import { Feather } from '@expo/vector-icons';
 import ButtonCostum from '@/components/ButtonCostum';
 import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
+import Animated, { useSharedValue, withSpring, FadeIn, FadeOut, FadeInUp, Easing, FadeInDown, useAnimatedProps, withTiming } from 'react-native-reanimated';
+import Svg, { Circle } from 'react-native-svg';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Email harus diisi'),
   password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
 });
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function LoginScreen() {
-  const fadeAnim = useAnimatedValue(0);
+  const WiconBR = useSharedValue<number>(10);
+  const HiconBR = useSharedValue<number>(10);
+
+  const WiconBL = useSharedValue<number>(80);
+  const HiconBL = useSharedValue<number>(80);
+
+  const WiconTL = useSharedValue<number>(20);
+  const HiconTL = useSharedValue<number>(20);
+
+  const WiconTR = useSharedValue<number>(20);
+  const HiconTR = useSharedValue<number>(20);
+
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+    // translateX.value = withSpring(translateX.value + 50);
+
+    WiconBR.value = withSpring(WiconBR.value + 60);
+    HiconBR.value = withSpring(HiconBR.value + 60);
+
+    WiconBL.value = withSpring(WiconBL.value + 120);
+    HiconBL.value = withSpring(HiconBL.value + 120);
+
+    WiconTL.value = withSpring(WiconTL.value + 200);
+    HiconTL.value = withSpring(HiconTL.value + 200);
+
+    WiconTR.value = withSpring(WiconTR.value + 280);
+    HiconTR.value = withSpring(HiconTR.value + 280);
+  })
 
   const [showPassword, setShowPassword] = useState(true);
 
@@ -45,17 +67,15 @@ export default function LoginScreen() {
     }
   };
 
+
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-
-      <View className="absolute z-10 bg-teal-500 h-80 w-80 top-0 left-0 rounded-full shadow-lg -translate-x-32 -translate-y-32" />
-
-
-      <View className="absolute bg-teal-500 h-80 w-80 top-0 right-0 rounded-full shadow-lg translate-x-36 translate-y-12" />
-      <Animated.View
-        style={{ opacity: fadeAnim, zIndex: 10 }}
+      <Animated.View style={{width:WiconTL,height:HiconTL}} className="absolute z-10 bg-teal-500 top-[-80] left-[-80] rounded-full" />
+      <Animated.View style={{width:WiconTR,height:HiconTR}} className="absolute bg-teal-500 top-16 right-[-100] rounded-full" />
+      <Animated.View style={{ zIndex: 10 }}
+        entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
-        <View className='z-10 bg-white p-4 rounded-lg'>
+        <View className=' bg-white p-4 rounded-lg'>
 
           <Text className="text-2xl font-bold text-center mb-6">Login</Text>
 
@@ -111,8 +131,9 @@ export default function LoginScreen() {
           Register
         </Link>
       </View>
-      <View className="-z-0 absolute bg-teal-500 h-60 w-60 bottom-1/4 left-0 rounded-full shadow-lg -translate-x-16 translate-y-20" />
-      <View className="absolute bg-teal-500 h-40 w-40 bottom-0 right-0 rounded-full shadow-lg translate-x-16 translate-y-20" />
+      <Animated.View style={{width:WiconBL,height:HiconBL}} className="absolute bg-[#03A791] bottom-24 left-[-60] rounded-full shadow-lg" />
+      <Animated.View style={{width:WiconBR,height:HiconBR}} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
+      </Animated.View>
     </SafeAreaView>
   );
 }

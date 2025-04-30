@@ -7,22 +7,23 @@ import ButtonCostum from "@/components/ButtonCostum";
 import { CameraMode, CameraView } from "expo-camera";
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import { Image } from "expo-image";
+import ModalCamera from "@/components/ModalCamera";
 
 export default function PerjalananScreen() {
   const router = useRouter();
 
-  const [kegiatan, setKegiatan] = useState<tring>('')
+  const [kegiatan, setKegiatan] = useState<string>('')
   const [modalVisible, setModalVisible] = useState(false);
 
-  const cameraRef = useRef<CameraView | null>(null);
+  // const cameraRef = useRef<CameraView | null>(null);
   const [uri, setUri] = useState<String | null>(null);
 
-  const takePicture = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
-    console.log('photo', photo?.uri);
-    setUri(photo?.uri ?? null);
-    setModalVisible(false)
-  };
+  // const takePicture = async () => {
+  //   const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
+  //   console.log('photo', photo?.uri);
+  //   setUri(photo?.uri ?? null);
+  //   setModalVisible(false)
+  // };
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
   return (
@@ -52,7 +53,8 @@ export default function PerjalananScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <Modal
+      <ModalCamera visible={modalVisible} onClose={()=> setModalVisible(false)} setUriImage={(e)=> setUri(e)}/>
+      {/* <Modal
         visible={modalVisible}
         animationType="fade"
       >
@@ -88,27 +90,27 @@ export default function PerjalananScreen() {
 
 
         </View>
-      </Modal>
+      </Modal> */}
     </View>
 
   );
 }
 
-const styles = StyleSheet.create({
+// const styles = StyleSheet.create({
 
-  shutterBtn: {
-    backgroundColor: "transparent",
-    borderWidth: 5,
-    borderColor: "white",
-    width: 85,
-    height: 85,
-    borderRadius: 45,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  shutterBtnInner: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
-  },
-});
+//   shutterBtn: {
+//     backgroundColor: "transparent",
+//     borderWidth: 5,
+//     borderColor: "white",
+//     width: 85,
+//     height: 85,
+//     borderRadius: 45,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   shutterBtnInner: {
+//     width: 70,
+//     height: 70,
+//     borderRadius: 50,
+//   },
+// });

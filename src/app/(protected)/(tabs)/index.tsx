@@ -109,7 +109,6 @@ const sampleData: VehicleData[] = [
 
 
 export default function Home() {
-  const navigation = useNavigation();
   const { logout } = useAuthStore();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);

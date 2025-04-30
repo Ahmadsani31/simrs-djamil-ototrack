@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, useAnimatedValue, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
@@ -10,6 +10,7 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { RegisterData } from '@/types/types';
 import ViewError from '@/components/ViewError';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 const validationSchema = yup.object().shape({
   name: yup.string().min(3, 'Minimal 3 karakter').required('Nama harus diisi'),
@@ -21,15 +22,7 @@ const validationSchema = yup.object().shape({
 });
 
 export default function RegisterScreen() {
-  const fadeAnim = useAnimatedValue(0);
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
   const { register, isLoading, error } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(true);
@@ -45,10 +38,11 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <View className="absolute bg-teal-500 h-80 w-80 top-0 left-0 rounded-full shadow-lg -translate-x-52 -translate-y-52" />
+      <Animated.View  className="absolute bg-teal-500 h-80 w-80 top-0 left-0 rounded-full shadow-lg -translate-x-52 -translate-y-52" />
       <View className="absolute bg-teal-500 h-80 w-80 top-0 right-0 rounded-full shadow-lg translate-x-36 translate-y-12" />
       <Animated.View
-        style={{ opacity: fadeAnim, zIndex: 10 }}
+        style={{ zIndex: 10 }}
+        entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
         <View className='z-10 bg-white p-4 rounded-lg'>
           <Text className="text-2xl font-bold text-center mb-6">Register</Text>
@@ -121,7 +115,7 @@ export default function RegisterScreen() {
           Login
         </Link>
       </View>
-      <View className="absolute bg-teal-500 h-40 w-40 bottom-0 left-0 rounded-full shadow-lg translate-x-16 translate-y-20" />
+      <Animated.View entering={FadeInDown.duration(500).springify()} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
     </SafeAreaView>
   );
 }

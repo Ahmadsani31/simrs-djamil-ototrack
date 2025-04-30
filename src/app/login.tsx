@@ -12,6 +12,7 @@ import ButtonCostum from '@/components/ButtonCostum';
 import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
+import useOnceEffect from '@/components/useOnceEffect';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Email harus diisi'),
@@ -33,7 +34,7 @@ export default function LoginScreen() {
   const HiconTR = useSharedValue<number>(20);
 
 
-  useEffect(() => {
+  useOnceEffect(() => {
     WiconBR.value = withSpring(WiconBR.value + 60);
     HiconBR.value = withSpring(HiconBR.value + 60);
 

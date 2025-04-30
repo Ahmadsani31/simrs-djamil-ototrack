@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Dimensions, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
@@ -11,15 +11,13 @@ import { Feather } from '@expo/vector-icons';
 import ButtonCostum from '@/components/ButtonCostum';
 import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
-import Animated, { useSharedValue, withSpring, FadeIn, FadeOut, FadeInUp, Easing, FadeInDown, useAnimatedProps, withTiming } from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
+import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Email harus diisi'),
   password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
 });
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function LoginScreen() {
   const WiconBR = useSharedValue<number>(10);
@@ -36,8 +34,6 @@ export default function LoginScreen() {
 
 
   useEffect(() => {
-    // translateX.value = withSpring(translateX.value + 50);
-
     WiconBR.value = withSpring(WiconBR.value + 60);
     HiconBR.value = withSpring(HiconBR.value + 60);
 

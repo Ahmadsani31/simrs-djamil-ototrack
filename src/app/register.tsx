@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
 import Input from '@/components/Input';
 import ButtonCostum from '@/components/ButtonCostum';
 import * as yup from 'yup';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { RegisterData } from '@/types/types';
 import ViewError from '@/components/ViewError';

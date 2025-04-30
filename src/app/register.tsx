@@ -10,7 +10,7 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import { RegisterData } from '@/types/types';
 import ViewError from '@/components/ViewError';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInLeft, FadeInRight, FadeInUp, FadeOutRight } from 'react-native-reanimated';
 
 const validationSchema = yup.object().shape({
   name: yup.string().min(3, 'Minimal 3 karakter').required('Nama harus diisi'),
@@ -38,76 +38,73 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View  className="absolute bg-teal-500 h-80 w-80 top-0 left-0 rounded-full shadow-lg -translate-x-52 -translate-y-52" />
-      <View className="absolute bg-teal-500 h-80 w-80 top-0 right-0 rounded-full shadow-lg translate-x-36 translate-y-12" />
-      <Animated.View
-        style={{ zIndex: 10 }}
+      <Animated.View entering={FadeInLeft.duration(500).springify().withInitialValues({ transform: [ { translateX: -300 }] })} className="absolute bg-teal-500 h-80 w-80 top-[-100] left-[-100] rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [ { translateX: 300 }] })} className="absolute bg-teal-500 h-80 w-80 top-40 right-[-100] rounded-full" />
+      <Animated.View className='z-10 bg-white p-4 rounded-lg'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
-        <View className='z-10 bg-white p-4 rounded-lg'>
-          <Text className="text-2xl font-bold text-center mb-6">Register</Text>
+        <Text className="text-2xl font-bold text-center mb-6">Register</Text>
 
-          {error && <ViewError plaintext={error} />}
-          <Formik
-            initialValues={{ name: '', email: '', password: '', password_confirmation: '' }}
-            validationSchema={validationSchema}
-            onSubmit={async (values) => handleRegister(values)}
-          >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
-              <>
-                <Input
-                  label="Full Name"
-                  placeholder="Enter your name"
-                  value={values.name}
-                  onChangeText={handleChange('name')}
-                  error={touched.name ? errors.name : undefined}
-                  className='bg-gray-200'
-                />
+        {error && <ViewError plaintext={error} />}
+        <Formik
+          initialValues={{ name: '', email: '', password: '', password_confirmation: '' }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => handleRegister(values)}
+        >
+          {({ handleChange, handleSubmit, values, errors, touched }) => (
+            <>
+              <Input
+                label="Full Name"
+                placeholder="Enter your name"
+                value={values.name}
+                onChangeText={handleChange('name')}
+                error={touched.name ? errors.name : undefined}
+                className='bg-gray-200'
+              />
 
-                <Input
-                  label="Email"
-                  placeholder="Enter your email"
-                  value={values.email}
-                  onChangeText={handleChange('email')}
-                  error={touched.email ? errors.email : undefined}
-                  className='bg-gray-200'
-                />
+              <Input
+                label="Email"
+                placeholder="Enter your email"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                error={touched.email ? errors.email : undefined}
+                className='bg-gray-200'
+              />
 
+              <Input
+                label="Password"
+                placeholder="Enter your password"
+                value={values.password}
+                onChangeText={handleChange('password')}
+                secureTextEntry={showPassword}
+                error={touched.password ? errors.password : undefined}
+                className='bg-gray-200'
+              />
+              <View className='relative'>
                 <Input
                   label="Password"
                   placeholder="Enter your password"
-                  value={values.password}
-                  onChangeText={handleChange('password')}
+                  value={values.password_confirmation}
+                  onChangeText={handleChange('password_confirmation')}
                   secureTextEntry={showPassword}
-                  error={touched.password ? errors.password : undefined}
+                  error={touched.password_confirmation ? errors.password_confirmation : undefined}
                   className='bg-gray-200'
                 />
-                <View className='relative'>
-                  <Input
-                    label="Password"
-                    placeholder="Enter your password"
-                    value={values.password_confirmation}
-                    onChangeText={handleChange('password_confirmation')}
-                    secureTextEntry={showPassword}
-                    error={touched.password_confirmation ? errors.password_confirmation : undefined}
-                    className='bg-gray-200'
-                  />
-                  <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
+                </TouchableOpacity>
+              </View>
 
-                <ButtonCostum
-                  classname="bg-indigo-500"
-                  title="Register"
-                  onPress={handleSubmit}
-                  loading={isLoading}
-                  variant="primary"
-                />
-              </>
-            )}
-          </Formik>
-        </View>
+              <ButtonCostum
+                classname="bg-indigo-500"
+                title="Register"
+                onPress={handleSubmit}
+                loading={isLoading}
+                variant="primary"
+              />
+            </>
+          )}
+        </Formik>
       </Animated.View>
       <View className="mt-4 flex-row justify-center">
         <Text>Already have an account? </Text>
@@ -115,7 +112,7 @@ export default function RegisterScreen() {
           Login
         </Link>
       </View>
-      <Animated.View entering={FadeInDown.duration(500).springify()} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [ { translateX: -300 }] })} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
     </SafeAreaView>
   );
 }

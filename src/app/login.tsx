@@ -70,60 +70,58 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View style={{width:WiconTL,height:HiconTL}} className="absolute z-10 bg-teal-500 top-[-80] left-[-80] rounded-full" />
-      <Animated.View style={{width:WiconTR,height:HiconTR}} className="absolute bg-teal-500 top-16 right-[-100] rounded-full" />
-      <Animated.View style={{ zIndex: 10 }}
+      <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute z-10 bg-teal-500 top-[-80] left-[-80] rounded-full" />
+      <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-teal-500 top-16 right-[-100] rounded-full" />
+      <Animated.View className=' bg-white p-4 rounded-lg z-10'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
-        <View className=' bg-white p-4 rounded-lg'>
 
-          <Text className="text-2xl font-bold text-center mb-6">Login</Text>
+        <Text className="text-2xl font-bold text-center mb-6">Login</Text>
 
-          {error && <ViewError plaintext={error} />}
+        {error && <ViewError plaintext={error} />}
 
-          <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={validationSchema}
-            onSubmit={async (values) => handleLogin(values)}
-          >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
-              <>
+        <Formik
+          initialValues={{ email: '', password: '' }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => handleLogin(values)}
+        >
+          {({ handleChange, handleSubmit, values, errors, touched }) => (
+            <>
+              <Input
+                label="Email"
+                placeholder="Enter your email"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                error={touched.email ? errors.email : undefined}
+                className='bg-gray-200'
+              />
+
+
+              <View className='relative'>
                 <Input
-                  label="Email"
-                  placeholder="Enter your email"
-                  value={values.email}
-                  onChangeText={handleChange('email')}
-                  error={touched.email ? errors.email : undefined}
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={values.password}
+                  onChangeText={handleChange('password')}
+                  secureTextEntry={showPassword}
+                  error={touched.password ? errors.password : undefined}
                   className='bg-gray-200'
                 />
+                <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
+                </TouchableOpacity>
+              </View>
 
-
-                <View className='relative'>
-                  <Input
-                    label="Password"
-                    placeholder="Enter your password"
-                    value={values.password}
-                    onChangeText={handleChange('password')}
-                    secureTextEntry={showPassword}
-                    error={touched.password ? errors.password : undefined}
-                    className='bg-gray-200'
-                  />
-                  <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
-                  </TouchableOpacity>
-                </View>
-
-                <ButtonCostum
-                  classname="bg-indigo-500"
-                  title="Login"
-                  onPress={handleSubmit}
-                  loading={isLoading}
-                  variant="primary"
-                />
-              </>
-            )}
-          </Formik>
-        </View>
+              <ButtonCostum
+                classname="bg-indigo-500"
+                title="Login"
+                onPress={handleSubmit}
+                loading={isLoading}
+                variant="primary"
+              />
+            </>
+          )}
+        </Formik>
       </Animated.View>
       <View className="mt-4 flex-row justify-center z-10">
         <Text>Don't have an account? </Text>
@@ -131,8 +129,8 @@ export default function LoginScreen() {
           Register
         </Link>
       </View>
-      <Animated.View style={{width:WiconBL,height:HiconBL}} className="absolute bg-[#03A791] bottom-24 left-[-60] rounded-full shadow-lg" />
-      <Animated.View style={{width:WiconBR,height:HiconBR}} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
+      <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#03A791] bottom-24 left-[-60] rounded-full shadow-lg" />
+      <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
       </Animated.View>
     </SafeAreaView>
   );

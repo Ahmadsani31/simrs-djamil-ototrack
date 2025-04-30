@@ -38,8 +38,8 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View entering={FadeInLeft.duration(500).springify().withInitialValues({ transform: [ { translateX: -300 }] })} className="absolute bg-teal-500 h-80 w-80 top-[-100] left-[-100] rounded-full" />
-      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [ { translateX: 300 }] })} className="absolute bg-teal-500 h-80 w-80 top-40 right-[-100] rounded-full" />
+      <Animated.View entering={FadeInLeft.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-teal-500 h-80 w-80 top-[-100] left-[-100] rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: 300 }] })} className="absolute bg-teal-500 h-80 w-80 top-40 right-[-100] rounded-full" />
       <Animated.View className='z-10 bg-white p-4 rounded-lg'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
@@ -112,7 +112,7 @@ export default function RegisterScreen() {
           Login
         </Link>
       </View>
-      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [ { translateX: -300 }] })} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
     </SafeAreaView>
   );
 }

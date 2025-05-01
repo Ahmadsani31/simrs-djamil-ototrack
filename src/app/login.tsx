@@ -73,7 +73,7 @@ export default function LoginScreen() {
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
 
-        <Text className="text-5xl font-bold text-center my-6">Sign - In</Text>
+        <Text className="text-5xl font-bold text-center mb-6">Sing - In</Text>
 
         {error && <ViewError plaintext={error} />}
 

@@ -9,11 +9,28 @@ import { useEffect } from 'react';
 import { Alert, BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import '@/utlis/backgroundLocationTask';
+import * as Location from 'expo-location'
+
+const BACKGROUND_TASK = 'background-location-task';
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
+  useEffect(() => {
+    const requestPermissions = async () => {
+
+      const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
+
+      console.log('hasStartedLocationUpdatesAsync',hasStarted);
+
+      
+    };
+
+    requestPermissions();
+  }, []);
 
   useEffect(() => {
     const backAction = () => {

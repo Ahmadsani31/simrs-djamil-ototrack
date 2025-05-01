@@ -2,10 +2,10 @@
   "expo": {
     "name": "zustand-expo",
     "slug": "zustand-expo",
-    "version": "1.0.0",
+    "version": "1.2.4",
     "scheme": "zustand-scheme",
     "web": {
-      "favicon": "./assets/application.png",
+      "favicon": "./assets/icon.png",
       "bundler": "metro"
     },
     "experiments": {
@@ -32,13 +32,14 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
-          "isIosBackgroundLocationEnabled":true,
-          "isAndroidBackgroundLocationEnabled":true
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "orientation": "portrait",
-    "icon": "./assets/application.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -58,8 +59,26 @@
       },
       "package": "com.nama.zustand_app",
       "minSdkVersion": 29,
-      "targetSdkVersion": 34
+      "targetSdkVersion": 34,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ]
     },
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "70657844-9c98-4d7a-9f9e-1a01e9dbb07e"
+      }
+    },
+    "owner": "darma31"
   }
 }

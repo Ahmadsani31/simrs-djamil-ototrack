@@ -1,4 +1,4 @@
-import { Alert, Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import Input from "@/components/Input";
@@ -6,24 +6,84 @@ import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
 import { CameraMode, CameraView } from "expo-camera";
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, UrlTile } from 'react-native-maps';
 import * as Location from 'expo-location'
+import * as TaskManager from 'expo-task-manager';
+import * as Device from 'expo-device';
+import { authService } from "@/services/api";
+import { useLocationStore } from "@/stores/locationStore";
+
+import * as SecureStore from 'expo-secure-store';
+import { Asset } from "expo-asset";
+import * as FileSystem from "expo-file-system";
+import { LeafletView } from "react-native-leaflet-view";
+
+const BACKGROUND_TASK = 'background-location-task';
+
+type Coord = {
+  latitude: number;
+  longitude: number;
+  timestamp: number;
+};
 
 export default function PerjalananScreen() {
+
+  const { coord, coords } = useLocationStore();
+
+  // const coords = useLocationStore((state) => state.coords);
+  console.log('====================================');
+  console.log(coord);
+  console.log('====================================');
+
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
 
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [coordsBatch, setCoordsBatch] = useState<Coord[]>([]);
+
+  // const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [locationArray, setLocationArray] = useState<Location.LocationObjectCoords[]>([]);
-  const [watcher, setWatcher] = useState<Location.LocationSubscription | null>(null);
 
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading.....');
-  const [locationServicesEnabled, setLocationServicesEnabled] = useState(false)
+  const [isTracking, setIsTracking] = useState(false);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     checkIfLocationEnabled();
     getCurrentLocation();
+    checkTrackingLive()
   }, [])
+
+  useEffect(() => {
+    if (coord.length > 0) {
+      console.log('====================================');
+      console.log('coord',coord);
+      console.log('====================================');
+      const newCoord = {
+        lat: coord[0].latitude,
+        lng: coord[0].longitude,
+      };
+
+      setMarkers([
+        {
+          position: newCoord,
+          icon: '📍',
+          size: [32, 32],
+        },
+      ]);
+      setLocation(newCoord)
+    }
+
+  }, [coord])
+
+  const checkTrackingLive = async () => {
+    const tracking = await SecureStore.getItemAsync('liveTracking');
+    if (tracking == 'true') {
+      setIsTracking(true)
+    } else {
+      setIsTracking(false)
+    }
+  }
 
   //check if location is enable or not
   const checkIfLocationEnabled = async () => {
@@ -37,8 +97,6 @@ export default function PerjalananScreen() {
         },
         { text: 'OK', onPress: () => console.log('OK Pressed') },
       ]);
-    } else {
-      setLocationServicesEnabled(enabled)         //store true into state
     }
   }
 
@@ -60,21 +118,21 @@ export default function PerjalananScreen() {
     //get current position lat and long
     const { coords } = await Location.getCurrentPositionAsync();
 
-    console.log('coords', coords)
+    // console.log('coords', coords)
 
     if (coords) {
       const { latitude, longitude } = coords;
-      console.log(latitude, longitude);
+      // console.log(latitude, longitude);
 
       //provide lat and long to get the the actual address
       let responce = await Location.reverseGeocodeAsync({
         latitude,
         longitude
       });
-      console.log('responce', responce);
+      // console.log('responce', responce);
       //loop on the responce to get the actual result
       for (let item of responce) {
-        let address = `(${item.postalCode}), ${item.formattedAddress}, ${item.district},  ${item.city},${item.subregion},${item.region}`
+        let address = `${item.formattedAddress},( ${item.postalCode}, ${item.district},  ${item.city},${item.subregion},${item.region})`
         setDisplayCurrentAddress(address)
       }
     }
@@ -83,35 +141,77 @@ export default function PerjalananScreen() {
 
 
   const startTracking = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Izin lokasi ditolak');
-      return;
+    console.log('Tracking start');
+
+    const { status: fg } = await Location.requestForegroundPermissionsAsync();
+    const { status: bg } = await Location.requestBackgroundPermissionsAsync();
+
+    if (fg !== 'granted' || bg !== 'granted') {
+      return Alert.alert('Permission required for background tracking');
     }
 
-    const subscription = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 3000,
-        distanceInterval: 1,
-      },
-      (loc) => {
-        console.log('Lokasi diperbarui:', loc.coords);
-        setLocationArray((prev) => [...prev, loc.coords]);
-        setLocation(loc);
+    const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
+    if (!hasStarted) {
+
+      await SecureStore.setItemAsync('liveTracking', 'true');
+
+      await Location.startLocationUpdatesAsync(BACKGROUND_TASK, {
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 5000,
+        distanceInterval: 5,
+        showsBackgroundLocationIndicator: true,
+        foregroundService: {
+          notificationTitle: 'Tracking location',
+          notificationBody: 'We are tracking your location in background',
+        },
+      });
+      setIsTracking(true);
+    }
+  };
+
+  const stopTracking = async () => {
+    await SecureStore.setItemAsync('liveTracking', 'false');
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
+    if (isRunning) {
+      await Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
+      setIsTracking(false);
+      setMarkers([]);
+    }
+  };
+
+
+  const [webViewContent, setWebViewContent] = useState<string | null>(null);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHtml = async () => {
+      try {
+        const path = require("@asset/leaflet.html");
+        const asset = Asset.fromModule(path);
+        await asset.downloadAsync();
+        const htmlContent = await FileSystem.readAsStringAsync(asset.localUri!);
+
+        if (isMounted) {
+          setWebViewContent(htmlContent);
+        }
+      } catch (error) {
+        Alert.alert('Error loading HTML', JSON.stringify(error));
+        console.error('Error loading HTML:', error);
       }
-    );
+    };
 
-    setWatcher(subscription);
-  };
+    loadHtml();
 
-  const stopTracking = () => {
-    if (watcher) {
-      watcher.remove();
-      setWatcher(null);
-      console.log('Tracking dihentikan');
-    }
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!webViewContent) {
+    return <ActivityIndicator size="large" />
+  }
+
+
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
@@ -128,14 +228,34 @@ export default function PerjalananScreen() {
             <View className="p-2 items-center">
               <Text className="text-center">{displayCurrentAddress}</Text>
             </View>
-            <ButtonCostum classname="bg-indigo-500" title="Start Tracking" onPress={startTracking} />
+            <ButtonCostum classname="bg-indigo-500" title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
             <ButtonCostum classname="bg-red-500" title="Stop Tracking" onPress={stopTracking} />
-
-            {locationArray.length === 0 ? (
+            {/* <View className="flex-1 h-96">
+            {markers.length > 0 ?
+              <LeafletView
+                source={{ html: webViewContent }}
+                mapCenterPosition={location}
+                zoom={20}
+                mapMarkers={markers}
+                doDebug={false}
+              />
+              :
+              <LeafletView
+                source={{ html: webViewContent }}
+                doDebug={false}
+                mapCenterPosition={{
+                  lat: -0.95373000,
+                  lng: 100.35199700,
+                }}
+                zoom={10}
+              />
+            }
+          </View> */}
+            {coords.length === 0 ? (
               <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
             ) : (
-              <ScrollView style={{ height: 100 }}>
-                {locationArray.map((coord, index) => (
+              <ScrollView style={{ height: 300 }}>
+                {coords.map((coord, index) => (
                   <View key={index} style={styles.coordItem}>
                     <Text style={styles.coordText}>
                       #{index + 1}: Lat {coord.latitude.toFixed(6)}, Lng {coord.longitude.toFixed(6)}
@@ -146,33 +266,8 @@ export default function PerjalananScreen() {
             )}
 
           </View>
-          {location && (
-            <View className="flex-1 h-96">
-              <MapView
-                scrollEnabled={true}   // nonaktifkan drag
-                zoomEnabled={true}     // nonaktifkan zoom
-                rotateEnabled={true}   // nonaktifkan rotasi
-                pitchEnabled={true}    // nonaktifkan 3D
-                ref={mapRef}
-                style={styles.map}
-                initialRegion={{
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-              >
-                <Marker
-                  coordinate={{
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                  }}
-                  title="Your Position"
-                />
-              </MapView>
 
-            </View>
-          )}
+
 
         </ScrollView>
       </KeyboardAvoidingView>

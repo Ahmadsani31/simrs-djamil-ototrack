@@ -64,10 +64,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     console.log('Register function called with data:', JSON.stringify(data));
     set({ isLoading: true, errorRegister: null });
     try {
-      const { token, user } = await authService.register(data);
+      const response = await authService.register(data);
+      const token = response.data.token;
+      const user = response.data.user;
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
     } catch (error: any) {
+      Alert.alert('Error', error.message as string);
       console.log('Register error:', JSON.stringify(error));
       set({
         errorRegister: error.response?.data?.message || 'Registration failed',

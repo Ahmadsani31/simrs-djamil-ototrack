@@ -21,6 +21,14 @@ export interface LoginData {
     password_confirmation: string;
   }
 
+  export interface TrackingData {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+  }
+
+
 
 
 export interface Todo {

@@ -2,7 +2,7 @@
   "expo": {
     "name": "zustand-expo",
     "slug": "zustand-expo",
-    "version": "1.2.5",
+    "version": "1.2.7",
     "scheme": "zustand-scheme",
     "web": {
       "favicon": "./assets/icon.png",
@@ -36,7 +36,20 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
-      "expo-asset"
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#232323",
+          "image": "./assets/splash-icon.png",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 200
+        }
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -50,11 +63,18 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier":"com.nama.zustand_app",
+      "icon":{
+        "dark":"./assets/ios-dark.png",
+        "light":"./assets/ios-light.png",
+        "tinted":"./assets/ios-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.nama.zustand_app",

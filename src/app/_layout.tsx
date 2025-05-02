@@ -21,12 +21,8 @@ export default function RootLayout() {
   const { isLoading } = useAutoLogin();
   useEffect(() => {
     const requestPermissions = async () => {
-
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
-
       console.log('hasStartedLocationUpdatesAsync',hasStarted);
-
-      
     };
 
     requestPermissions();

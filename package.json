@@ -41,7 +41,9 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "yup": "^1.6.1",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "expo-splash-screen": "~0.29.24",
+    "expo-font": "~13.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

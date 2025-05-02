@@ -3,9 +3,9 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL;
- console.log('url',API_URL);
- 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+console.log('API URL ', API_URL);
+
 // const API_URL = process.env.EXPO_PUBLIC_API_URL // Replace with your API URL
 
 const api = axios.create({
@@ -39,12 +39,12 @@ api.interceptors.response.use(
 );
 
 export const authService = {
-  login: async (data:LoginData) => {
+  login: async (data: LoginData) => {
     console.log('Login function called with data:', JSON.stringify(data));
     const response = await api.post('/auth/login', data);
     return response.data;
   },
-  register: async (data:RegisterData) => {
+  register: async (data: RegisterData) => {
     const response = await api.post('/auth/register', data);
     return response.data;
   },
@@ -52,8 +52,8 @@ export const authService = {
     const response = await api.get('/user');
     return response.data;
   },
-  liveTracking: async (data:any) => {
-    const response = await api.post('/live-tracking',data);
+  liveTracking: async (data: any) => {
+    const response = await api.post('/live-tracking', data);
     return response.data;
   },
 };

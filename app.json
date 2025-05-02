@@ -2,7 +2,7 @@
   "expo": {
     "name": "zustand-expo",
     "slug": "zustand-expo",
-    "version": "1.2.7",
+    "version": "1.2.8",
     "scheme": "zustand-scheme",
     "web": {
       "favicon": "./assets/icon.png",

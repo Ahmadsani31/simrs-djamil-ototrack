@@ -67,13 +67,13 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute z-10 bg-teal-500 top-[-80] left-[-80] rounded-full" />
-      <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-teal-500 top-16 right-[-100] rounded-full" />
+      <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute z-10 bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
+      <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
       <Animated.View className=' bg-white p-4 rounded-lg z-10'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
 
-        <Text className="text-5xl font-bold text-center mb-6">Sing - In</Text>
+        <Text className="text-5xl font-bold text-center my-6">Sing - In</Text>
 
         {error && <ViewError plaintext={error} />}
 
@@ -110,7 +110,7 @@ export default function LoginScreen() {
               </View>
 
               <ButtonCostum
-                classname="bg-indigo-500"
+                classname="bg-[#06202B]"
                 title="Login"
                 onPress={handleSubmit}
                 loading={isLoading}
@@ -122,11 +122,11 @@ export default function LoginScreen() {
       </Animated.View>
       <View className="mt-4 flex-row justify-center z-10">
         <Text>Don't have an account? </Text>
-        <Link href="/register" push className="text-blue-500">
+        <Link href="/register" push className="text-[#205781] font-bold">
           Register
         </Link>
       </View>
-      <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#03A791] bottom-24 left-[-60] rounded-full shadow-lg" />
+      <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#497D74] bottom-24 left-[-60] rounded-full shadow-lg" />
       <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
       </Animated.View>
     </SafeAreaView>

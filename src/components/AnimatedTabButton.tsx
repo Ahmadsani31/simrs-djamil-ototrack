@@ -72,7 +72,7 @@ export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: 
         />
         {/* Icon */}
         <Animated.View style={animatedIconStyle}>
-          <Ionicons name={icon} size={28} color={focused ? '#fff' : '#aaa'} />
+          <Ionicons name={icon} size={28} color={focused ? '#205781' : '#aaa'} />
         </Animated.View>
         {/* Label muncul jika active */}
         <Animated.Text

@@ -38,8 +38,8 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View entering={FadeInLeft.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-teal-500 h-80 w-80 top-[-100] left-[-100] rounded-full" />
-      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: 300 }] })} className="absolute bg-teal-500 h-80 w-80 top-40 right-[-100] rounded-full" />
+      <Animated.View entering={FadeInLeft.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-[#205781] h-80 w-80 top-[-100] left-[-100] rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: 300 }] })} className="absolute bg-[#497D74] h-80 w-80 top-40 right-[-100] rounded-full" />
       <Animated.View className='z-10 bg-white p-4 rounded-lg'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
@@ -96,7 +96,7 @@ export default function RegisterScreen() {
               </View>
 
               <ButtonCostum
-                classname="bg-indigo-500"
+                classname="bg-[#06202B]"
                 title="Register"
                 onPress={handleSubmit}
                 loading={isLoading}
@@ -108,11 +108,11 @@ export default function RegisterScreen() {
       </Animated.View>
       <View className="mt-4 flex-row justify-center">
         <Text>Already have an account? </Text>
-        <Link href="/login" replace className="text-blue-500">
+        <Link href="/login" replace className="text-[#205781] font-bold">
           Login
         </Link>
       </View>
-      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-teal-500 h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
+      <Animated.View entering={FadeInRight.duration(500).springify().withInitialValues({ transform: [{ translateX: -300 }] })} className="absolute bg-[#4F959D] h-40 w-40 bottom-[-50] left-1/4 rounded-full" />
     </SafeAreaView>
   );
 }

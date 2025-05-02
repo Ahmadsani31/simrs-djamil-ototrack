@@ -9,14 +9,15 @@ export default function KendaraanScreen() {
 
   return (
     <View className="flex-1 bg-slate-300">
-      <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <View className="p-4">
+      <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
+      <View className="px-4">
         <Text className="text-xl mb-2 font-bold text-white">List Kendaraan</Text>
         <FlatList
           data={dataKendaraan}
           bounces
-          style={{height:height-190,flexGrow:0}}
+          style={{flexGrow:0}}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 105 }}
           renderItem={({ item }) => (
             <View className="p-4 my-2 bg-white rounded-lg">
               <View className="flex-1 flex-row w-full items-center">
@@ -39,9 +40,7 @@ export default function KendaraanScreen() {
             </View>
           )}
         />
-        <View className='h-96' />
       </View>
-
     </View>
   );
 }

@@ -3,10 +3,12 @@ import { useAuthStore } from '@/stores/authStore';
 
 export default function Profile() {
   const { user, logout } = useAuthStore();
-
+console.log('====================================');
+console.log(user);
+console.log('====================================');
   return (
     <View className="flex-1 bg-slate-300">
-      <View className="bg-[#60B5FF] rounded-br-[50]  rounded-bl-[50] p-6  shadow">
+      <View className="bg-[#205781] rounded-br-[50]  rounded-bl-[50] p-6  shadow">
         <View className='bg-white rounded-lg p-4'>
         <Text className="text-xl font-bold mb-4">Profile Information</Text>
         
@@ -27,7 +29,6 @@ export default function Profile() {
           <Text className="text-white font-medium">Logout</Text>
         </TouchableOpacity>
         </View>
-    
       </View>
     </View>
   );

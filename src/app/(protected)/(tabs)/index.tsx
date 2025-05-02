@@ -140,7 +140,7 @@ export default function Home() {
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
         <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
-        <View className='p-4'>
+        <View className='px-4'>
 
           <View className='mb-4 '>
             <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
@@ -148,27 +148,23 @@ export default function Home() {
 
           </View>
           <TouchableOpacity onPress={handleSnapPress}
-            className="flex-row items-center justify-center bg-[#06202B] py-3 px-6 rounded-lg"
+            className="flex-row items-center justify-center bg-[#FD8B51] py-3 px-6 rounded-lg"
           >
             <MaterialIcons name="qr-code-scanner" size={24} color="white" />
             <Text className="text-white font-bold ml-2">Scan Barcode</Text>
           </TouchableOpacity>
-          <View className="flex-row justify-between items-center px-1 mt-11 mb-2">
-            <Text className="text-lg font-bold">List Pemakaianan</Text>
-          </View>
-
           <FlatList
             data={dataPemakaian}
-            style={{ height }}
+            style={{ marginTop:20 }}
             keyExtractor={(item) => item.id}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 330 }}
+            contentContainerStyle={{ paddingBottom: 185 }}
             ListHeaderComponent={
-              <View className='p-2 bg-[#205781] mb-2 rounded-lg'>
-                <TextInput className='border border-gray-300 rounded-md bg-gray-200 p-4'
+              <View className='p-2 bg-white mb-2 rounded-lg'>
+                <TextInput className='border border-gray-300 rounded-md bg-gray-100 p-4'
                   placeholder="Search"
                 />
               </View>

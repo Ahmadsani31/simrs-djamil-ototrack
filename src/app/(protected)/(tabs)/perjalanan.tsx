@@ -1,80 +1,28 @@
 import { ActivityIndicator, Alert, Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import Input from "@/components/Input";
-import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
-import { CameraMode, CameraView } from "expo-camera";
-import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
-import MapView, { Marker, PROVIDER_GOOGLE, UrlTile } from 'react-native-maps';
 import * as Location from 'expo-location'
-import * as TaskManager from 'expo-task-manager';
-import * as Device from 'expo-device';
-import { authService } from "@/services/api";
 import { useLocationStore } from "@/stores/locationStore";
 
 import * as SecureStore from 'expo-secure-store';
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { LeafletView } from "react-native-leaflet-view";
 
 const BACKGROUND_TASK = 'background-location-task';
-
-type Coord = {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
-};
 
 export default function PerjalananScreen() {
 
   const { coord, coords } = useLocationStore();
 
-  // const coords = useLocationStore((state) => state.coords);
-  console.log('====================================');
-  console.log(coord);
-  console.log('====================================');
-
-  const router = useRouter();
-  const mapRef = useRef<MapView>(null);
-
-  const [coordsBatch, setCoordsBatch] = useState<Coord[]>([]);
-
-  // const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [locationArray, setLocationArray] = useState<Location.LocationObjectCoords[]>([]);
-
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading.....');
   const [isTracking, setIsTracking] = useState(false);
-  const [markers, setMarkers] = useState<any[]>([]);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+
 
   useEffect(() => {
     checkIfLocationEnabled();
     getCurrentLocation();
     checkTrackingLive()
   }, [])
-
-  useEffect(() => {
-    if (coord.length > 0) {
-      console.log('====================================');
-      console.log('coord',coord);
-      console.log('====================================');
-      const newCoord = {
-        lat: coord[0].latitude,
-        lng: coord[0].longitude,
-      };
-
-      setMarkers([
-        {
-          position: newCoord,
-          icon: '📍',
-          size: [32, 32],
-        },
-      ]);
-      setLocation(newCoord)
-    }
-
-  }, [coord])
 
   const checkTrackingLive = async () => {
     const tracking = await SecureStore.getItemAsync('liveTracking');
@@ -175,7 +123,6 @@ export default function PerjalananScreen() {
     if (isRunning) {
       await Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
       setIsTracking(false);
-      setMarkers([]);
     }
   };
 
@@ -218,7 +165,7 @@ export default function PerjalananScreen() {
   return (
 
     <View className="flex-1 bg-slate-300">
-      <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
+      <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
       <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
         <ScrollView style={{ marginBottom: 80 }}>
           <View className="m-4 p-4 bg-white rounded-lg">
@@ -228,29 +175,8 @@ export default function PerjalananScreen() {
             <View className="p-2 items-center">
               <Text className="text-center">{displayCurrentAddress}</Text>
             </View>
-            <ButtonCostum classname="bg-indigo-500" title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
-            <ButtonCostum classname="bg-red-500" title="Stop Tracking" onPress={stopTracking} />
-            {/* <View className="flex-1 h-96">
-            {markers.length > 0 ?
-              <LeafletView
-                source={{ html: webViewContent }}
-                mapCenterPosition={location}
-                zoom={20}
-                mapMarkers={markers}
-                doDebug={false}
-              />
-              :
-              <LeafletView
-                source={{ html: webViewContent }}
-                doDebug={false}
-                mapCenterPosition={{
-                  lat: -0.95373000,
-                  lng: 100.35199700,
-                }}
-                zoom={10}
-              />
-            }
-          </View> */}
+            <ButtonCostum classname="bg-[#FD8B51]" title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
+            <ButtonCostum classname="bg-[#273F4F]" title="Stop Tracking" onPress={stopTracking} />
             {coords.length === 0 ? (
               <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
             ) : (

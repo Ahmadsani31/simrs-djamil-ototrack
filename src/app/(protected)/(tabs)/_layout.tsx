@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Entypo, Feather, Ionicons } from '@expo/vector-icons';
 import {AnimatedTabButton} from '@/components/AnimatedTabButton';
 
 
@@ -19,7 +19,7 @@ export default function TabsLayout() {
             marginLeft: 20,
             marginRight: 20,
             borderRadius: 20,
-            backgroundColor: '#273F4F',
+            backgroundColor: '#205781',
             shadowRadius: 10,
             borderTopWidth: 0,
             shadowOffset: { width: 0, height: 200 },
@@ -38,7 +38,7 @@ export default function TabsLayout() {
           headerTitle: '',
           headerLeft: () => (
             <View className='px-5 flex-row items-center'>
-              <Feather name="bell" size={22} color="white" /> 
+              <Entypo name="location" size={22} color="white" /> 
               <Text className='font-bold ms-2 text-white text-xl'>App Tracking</Text>
             </View>
           ),

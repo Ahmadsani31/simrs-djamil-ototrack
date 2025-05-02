@@ -90,8 +90,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const token = await SecureStore.getItemAsync('token');
       if (token) {
-        const user = await authService.getProfile();
-
+        const response = await authService.getProfile();
+        const user = response.data.user;
         console.log('Check auth successful:', token, user);
 
         set({ token, user, isLoading: false });

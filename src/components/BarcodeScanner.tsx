@@ -53,7 +53,7 @@ export default function BarcodeScanner({ onScan, onClose }: {
     return (
       <View className='flex-1 w-full items-center justify-center bg-white'>
         <Text className='font-medium text-xl'>We need your permission to show the camera</Text>
-        <ButtonCostum classname='bg-black' onPress={()=>requestPermission()} title="grant permission" />
+        <ButtonCostum classname='bg-[#273F4F]' onPress={()=>requestPermission()} title="Grant permission" />
       </View>
     );
   }

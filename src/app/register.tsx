@@ -43,7 +43,7 @@ export default function RegisterScreen() {
       <Animated.View className='z-10 bg-white p-4 rounded-lg'
         entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
       >
-        <Text className="text-2xl font-bold text-center mb-6">Register</Text>
+        <Text className="text-5xl font-bold text-center my-6">Register</Text>
 
         {error && <ViewError plaintext={error} />}
         <Formik

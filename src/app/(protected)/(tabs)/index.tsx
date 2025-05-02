@@ -9,6 +9,10 @@ import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { dataPemakaian } from '@/data/Example';
 import SafeAreaView from '@/components/SafeAreaView';
+import DateTimePicker,{DateTimePickerAndroid} from '@react-native-community/datetimepicker';
+import { Pressable } from 'react-native';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+
 
 interface Todo {
   id: string;
@@ -135,6 +139,21 @@ export default function Home() {
     restSpeedThreshold: 0.1,
     stiffness: 500,
   });
+  const [date, setDate] = useState(new Date());
+  const onChange = (event:any, selectedDate:any) => {
+    const currentDate = selectedDate;
+    setDate(currentDate);
+  };
+
+
+  const showMode = (currentMode:any) => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange,
+      mode: currentMode,
+      is24Hour: true,
+    });
+  };
 
   return (
     <SafeAreaView noTop>
@@ -163,11 +182,13 @@ export default function Home() {
             stickyHeaderIndices={[0]}
             contentContainerStyle={{ paddingBottom: 185 }}
             ListHeaderComponent={
-              <View className='p-2 bg-white mb-2 rounded-lg'>
+              <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
                 <TextInput className='border border-gray-300 rounded-md bg-gray-100 p-4'
-                  placeholder="Search"
+                  placeholder="Select Date"
+                  editable={false}
+                  value={date.toDateString()}
                 />
-              </View>
+              </Pressable>
             }
             renderItem={({ item }) => (
               <View className="bg-white p-4 rounded-lg shadow mb-2">

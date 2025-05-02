@@ -15,6 +15,7 @@ web-build/
 
 ios
 android
+trash
 
 # macOS
 .DS_Store

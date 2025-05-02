@@ -8,6 +8,7 @@ import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorh
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { dataPemakaian } from '@/data/Example';
+import SafeAreaView from '@/components/SafeAreaView';
 
 interface Todo {
   id: string;
@@ -57,7 +58,7 @@ export default function Home() {
         bottomSheetRef.current?.close();
       };
     }, [])
-   )
+  )
 
 
   if (loading) {
@@ -116,12 +117,14 @@ export default function Home() {
         onPress: () => null,
         style: 'cancel',
       },
-      { text: 'OK', onPress: () => {
-        router.push({
-          pathname: '/(protected)/detail',
-          params: { data: data },
-        });
-      } },
+      {
+        text: 'OK', onPress: () => {
+          router.push({
+            pathname: '/(protected)/detail',
+            params: { data: data },
+          });
+        }
+      },
     ]);
   };
 
@@ -134,72 +137,73 @@ export default function Home() {
   });
 
   return (
-    <>
+    <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
-        <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
+        <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
         <View className='p-4'>
 
-            <View className='mb-4'>
-              <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
-              <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
+          <View className='mb-4 '>
+            <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
+            <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
 
-            </View>
-            <TouchableOpacity onPress={handleSnapPress}
-              className="flex-row items-center justify-center bg-[#077A7D] py-3 px-6 rounded-lg"
-            >
-              <MaterialIcons name="qr-code-scanner" size={24} color="white" />
-              <Text className="text-white font-bold ml-2">Scan Barcode</Text>
-            </TouchableOpacity>
-          <View className="flex-row justify-between items-center px-4 mt-5 mb-2">
-          <Text className="text-lg font-bold">List Pemakaianan</Text>
+          </View>
+          <TouchableOpacity onPress={handleSnapPress}
+            className="flex-row items-center justify-center bg-[#06202B] py-3 px-6 rounded-lg"
+          >
+            <MaterialIcons name="qr-code-scanner" size={24} color="white" />
+            <Text className="text-white font-bold ml-2">Scan Barcode</Text>
+          </TouchableOpacity>
+          <View className="flex-row justify-between items-center px-1 mt-11 mb-2">
+            <Text className="text-lg font-bold">List Pemakaianan</Text>
+          </View>
+
+          <FlatList
+            data={dataPemakaian}
+            style={{ height }}
+            keyExtractor={(item) => item.id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            stickyHeaderIndices={[0]}
+            contentContainerStyle={{ paddingBottom: 330 }}
+            ListHeaderComponent={
+              <View className='p-2 bg-[#205781] mb-2 rounded-lg'>
+                <TextInput className='border border-gray-300 rounded-md bg-gray-200 p-4'
+                  placeholder="Search"
+                />
+              </View>
+            }
+            renderItem={({ item }) => (
+              <View className="bg-white p-4 rounded-lg shadow mb-2">
+                <View className='flex-row items-center justify-between'>
+                  <Text className={`text-2xl font-bold text-black`}>
+                    {item.vehicleName}
+                  </Text>
+                  <Text className='text-secondary text-sm'>
+                    {item.date}
+                  </Text>
+                </View>
+                <Text className='font-medium text-lg'>
+                  {item.userName}
+                </Text>
+                <View className='flex-row items-center justify-around mt-4'>
+                  <TouchableOpacity onPress={() => setModalVisible(true)}>
+                    <Text className="text-black bg-blue-300 p-2 rounded-lg">Jam Berangkat: {item.departureTime}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    <Text className="text-black bg-amber-300 p-2 rounded-lg">Jam Pulang: {item.returnTime}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            ListEmptyComponent={
+              <View className="flex-1 justify-center items-center bg-white p-5 mt-8">
+                <Text>No todos found</Text>
+              </View>
+            }
+          />
         </View>
 
-        <FlatList
-          data={dataPemakaian}
-          style={{height:(height-320)}}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          stickyHeaderIndices={[0]}
-          ListHeaderComponent={
-            <View className='p-2 bg-blue-300 mb-2 rounded-lg'>
-              <TextInput className='border border-gray-300 rounded-md bg-gray-200 p-4'
-                placeholder="Search"
-              />
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View className="bg-white p-4 rounded-lg shadow mb-2">
-              <View className='flex-row items-center justify-between'>
-                <Text className={`text-2xl font-bold text-black`}>
-                  {item.vehicleName}
-                </Text>
-                <Text className='text-secondary text-sm'>
-                  {item.date}
-                </Text>
-              </View>
-              <Text className='font-medium text-lg'>
-                {item.userName}
-              </Text>
-              <View className='flex-row items-center justify-around mt-4'>
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
-                  <Text className="text-black bg-blue-300 p-2 rounded-lg">Jam Berangkat: {item.departureTime}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text className="text-black bg-amber-300 p-2 rounded-lg">Jam Pulang: {item.returnTime}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-          ListEmptyComponent={
-            <View className="flex-1 justify-center items-center bg-white p-5 mt-8">
-              <Text>No todos found</Text>
-            </View>
-          }
-        />
-        </View>
-   
         <ModalRN
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
@@ -229,6 +233,6 @@ export default function Home() {
 
         </BottomSheetView>
       </BottomSheet>
-    </>
+    </SafeAreaView>
   );
 }

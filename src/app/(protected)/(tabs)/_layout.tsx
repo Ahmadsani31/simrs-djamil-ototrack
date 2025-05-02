@@ -1,8 +1,9 @@
 import { Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { useEffect, useRef } from 'react';
-import { Animated, Pressable, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Animated, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Feather, Ionicons } from '@expo/vector-icons';
+import {AnimatedTabButton} from '@/components/AnimatedTabButton';
 
 
 export default function TabsLayout() {
@@ -11,125 +12,69 @@ export default function TabsLayout() {
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: 'teal',
+          headerShadowVisible: false,
           tabBarStyle: {
             position: 'absolute',
             bottom: 20,
-            height: 25,
             marginLeft: 20,
             marginRight: 20,
             borderRadius: 20,
-            backgroundColor: '#06202B',
+            backgroundColor: '#273F4F',
             shadowRadius: 10,
             borderTopWidth: 0,
             shadowOffset: { width: 0, height: 200 },
           },
           headerStyle: {
-            backgroundColor: '#60B5FF',
+            backgroundColor: '#205781',
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
           },
           headerTitleStyle: {
             fontWeight: 'bold',
             color: '#fff',
           },
           tabBarShowLabel: false,
+          headerTitle: '',
+          headerLeft: () => (
+            <View className='px-5 flex-row items-center'>
+              <Feather name="bell" size={22} color="white" /> 
+              <Text className='font-bold ms-2 text-white text-xl'>App Tracking</Text>
+            </View>
+          ),
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="home-outline" label='Home' />,
+            tabBarButton: (props) => <AnimatedTabButton {...props} icon="home-sharp" label='Home' />,
           }}
         />
         <Tabs.Screen
           name="perjalanan"
           options={{
             title: 'Perjalanan',
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="document-attach-outline" label='Home' />,
+            tabBarButton: (props) => <AnimatedTabButton {...props} icon="speedometer-sharp" label='Job' />,
           }}
         />
         <Tabs.Screen
           name="kendaraan"
           options={{
             title: 'Kendaraan',
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="car-outline" label='Home' />,
+            tabBarButton: (props) => <AnimatedTabButton {...props} icon="car-sharp" label='Car' />,
           }}
         />
+        
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="person-outline" label="Profil" />,
+            tabBarButton: (props) => <AnimatedTabButton {...props} icon="person-sharp" label="Profil" />,
 
           }}
         />
       </Tabs>
     </PrivateRoute>
-  );
-}
-
-function AnimatedTabButton({ icon, label, accessibilityState, onPress }: any) {
-  const focused = accessibilityState.selected;
-
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const labelAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: focused ? 1.3 : 1,
-        useNativeDriver: true,
-        friction: 5,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: focused ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(labelAnim, {
-        toValue: focused ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [focused]);
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        bottom:40
-      }}
-    >
-      <View style={{ width: 50, height: 50, alignItems: 'center', justifyContent: 'center' }} className={`${focused ? 'pt-0' : 'pt-4'} bg-[#BEE4D0] w-full rounded-full absolute`}>
-        {/* Bulatan background */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: '#077A7D',
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          }}
-        />
-        {/* Icon */}
-        <Ionicons name={icon} size={28} color={focused ? '#fff' : '#000'} />
-        {/* Label muncul jika active */}
-        <Animated.Text
-          style={{
-            fontSize: 12,
-            color: focused ? '#fff' : '#aaa',
-            opacity: labelAnim,
-            transform: [{ scale: labelAnim }],
-          }}
-        >
-          {label}
-        </Animated.Text>
-      </View>
-    </Pressable>
   );
 }

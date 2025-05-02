@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import {  Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface AnimatedTabButtonProps {
   icon: any;
@@ -9,32 +10,44 @@ interface AnimatedTabButtonProps {
   onPress: () => void;
 }
 
-const AnimatedTabButton: React.FC<AnimatedTabButtonProps> = ({ icon, label, accessibilityState, onPress }: any) => {
+export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: any) {
   const focused = accessibilityState.selected;
 
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const labelAnim = useRef(new Animated.Value(0)).current;
+  // const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: focused ? 1.3 : 1,
-        useNativeDriver: true,
-        friction: 5,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: focused ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(labelAnim, {
-        toValue: focused ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [focused]);
+  const scale = useSharedValue(0)
+  
+  // useEffect(() => {
+  //   Animated.spring(scaleAnim, {
+  //     toValue: focused ? 1.3 : 1,
+  //     useNativeDriver: true,
+  //     friction: 5,
+  //   }).start();
+  // }, [focused]);
+
+      useEffect(() => {
+          scale.value = withSpring(
+              typeof focused === "boolean" ? (focused ? 1 : 0) : focused, { duration: 350 }
+          )
+      }, [scale, focused]);
+
+
+  const animatedIconStyle = useAnimatedStyle(() => {
+    const scaleValue = interpolate(scale.value, [0, 1], [1, 1.2]);
+    const top = interpolate(scale.value+1, [0,1], [1, 0])
+    return {
+      transform: [
+        { scale: scaleValue }
+      ],
+      top
+    };
+  })
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(1, [0, 1], [1, 0]);
+    return { opacity };
+  })
+
 
   return (
     <Pressable
@@ -42,10 +55,10 @@ const AnimatedTabButton: React.FC<AnimatedTabButtonProps> = ({ icon, label, acce
       style={{
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        bottom: 15
       }}
     >
-      <View style={{ width: 50, height: 50, alignItems: 'center', justifyContent: 'center' }} className={`${focused ? 'pt-0' : 'pt-4'} bg-[#BEE4D0] w-full rounded-full`}>
+      <View style={{ width: 50, height: 50, alignItems: 'center', justifyContent: 'center' }} className={`${focused ? 'pt-0' : 'pt-4'} bg-[#BEE4D0] w-full rounded-full absolute`}>
         {/* Bulatan background */}
         <Animated.View
           style={{
@@ -53,27 +66,28 @@ const AnimatedTabButton: React.FC<AnimatedTabButtonProps> = ({ icon, label, acce
             width: 50,
             height: 50,
             borderRadius: 25,
-            backgroundColor: '#077A7D',
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
+            backgroundColor:focused? '#FE7743':'#F2E5BF',
+            transform: [{ scale: focused ? 1.3 : 1, }],
           }}
         />
         {/* Icon */}
-        <Ionicons name={icon} size={28} color={focused ? '#fff' : '#aaa'} />
+        <Animated.View style={animatedIconStyle}>
+          <Ionicons name={icon} size={28} color={focused ? '#fff' : '#aaa'} />
+        </Animated.View>
         {/* Label muncul jika active */}
         <Animated.Text
-          style={{
+          style={[{
             fontSize: 12,
-            color: focused ? '#fff' : '#aaa',
-            opacity: labelAnim,
-            transform: [{ scale: labelAnim }],
-          }}
+            color: '#fff',
+            opacity: focused ? 1 : 0,
+
+          }]}
         >
           {label}
         </Animated.Text>
       </View>
     </Pressable>
   );
-};
+}
 
-export default AnimatedTabButton;
+

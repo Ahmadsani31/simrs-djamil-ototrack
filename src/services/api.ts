@@ -4,7 +4,8 @@ import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
-
+ console.log('url',API_URL);
+ 
 // const API_URL = process.env.EXPO_PUBLIC_API_URL // Replace with your API URL
 
 const api = axios.create({

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from '
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
+import { colors } from '@/constants/colors';
 const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
@@ -53,7 +54,7 @@ export default function BarcodeScanner({ onScan, onClose }: {
     return (
       <View className='flex-1 w-full items-center justify-center bg-white'>
         <Text className='font-medium text-xl'>We need your permission to show the camera</Text>
-        <ButtonCostum classname='bg-[#273F4F]' onPress={()=>requestPermission()} title="Grant permission" />
+        <ButtonCostum classname={colors.secondary} onPress={()=>requestPermission()} title="Grant permission" />
       </View>
     );
   }

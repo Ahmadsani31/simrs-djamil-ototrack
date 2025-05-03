@@ -60,6 +60,7 @@ export default function RegisterScreen() {
                 onChangeText={handleChange('name')}
                 error={touched.name ? errors.name : undefined}
                 className='bg-gray-200'
+                autoFocus={true}
               />
 
               <Input

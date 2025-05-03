@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 console.log('URL API = ',API_URL);
 
 // const API_URL = process.env.EXPO_PUBLIC_API_URL // Replace with your API URL
@@ -51,15 +52,19 @@ export const authService = {
     const response = await api.get('/user');
     return response.data;
   },
-  liveTracking: async (data: any) => {
-    const response = await api.post('/live-tracking', data);
-    return response.data;
-  },
 };
 
 export const todoService = {
   getTodos: async () => {
     const response = await api.get('/todos');
+    return response.data;
+  },
+  // Add other todo-related methods here
+};
+
+export const tracking = {
+  live_get: async (data: any) => {
+    const response = await api.post('/live-tracking', data);
     return response.data;
   },
   // Add other todo-related methods here

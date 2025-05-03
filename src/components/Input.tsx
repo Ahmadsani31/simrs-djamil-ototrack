@@ -12,6 +12,7 @@ interface InputProps {
   error?: string;
   className?: string;
   inputMode?: any;
+  autoFocus?: boolean;
 }
 
 export default function Input({
@@ -22,7 +23,8 @@ export default function Input({
   secureTextEntry = false,
   error,
   className,
-  inputMode = 'text'
+  inputMode = 'text',
+  autoFocus
 }: InputProps) {
 
   return (
@@ -35,6 +37,7 @@ export default function Input({
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         inputMode={inputMode}
+        autoFocus={autoFocus}
       />
       {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
     </View>

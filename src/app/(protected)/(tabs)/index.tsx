@@ -1,19 +1,16 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { todoService } from '@/services/api';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Entypo, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import { ModalRN } from '@/components/ModalRN';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { dataPemakaian } from '@/data/Example';
 import SafeAreaView from '@/components/SafeAreaView';
-import DateTimePicker,{DateTimePickerAndroid} from '@react-native-community/datetimepicker';
-import { Pressable } from 'react-native';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import {DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import { colors } from '@/constants/colors';
-
+import dayjs from 'dayjs';
 
 interface Todo {
   id: string;
@@ -21,37 +18,8 @@ interface Todo {
   completed: boolean;
 }
 
-type VehicleData = {
-  id: string;
-  vehicleName: string;
-  userName: string;
-  departureTime: string;
-  returnTime: string;
-  date: string;
-};
-
-
-const { height } = Dimensions.get('window');
 
 export default function Home() {
-  const { logout } = useAuthStore();
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const data = await todoService.getTodos();
-        setTodos(data);
-      } catch (error) {
-        Alert.alert('Error', 'Failed to fetch todos');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // fetchTodos();
-  }, []);
 
   useFocusEffect(
     // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
@@ -64,15 +32,6 @@ export default function Home() {
       };
     }, [])
   )
-
-
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <Text>Loading todos...</Text>
-      </View>
-    );
-  }
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -93,6 +52,14 @@ export default function Home() {
   };
   const [camera, setCamera] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
 
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -133,19 +100,19 @@ export default function Home() {
     ]);
   };
 
-  const animationConfigs = useBottomSheetSpringConfigs({
-    damping: 80,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
-    stiffness: 500,
-  });
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date);
+  const [inputDate, setInputDate] = useState<string>();
+
   const onChange = (event:any, selectedDate:any) => {
+    const dateTimestamp = event.nativeEvent.timestamp;
     const currentDate = selectedDate;
     setDate(currentDate);
+    setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
   };
 
+  const toggleResetDate = ()=>{
+    setInputDate('');
+  }
 
   const showMode = (currentMode:any) => {
     DateTimePickerAndroid.open({
@@ -184,11 +151,13 @@ export default function Home() {
             contentContainerStyle={{ paddingBottom: 185 }}
             ListHeaderComponent={
               <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
-                <TextInput className='border border-gray-300 rounded-md bg-gray-100 p-4'
+                <Fontisto className='absolute z-10 left-6 top-5' name="date" size={24} color={'black'}/>
+                <TextInput className='border border-gray-300 rounded-md bg-gray-100 py-4 ps-14'
                   placeholder="Select Date"
                   editable={false}
-                  value={date.toDateString()}
+                  value={inputDate}
                 />
+                {inputDate && <Entypo className='absolute right-5 top-5' name='circle-with-cross' size={28} color={'black'} onPress={toggleResetDate}/>}
               </Pressable>
             }
             renderItem={({ item }) => (
@@ -226,11 +195,11 @@ export default function Home() {
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
         >
-          <ModalRN.Header><Text>Title</Text></ModalRN.Header>
+          <ModalRN.Header><Text className='font-bold'>Title</Text></ModalRN.Header>
           <ModalRN.Content><Text>Content</Text></ModalRN.Content>
           <ModalRN.Footer>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text className='bg-red-500 p-3 items-center rounded-lg text-white'>Close</Text>
+              <Text className={`py-2 px-4 ${colors.warning} items-center rounded-lg text-white`}>Close</Text>
             </TouchableOpacity>
           </ModalRN.Footer>
         </ModalRN>

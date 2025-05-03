@@ -4,9 +4,7 @@ import { colors } from '@/constants/colors';
 
 export default function Profile() {
   const { user, logout } = useAuthStore();
-console.log('====================================');
-console.log(user);
-console.log('====================================');
+
   return (
     <View className="flex-1 bg-slate-300">
       <View className="bg-[#205781] rounded-br-[50]  rounded-bl-[50] p-6  shadow">

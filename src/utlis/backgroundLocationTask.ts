@@ -1,7 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import { LocationObject } from 'expo-location';
 import { useLocationStore } from '@/stores/locationStore';
-import { authService } from '@/services/api';
+import { authService, tracking } from '@/services/api';
 import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';
 
@@ -39,7 +39,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
             const osVersion = Device.osVersion;
             const platformApiLevel = Device.platformApiLevel;
             try {
-              await authService.liveTracking({
+              await tracking.live_get({
                 manufacturer,
                 modelName,
                 osVersion,

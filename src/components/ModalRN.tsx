@@ -93,13 +93,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
         backgroundColor: '#f7f7f7',
-        alignItems: 'center',
     },
     content: {
         padding: 20,
     },
     footer: {
-        padding: 16,
+        padding: 10,
         borderTopWidth: 1,
         borderTopColor: '#eee',
         flexDirection: 'row',

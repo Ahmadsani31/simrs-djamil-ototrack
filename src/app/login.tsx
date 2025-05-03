@@ -13,6 +13,7 @@ import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
+import SkeletonItem from '@/components/SkeletonItem';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Email harus diisi'),
@@ -74,7 +75,6 @@ export default function LoginScreen() {
       >
 
         <Text className="text-5xl font-bold text-center my-6">Sing - In</Text>
-
         {error && <ViewError plaintext={error} />}
 
         <Formik

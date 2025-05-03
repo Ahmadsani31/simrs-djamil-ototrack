@@ -1,6 +1,6 @@
 import { Alert, BackHandler, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "@/components/Input";
 import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
@@ -8,12 +8,30 @@ import { AntDesign } from '@expo/vector-icons';
 import { Image } from "expo-image";
 import ModalCamera from "@/components/ModalCamera";
 import SafeAreaView from "@/components/SafeAreaView";
+import secureApi from "@/services/service";
+import { Formik } from "formik";
+import * as yup from 'yup';
+import { colors } from "@/constants/colors";
+
+interface dataDetail {
+  name: string;
+  no_polisi: string;
+}
+
+const validationSchema = yup.object().shape({
+  kegiatan: yup.string().required('Kegiatan harus diisi'),
+  spidometer: yup.number().required('Spidometer harus diisi'),
+});
+
 
 export default function DetailScreen() {
-  const { data } = useLocalSearchParams();
+  const { uuid } = useLocalSearchParams();
 
   const [kegiatan, setKegiatan] = useState<string>('')
   const [modalVisible, setModalVisible] = useState(false);
+
+  const [row, setRow] = useState<dataDetail>()
+
 
   const [uri, setUri] = useState<String | null>(null);
 
@@ -27,7 +45,7 @@ export default function DetailScreen() {
         onPress: () => null,
         style: 'cancel',
       },
-      {text: 'YES', onPress: () => router.back()},
+      { text: 'YES', onPress: () => router.back() },
     ]);
     return true;
   };
@@ -43,39 +61,98 @@ export default function DetailScreen() {
     return () => backHandler.remove();
   }, []);
 
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await secureApi.get(`/reservasi/detail?uniqued_id=${uuid}`);
+
+        console.log(res.data);
+        setRow(res.data)
+
+      } catch (error: any) {
+        console.log("Error fetching data:", JSON.stringify(error.response?.data?.message));
+        // console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+  }, [uuid]);
+
+  const handleSubmitKegiatan = (values: any) => {
+    if (!uri && values.spidometer == '') {
+      Alert.alert('Peringatan!', 'Foto spidometer belum di ambil', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => null },
+      ]);
+      return
+    }
+
+    console.log('data ',values);
+    
+  }
+
 
   return (
 
     <SafeAreaView className="flex-1 bg-slate-300">
-      <View className='absolute w-full bg-[#60B5FF] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <KeyboardAvoidingView className="flex-1 mt-16" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-        <ScrollView style={{ marginBottom: 80 }}>
+      <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
+      <KeyboardAvoidingView className="flex-1 mt-10" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
+        <ScrollView>
           <View className="m-4 p-4 bg-white rounded-lg">
-            <View className="items-center mb-3">
-              <Text className="text-3xl font-bold">Nama Kendaraan</Text>
-              <Text className="font-medium text-center">{JSON.stringify(data, null, "")}</Text>
+            <View className="items-center mb-3 py-2">
+              <Text className="text-5xl font-bold">{row?.name}</Text>
+              <Text className="font-medium text-center mt-3">{row?.no_polisi}</Text>
             </View>
-            <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={kegiatan} onChangeText={setKegiatan} />
-            {!uri ? (
-              <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-amber-500" onPress={() => setModalVisible(true)}>
-                <AntDesign name="camera" size={32} />
-                <Text className="font-bold text-white ms-2">Open Camera</Text>
-              </TouchableOpacity>
-            ) : (
-              <View className="w-full rounded-lg bg-black my-4">
-                <Image
-                  source={{ uri }}
-                  contentFit="contain"
-                  style={{ aspectRatio: 1, resizeMode: 'contain' }}
-                />
-                <TouchableOpacity className="absolute right-2 top-2" onPress={() => setUri(null)}>
-                  <AntDesign name="closecircleo" size={32} color="red" />
-                </TouchableOpacity>
-              </View>
-            )}
-            <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value="" onChangeText={setKegiatan} />
-            <ButtonCostum classname="bg-indigo-500" title="Submit" />
-            <ButtonCostum classname="bg-red-500" title="Kembali" onPress={backAction} />
+            <View className="border border-b-2 w-full mb-4" />
+            <Formik
+              initialValues={{ kegiatan: '', spidometer: '' }}
+              validationSchema={validationSchema}
+              onSubmit={async (values) => await handleSubmitKegiatan(values)}
+            >
+              {({ handleChange, handleSubmit, values, errors, touched }) => (
+                <>
+                {errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
+                  <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
+                  {!uri ? (
+                    <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
+                      <AntDesign name="camera" size={32} />
+                      <Text className="font-bold text-white ms-2">Open Camera</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <>
+                      <View className="w-full rounded-lg bg-black my-4">
+                        <Image
+                          source={{ uri }}
+                          contentFit="contain"
+                          style={{ aspectRatio: 1, resizeMode: 'contain' }}
+                        />
+                        <TouchableOpacity className="absolute right-2 top-2" onPress={() => {
+                          setUri(null)
+                          values.spidometer = '';
+                        }}>
+                          <AntDesign name="closecircleo" size={32} color="red" />
+                        </TouchableOpacity>
+                      </View>
+                      <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
+                    </>
+                  )}
+                  <ButtonCostum classname={colors.primary} title="Submit" onPress={handleSubmit} />
+                </>
+              )}
+            </Formik>
+
+            <ButtonCostum classname={colors.warning} title="Kembali" onPress={backAction} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

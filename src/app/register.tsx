@@ -23,13 +23,16 @@ const validationSchema = yup.object().shape({
 
 export default function RegisterScreen() {
 
-  const { register, isLoading, error } = useAuthStore();
+  const { 
+    // register, 
+    isLoading, 
+    error } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(true);
 
   const handleRegister = async (data: RegisterData) => {
     try {
-      await register(data);
+      // await register(data);
       router.replace('/(protected)'); // Redirect to the protected tabs after registration);
     } catch (error) {
       Alert.alert('Error', error as string);

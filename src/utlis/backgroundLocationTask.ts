@@ -1,7 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import { LocationObject } from 'expo-location';
 import { useLocationStore } from '@/stores/locationStore';
-import { authService, tracking } from '@/services/api';
+// import { authService, tracking } from '@/services/api';
 import * as Device from 'expo-device';
 import * as SecureStore from 'expo-secure-store';
 
@@ -32,27 +32,27 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
       useLocationStore.getState().addToBatchCoordinate(newCoord);
 
       useLocationStore.getState().addToCoordinate(newCoord);
-          const token = await SecureStore.getItemAsync('token');
-          if (token) {
-            const manufacturer = Device.manufacturer;
-            const modelName = Device.modelName;
-            const osVersion = Device.osVersion;
-            const platformApiLevel = Device.platformApiLevel;
-            try {
-              await tracking.live_get({
-                manufacturer,
-                modelName,
-                osVersion,
-                platformApiLevel,
-                locations: newCoord,
-                timestamp: Date.now(),
-              });
+          // const token = await SecureStore.getItemAsync('token');
+          // if (token) {
+          //   const manufacturer = Device.manufacturer;
+          //   const modelName = Device.modelName;
+          //   const osVersion = Device.osVersion;
+          //   const platformApiLevel = Device.platformApiLevel;
+          //   try {
+          //     await tracking.live_get({
+          //       manufacturer,
+          //       modelName,
+          //       osVersion,
+          //       platformApiLevel,
+          //       locations: newCoord,
+          //       timestamp: Date.now(),
+          //     });
       
-              //   console.log('✅ Batch terkirim:', batch.length);
-            } catch (err) {
-              console.error('❌ Gagal kirim:', err);
-            }
-          }
+          //     //   console.log('✅ Batch terkirim:', batch.length);
+          //   } catch (err) {
+          //     console.error('❌ Gagal kirim:', err);
+          //   }
+          // }
 
       console.log('📍 Background Location:', latitude, longitude);
     }

@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
+import { colors } from '@/constants/colors';
 
 export default function Profile() {
   const { user, logout } = useAuthStore();
@@ -24,7 +25,7 @@ console.log('====================================');
         
         <TouchableOpacity
           onPress={logout}
-          className="bg-red-500 p-3 rounded items-center"
+          className={`${colors.danger} p-3 rounded items-center`}
         >
           <Text className="text-white font-medium">Logout</Text>
         </TouchableOpacity>

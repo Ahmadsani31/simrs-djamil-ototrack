@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
+console.log('URL API = ',API_URL);
 
 // const API_URL = process.env.EXPO_PUBLIC_API_URL // Replace with your API URL
 

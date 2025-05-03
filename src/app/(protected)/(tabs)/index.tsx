@@ -12,6 +12,7 @@ import SafeAreaView from '@/components/SafeAreaView';
 import DateTimePicker,{DateTimePickerAndroid} from '@react-native-community/datetimepicker';
 import { Pressable } from 'react-native';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { colors } from '@/constants/colors';
 
 
 interface Todo {
@@ -167,7 +168,7 @@ export default function Home() {
 
           </View>
           <TouchableOpacity onPress={handleSnapPress}
-            className="flex-row items-center justify-center bg-[#FD8B51] py-3 px-6 rounded-lg"
+            className={`flex-row items-center justify-center ${colors.primary} py-3 px-6 rounded-lg`}
           >
             <MaterialIcons name="qr-code-scanner" size={24} color="white" />
             <Text className="text-white font-bold ml-2">Scan Barcode</Text>

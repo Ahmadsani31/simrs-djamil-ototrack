@@ -7,6 +7,7 @@ import { useLocationStore } from "@/stores/locationStore";
 import * as SecureStore from 'expo-secure-store';
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
+import { colors } from "@/constants/colors";
 
 const BACKGROUND_TASK = 'background-location-task';
 
@@ -175,8 +176,8 @@ export default function PerjalananScreen() {
             <View className="p-2 items-center">
               <Text className="text-center">{displayCurrentAddress}</Text>
             </View>
-            <ButtonCostum classname="bg-[#FD8B51]" title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
-            <ButtonCostum classname="bg-[#273F4F]" title="Stop Tracking" onPress={stopTracking} />
+            <ButtonCostum classname={colors.primary} title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
+            <ButtonCostum classname={colors.secondary} title="Stop Tracking" onPress={stopTracking} />
             {coords.length === 0 ? (
               <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
             ) : (

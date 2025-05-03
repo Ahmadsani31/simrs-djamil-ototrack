@@ -13,6 +13,7 @@ export default function TabsLayout() {
         screenOptions={{
           tabBarActiveTintColor: 'teal',
           headerShadowVisible: false,
+          // headerTitleAlign: 'center',
           tabBarStyle: {
             position: 'absolute',
             bottom: 20,
@@ -35,11 +36,12 @@ export default function TabsLayout() {
             color: '#fff',
           },
           tabBarShowLabel: false,
-          headerTitle: '',
+          headerTitle: ()=>(
+            <Text className='font-bold text-white text-xl'>App Tracking</Text>
+          ),
           headerLeft: () => (
             <View className='px-5 flex-row items-center'>
               <Entypo name="location" size={22} color="white" /> 
-              <Text className='font-bold ms-2 text-white text-xl'>App Tracking</Text>
             </View>
           ),
         }}

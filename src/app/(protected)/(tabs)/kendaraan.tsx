@@ -30,7 +30,7 @@ export default function KendaraanScreen() {
       try {
         const res = await secureApi.get(`/kendaraan`);
 
-        console.log(res.data.data);
+        // console.log(res.data.data);
 
         setDatakendaraan(res.data.data)
 

@@ -81,6 +81,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   // },
 
   logout: async () => {
+    const token = await SecureStore.getItemAsync('token');
+    set({ isLoading: true });
+    if (token) {
+    const response =  await restApi.logout(token);
+    console.log('response logout ', response);
+    set({ isLoading: false });
+    }
     await SecureStore.deleteItemAsync('token');
     set({ token: null, user: null });
   },

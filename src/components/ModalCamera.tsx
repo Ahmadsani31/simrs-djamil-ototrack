@@ -3,6 +3,8 @@ import React, { useRef, useState } from 'react';
 import { View, Modal, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
+// import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
+// import { Asset } from 'expo-asset';
 
 interface InputProps {
   visible: boolean;
@@ -15,13 +17,13 @@ export default function ModalCamera({
   onClose,
   setUriImage,
 }: InputProps) {
+
   const [permission, requestPermission] = useCameraPermissions();
 
   const cameraRef = useRef<CameraView | null>(null);
 
   const takePicture = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({ imageType: "png", base64: true });
-    console.log('photo modal', photo?.uri);
+    const photo = await cameraRef.current?.takePictureAsync({ base64:true,quality:0.6 });
     setUriImage(photo?.uri ?? null);
     onClose();
   };
@@ -67,13 +69,13 @@ export default function ModalCamera({
               </View>
             </CameraView>
           ) :
-              <View className='flex-1 w-full items-center justify-center bg-white'>
-                <Text className='font-bold text-2xl'>Permissions needed!</Text>
-                <Text className='font-medium text-xl bg-slate-300 p-3 m-8 text-center rounded-lg'>We need your permission to show the camera please click bottom <Text className='font-bold'>grant permission</Text>  and Allow this App</Text>
-                <ButtonCostum classname='bg-black' onPress={() => requestPermission()} title="grant permission" />
-                <ButtonCostum classname='bg-red-500' onPress={onClose} title="close" />
-              </View>
-            }
+            <View className='flex-1 w-full items-center justify-center bg-white'>
+              <Text className='font-bold text-2xl'>Permissions needed!</Text>
+              <Text className='font-medium text-xl bg-slate-300 p-3 m-8 text-center rounded-lg'>We need your permission to show the camera please click bottom <Text className='font-bold'>grant permission</Text>  and Allow this App</Text>
+              <ButtonCostum classname='bg-black' onPress={() => requestPermission()} title="grant permission" />
+              <ButtonCostum classname='bg-red-500' onPress={onClose} title="close" />
+            </View>
+          }
 
         </View>
       </Modal>

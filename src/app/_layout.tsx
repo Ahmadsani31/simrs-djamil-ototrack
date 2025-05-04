@@ -12,6 +12,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '@/utlis/backgroundLocationTask';
 import * as Location from 'expo-location'
 
+import * as Device from 'expo-device';
+
 const BACKGROUND_TASK = 'background-location-task';
 
 SplashScreen.preventAutoHideAsync();
@@ -20,6 +22,14 @@ export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
   useEffect(() => {
+
+    if (Device.isDevice) {
+      console.log('real device');
+    }else{
+      console.log('use emulator');
+    }
+
+
     const requestPermissions = async () => {
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
       console.log('hasStartedLocationUpdatesAsync',hasStarted);

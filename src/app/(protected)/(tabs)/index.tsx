@@ -14,6 +14,8 @@ import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import SkeletonItem from '@/components/SkeletonItem';
 
+import {ALERT_TYPE, Dialog, Toast} from 'react-native-alert-notification';
+
 interface Todo {
   id: string;
   title: string;
@@ -49,7 +51,7 @@ export default function Home() {
   const fetchDataAktif = async () => {
     setLoading(true);
     try {
-      const res = await secureApi.get(`/reservasi/aktif`);
+      const res = await secureApi.get(`reservasi/aktif`);
       console.log('res data aktif ', res);
 
       if (res.status === true) {
@@ -58,7 +60,7 @@ export default function Home() {
       }
     } catch (error: any) {
       // console.error("Error fetching data:", error);
-      console.log("Error fetching data:", JSON.stringify(error.response?.data?.message));
+      console.log("Error /reservasi/aktif", JSON.stringify(error.response?.data?.message));
       setReservasi(false);
 
     } finally {
@@ -82,7 +84,7 @@ export default function Home() {
       // setTodos(response.data);
     } catch (error: any) {
 
-      console.log(JSON.stringify(error.response?.data?.message));
+      console.log(JSON.stringify("Error reservasi/list :",error.response?.data?.message));
 
       // Alert.alert('Error', 'Failed to fetch todos');
     } finally {
@@ -157,8 +159,7 @@ export default function Home() {
       });
       if (res.status === true) {
         // toast.success('Barcode Scan Success')
-        setCamera(false);
-        bottomSheetRef.current?.close();
+
         Alert.alert('Scan Successfully', 'Tekan OK untuk menlanjutkan proses..', [
           {
             text: 'Cancel',
@@ -189,8 +190,10 @@ export default function Home() {
           text: 'OK', onPress: () => null
         },
       ]);
+    }finally{
+      setCamera(false);
+      bottomSheetRef.current?.close();
     }
-
 
   };
 

@@ -13,9 +13,17 @@ import { Formik } from "formik";
 import * as yup from 'yup';
 import { colors } from "@/constants/colors";
 
+import * as Location from 'expo-location'
+import { reLocation } from "@/hooks/locationRequired";
+
 interface dataDetail {
   name: string;
   no_polisi: string;
+}
+
+interface Coords {
+  lat: string;
+  long: string;
 }
 
 const validationSchema = yup.object().shape({
@@ -27,13 +35,18 @@ const validationSchema = yup.object().shape({
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
 
-  const [kegiatan, setKegiatan] = useState<string>('')
+
+  const [reqLocation, setReqLocation] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false);
+
+  const [kendaraanID, setKendaraanID] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [row, setRow] = useState<dataDetail>()
 
 
   const [uri, setUri] = useState<String | null>(null);
+  const [blob, setBlob] = useState<String | null>(null);
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
@@ -51,7 +64,7 @@ export default function DetailScreen() {
   };
 
   useEffect(() => {
-
+    loadLocation();
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -61,7 +74,12 @@ export default function DetailScreen() {
     return () => backHandler.remove();
   }, []);
 
-  const [loading, setLoading] = useState(false);
+  const loadLocation = async () => {
+    const reLoc = await reLocation.enable()
+    setReqLocation(reLoc);
+  }
+
+
 
   useEffect(() => {
 
@@ -72,6 +90,8 @@ export default function DetailScreen() {
 
         console.log(res.data);
         setRow(res.data)
+
+        setKendaraanID(res.data.id)
 
       } catch (error: any) {
         console.log("Error fetching data:", JSON.stringify(error.response?.data?.message));
@@ -85,7 +105,8 @@ export default function DetailScreen() {
 
   }, [uuid]);
 
-  const handleSubmitKegiatan = (values: any) => {
+  const handleSubmitKegiatan = async (values: any) => {
+    setLoading(true)
     if (!uri && values.spidometer == '') {
       Alert.alert('Peringatan!', 'Foto spidometer belum di ambil', [
         {
@@ -97,9 +118,54 @@ export default function DetailScreen() {
       ]);
       return
     }
+    const coordinate = await reLocation.getCoordinate()
 
-    console.log('data ',values);
-    
+    if (!coordinate?.lat && coordinate?.long) {
+      Alert.alert('Peringatan!', 'Error device location', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => null },
+      ]);
+      return
+    }
+
+    try {
+
+      const formData = new FormData();
+      formData.append('latitude', coordinate?.lat?.toString() || '');
+      formData.append('longitude', coordinate?.long.toString() || '');
+      formData.append('kegiatan', values.kegiatan);
+      formData.append('spidometer', values.spidometer);
+      formData.append('kendaraan_id', kendaraanID ? kendaraanID : '');
+      formData.append('fileImage', {
+        uri: uri,
+        name: 'spidometer-capture.jpg',
+        type: 'image/jpeg',
+      } as any);
+
+      console.log('formData', formData);
+
+      const response = await secureApi.postForm('/reservasi/save_detail', formData)
+      console.log('response ', JSON.stringify(response));
+
+      // if (response.status === true) {
+      //   // toast.success(response.message)
+      //   // localStorage.setItem('reservasi_id', response.reservasi_id);
+      //   // navigate('/reservasi');
+      // } else {
+      //   toast.error(response.message)
+      // }
+    } catch (error :any) {
+      // alert(error.response.data.message)
+      console.log('response error', JSON.stringify(error.response.data));
+    } finally{
+      setLoading(false);
+    }
+
+
   }
 
 
@@ -122,7 +188,7 @@ export default function DetailScreen() {
             >
               {({ handleChange, handleSubmit, values, errors, touched }) => (
                 <>
-                {errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
+                  {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
                   <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
                   {!uri ? (
                     <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
@@ -139,6 +205,7 @@ export default function DetailScreen() {
                         />
                         <TouchableOpacity className="absolute right-2 top-2" onPress={() => {
                           setUri(null)
+                          setBlob(null)
                           values.spidometer = '';
                         }}>
                           <AntDesign name="closecircleo" size={32} color="red" />
@@ -147,12 +214,12 @@ export default function DetailScreen() {
                       <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
                     </>
                   )}
-                  <ButtonCostum classname={colors.primary} title="Submit" onPress={handleSubmit} />
+                  <ButtonCostum classname={colors.primary} title="Submit" loading={loading} onPress={handleSubmit} />
                 </>
               )}
             </Formik>
 
-            <ButtonCostum classname={colors.warning} title="Kembali" onPress={backAction} />
+            <ButtonCostum classname={colors.warning} title="Kembali" loading={loading} onPress={backAction} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

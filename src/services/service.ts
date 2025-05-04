@@ -1,4 +1,6 @@
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
+import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 // Ganti dengan base URL API kamu
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -13,7 +15,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync('token');
-    console.log('token api interceptors ', token);
+    // console.log('token api interceptors ', token);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,10 +34,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && message.toLowerCase().includes('expired token')) {
       console.log('Token expired, logging out...');
       SecureStore.deleteItemAsync('token');
+      secureApi.prosesLogout();
     }
 
-    console.log('error api interceptors ', error);
-    console.log('error api interceptors message ', message);
+    // console.log('error api interceptors ', error);
+    // console.log('error api interceptors message ', message);
 
     // Lanjutkan error
     return Promise.reject(error);
@@ -87,6 +90,10 @@ const secureApi = {
     });
     return response.data;
   },
+  prosesLogout: async () =>{
+    const { logout } = useAuthStore();
+    logout();
+  }
 };
 
 export default secureApi;

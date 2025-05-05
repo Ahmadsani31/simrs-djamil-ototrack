@@ -8,220 +8,188 @@ import * as SecureStore from 'expo-secure-store';
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import { colors } from "@/constants/colors";
+import { ModalRN } from "@/components/ModalRN";
+import { Formik, useFormik } from "formik";
+import { Image } from "expo-image";
+import Input from "@/components/Input";
+import * as yup from 'yup';
+import { AntDesign } from '@expo/vector-icons';
+import ModalCamera from "@/components/ModalCamera";
+import { reLocation } from "@/hooks/locationRequired";
+import secureApi from "@/services/service";
+import SafeAreaView from "@/components/SafeAreaView";
+import { router } from "expo-router";
 
 const BACKGROUND_TASK = 'background-location-task';
 
+const validationSchema = yup.object().shape({
+  spidometer: yup.number().required('Spidometer harus diisi'),
+});
+
 export default function PerjalananScreen() {
 
-  const { coord, coords } = useLocationStore();
-
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading.....');
-  const [isTracking, setIsTracking] = useState(false);
 
+  const [dialogCamera, setDialogCamera] = useState(false);
+  const [dialogExit, setDialogExit] = useState(false);
+
+  const [uri, setUri] = useState<String | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [reqLocation, setReqLocation] = useState<boolean>(false)
 
   useEffect(() => {
-    checkIfLocationEnabled();
-    getCurrentLocation();
-    checkTrackingLive()
+    loadLocation();
   }, [])
 
-  const checkTrackingLive = async () => {
-    const tracking = await SecureStore.getItemAsync('liveTracking');
-    if (tracking == 'true') {
-      setIsTracking(true)
-    } else {
-      setIsTracking(false)
-    }
-  }
+  const formik = useFormik({
+    initialValues: { spidometer: '' },
+    validationSchema,
+    onSubmit: async (values) => handleSubmit(values)
+  });
 
-  //check if location is enable or not
-  const checkIfLocationEnabled = async () => {
-    let enabled = await Location.hasServicesEnabledAsync();       //returns true or false
-    if (!enabled) {                     //if not enable 
-      Alert.alert('Location not enabled', 'Please enable your Location', [
+
+  const handleSubmit = async (values: any) => {
+    setLoading(true)
+    const coordinate = await reLocation.getCoordinate()
+
+    if (!coordinate?.lat && coordinate?.long) {
+      Alert.alert('Peringatan!', 'Error device location', [
         {
           text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
+          onPress: () => null,
           style: 'cancel',
         },
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
+        { text: 'YES', onPress: () => null },
       ]);
-    }
-  }
-
-  //get current location
-  const getCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();  //used for the pop up box where we give permission to use location 
-    console.log(status);
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Allow the app to use the location services', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ]);
+      return
     }
 
-    //get current position lat and long
-    const { coords } = await Location.getCurrentPositionAsync();
+    const reservasi_id = await SecureStore.getItemAsync('reservasi_id');
 
-    // console.log('coords', coords)
+    const formData = new FormData();
+    formData.append('latitude', coordinate?.lat?.toString() || '');
+    formData.append('longitude', coordinate?.long.toString() || '');
+    formData.append('spidometer', values.spidometer);
+    formData.append('reservasi_id', reservasi_id ? reservasi_id : '7');
+    formData.append('fileImage', {
+      uri: uri,
+      name: 'spidometer-capture.jpg',
+      type: 'image/jpeg',
+    } as any);
 
-    if (coords) {
-      const { latitude, longitude } = coords;
-      // console.log(latitude, longitude);
+    console.log('formData', formData);
+    try {
+      const response = await secureApi.postForm('/reservasi/return_kendaraan', formData)
+      console.log('response ', JSON.stringify(response));
 
-      //provide lat and long to get the the actual address
-      let responce = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude
-      });
-      // console.log('responce', responce);
-      //loop on the responce to get the actual result
-      for (let item of responce) {
-        let address = `${item.formattedAddress},( ${item.postalCode}, ${item.district},  ${item.city},${item.subregion},${item.region})`
-        setDisplayCurrentAddress(address)
+      if (response.status == true) {
+         await SecureStore.deleteItemAsync('token');
+        router.replace('(protected)');
+        
+      }else{
+        Alert.alert('Peringatan!', response.message, [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          { text: 'YES', onPress: () => null },
+        ]);
       }
+
+    } catch (error: any) {
+      console.log('response ', JSON.stringify(error.response.data));
+
+    } finally{
+      setLoading(false)
     }
+
   }
 
 
-
-  const startTracking = async () => {
-    console.log('Tracking start');
-
-    const { status: fg } = await Location.requestForegroundPermissionsAsync();
-    const { status: bg } = await Location.requestBackgroundPermissionsAsync();
-
-    if (fg !== 'granted' || bg !== 'granted') {
-      return Alert.alert('Permission required for background tracking');
-    }
-
-    const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
-    if (!hasStarted) {
-
-      await SecureStore.setItemAsync('liveTracking', 'true');
-
-      await Location.startLocationUpdatesAsync(BACKGROUND_TASK, {
-        accuracy: Location.Accuracy.Highest,
-        timeInterval: 5000,
-        distanceInterval: 5,
-        showsBackgroundLocationIndicator: true,
-        foregroundService: {
-          notificationTitle: 'Tracking location',
-          notificationBody: 'We are tracking your location in background',
-        },
-      });
-      setIsTracking(true);
-    }
-  };
-
-  const stopTracking = async () => {
-    await SecureStore.setItemAsync('liveTracking', 'false');
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
-    if (isRunning) {
-      await Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
-      setIsTracking(false);
-    }
-  };
-
-
-  const [webViewContent, setWebViewContent] = useState<string | null>(null);
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadHtml = async () => {
-      try {
-        const path = require("@asset/leaflet.html");
-        const asset = Asset.fromModule(path);
-        await asset.downloadAsync();
-        const htmlContent = await FileSystem.readAsStringAsync(asset.localUri!);
-
-        if (isMounted) {
-          setWebViewContent(htmlContent);
-        }
-      } catch (error) {
-        Alert.alert('Error loading HTML', JSON.stringify(error));
-        console.error('Error loading HTML:', error);
-      }
-    };
-
-    loadHtml();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  if (!webViewContent) {
-    return <ActivityIndicator size="large" />
+  const loadLocation = async () => {
+    const reLoc = await reLocation.enable()
+    setReqLocation(reLoc);
   }
+
+
+  const handleDialogExit = () => {
+    setDialogExit(false);
+    setUri(null)
+    formik.resetForm()
+  }
+
 
 
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
   return (
+    <SafeAreaView noTop>
+      <View className="flex-1 bg-slate-300">
+        <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
+        <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
 
-    <View className="flex-1 bg-slate-300">
-      <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
-      <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-        <ScrollView style={{ marginBottom: 80 }}>
-          <View className="m-4 p-4 bg-white rounded-lg">
-            <View className="items-center text-center mb-3">
-              <Text className="text-3xl font-bold">Live Location Tracking</Text>
-            </View>
-            <View className="p-2 items-center">
-              <Text className="text-center">{displayCurrentAddress}</Text>
-            </View>
-            <ButtonCostum classname={colors.primary} title={isTracking ? 'Tracking' : 'Start Tracking'} onPress={startTracking} />
-            <ButtonCostum classname={colors.secondary} title="Stop Tracking" onPress={stopTracking} />
-            {coords.length === 0 ? (
-              <Text style={{ textAlign: 'center' }}>Belum ada lokasi.</Text>
-            ) : (
-              <ScrollView style={{ height: 300 }}>
-                {coords.map((coord, index) => (
-                  <View key={index} style={styles.coordItem}>
-                    <Text style={styles.coordText}>
-                      #{index + 1}: Lat {coord.latitude.toFixed(6)}, Lng {coord.longitude.toFixed(6)}
-                    </Text>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-
+          <View className='px-4'>
+            <ScrollView style={{ marginBottom: 80 }}>
+              <View className="p-4 bg-white rounded-lg">
+                <View className="items-center text-center mb-3">
+                  <Text className="text-3xl font-bold">Live Location Tracking</Text>
+                </View>
+                <View className="p-2 items-center">
+                  <Text className="text-center">{displayCurrentAddress}</Text>
+                </View>
+                <ButtonCostum classname={colors.secondary} title="Pengembalian Kendaraan" onPress={() => setDialogExit(!dialogExit)} />
+              </View>
+            </ScrollView>
           </View>
+        </KeyboardAvoidingView>
 
+        <ModalRN
+          visible={dialogExit}
+          onClose={handleDialogExit}
+        >
+          <ModalRN.Header onClose={handleDialogExit}>
+            <Text className='font-bold text-center'>Proses Kembalikan Kendaraan</Text>
+            <Text className="text-center">Silahkan foto spidometer kendaraan yang terbaru</Text>
+          </ModalRN.Header>
+          <ModalRN.Content>
 
+            {formik.touched.spidometer && formik.errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
 
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
-
+            {!uri ? (
+              <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setDialogCamera(true)}>
+                <AntDesign name="camera" size={32} />
+                <Text className="font-bold text-white ms-2">Open Camera</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <View className="w-full rounded-lg bg-black my-4">
+                  <Image
+                    source={{ uri }}
+                    contentFit="contain"
+                    style={{ aspectRatio: 1, resizeMode: 'contain' }}
+                  />
+                  <TouchableOpacity className="absolute right-2 top-2" onPress={() => {
+                    formik.values.spidometer = '';
+                    setUri(null)
+                  }}>
+                    <AntDesign name="closecircleo" size={32} color="red" />
+                  </TouchableOpacity>
+                </View>
+                <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={formik.values.spidometer} error={formik.errors.spidometer} onChangeText={formik.handleChange('spidometer')} />
+              </>
+            )}
+          </ModalRN.Content>
+          <ModalRN.Footer>
+            <View className="gap-2 flex-row">
+              <ButtonCostum classname={colors.warning} title="Exit" onPress={handleDialogExit} />
+              <ButtonCostum classname={colors.primary} loading={loading} title="Submit" onPress={formik.handleSubmit} />
+            </View>
+          </ModalRN.Footer>
+        </ModalRN>
+        <ModalCamera visible={dialogCamera} onClose={() => setDialogCamera(false)} setUriImage={(e) => setUri(e)} />
+      </View>
+    </SafeAreaView>
   );
 }
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  buttonContainer: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  coordsBox: {
-    marginTop: 10,
-    padding: 16,
-    backgroundColor: '#eee',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  coordText: { fontSize: 16, fontWeight: '500' },
-  coordItem: { paddingVertical: 6, borderBottomWidth: 1, borderColor: '#ccc' },
-  map: { marginTop: 20, width: '100%', height: '100%' },
-  controls: {
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-});

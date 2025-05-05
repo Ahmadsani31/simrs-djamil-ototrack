@@ -12,8 +12,7 @@ import secureApi from "@/services/service";
 import { Formik } from "formik";
 import * as yup from 'yup';
 import { colors } from "@/constants/colors";
-
-import * as Location from 'expo-location'
+import * as SecureStore from 'expo-secure-store';
 import { reLocation } from "@/hooks/locationRequired";
 
 interface dataDetail {
@@ -151,13 +150,23 @@ export default function DetailScreen() {
       const response = await secureApi.postForm('/reservasi/save_detail', formData)
       console.log('response ', JSON.stringify(response));
 
-      // if (response.status === true) {
-      //   // toast.success(response.message)
-      //   // localStorage.setItem('reservasi_id', response.reservasi_id);
-      //   // navigate('/reservasi');
-      // } else {
-      //   toast.error(response.message)
-      // }
+      if (response.status === true) {
+         await SecureStore.setItemAsync('reservasi_id', response.data.reservasi_id);
+        // toast.success(response.message)
+        // localStorage.setItem('reservasi_id', response.data.reservasi_id);
+        // navigate('/reservasi');
+        router.replace('(protected)/perjalanan')
+      } else {
+        Alert.alert('Peringatan!', response.message, [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          { text: 'YES', onPress: () => null },
+        ]);
+        // toast.error(response.message)
+      }
     } catch (error :any) {
       // alert(error.response.data.message)
       console.log('response error', JSON.stringify(error.response.data));
@@ -177,7 +186,7 @@ export default function DetailScreen() {
         <ScrollView>
           <View className="m-4 p-4 bg-white rounded-lg">
             <View className="items-center mb-3 py-2">
-              <Text className="text-5xl font-bold">{row?.name}</Text>
+              <Text className="text-5xl text-center font-bold">{row?.name}</Text>
               <Text className="font-medium text-center mt-3">{row?.no_polisi}</Text>
             </View>
             <View className="border border-b-2 w-full mb-4" />

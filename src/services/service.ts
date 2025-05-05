@@ -34,7 +34,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && message.toLowerCase().includes('expired token')) {
       console.log('Token expired, logging out...');
       SecureStore.deleteItemAsync('token');
-      secureApi.prosesLogout();
+      router.dismissAll();
     }
 
     // console.log('error api interceptors ', error);
@@ -89,10 +89,6 @@ const secureApi = {
       },
     });
     return response.data;
-  },
-  prosesLogout: async () =>{
-    const { logout } = useAuthStore();
-    logout();
   }
 };
 

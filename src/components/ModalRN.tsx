@@ -6,7 +6,11 @@ import {
     Animated,
     TouchableWithoutFeedback,
     Dimensions,
+    Text,
+    TouchableOpacity,
 } from 'react-native';
+
+import { AntDesign, Entypo } from '@expo/vector-icons';
 
 interface ModalProps {
     visible: boolean;
@@ -63,8 +67,15 @@ export function ModalRN({ visible, onClose, children }: ModalProps) {
     );
 }
 
-ModalRN.Header = function Header({ children }: { children: React.ReactNode }) {
-    return <View style={styles.header}>{children}</View>;
+ModalRN.Header = function Header({ children,onClose }: { children: React.ReactNode,onClose: () => void }) {
+    return (
+        <View style={styles.header}>
+            <TouchableOpacity onPress={onClose} className='absolute z-10 top-0 right-0 '>
+                <Entypo name='circle-with-cross' size={28} />
+            </TouchableOpacity>
+            {children}
+        </View>
+    );
 };
 
 ModalRN.Content = function Content({ children }: { children: React.ReactNode }) {

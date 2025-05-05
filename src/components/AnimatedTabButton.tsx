@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import {  Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { Pressable } from 'react-native-gesture-handler';
 
 interface AnimatedTabButtonProps {
   icon: any;
@@ -13,28 +14,18 @@ interface AnimatedTabButtonProps {
 export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: any) {
   const focused = accessibilityState.selected;
 
-  // const scaleAnim = useRef(new Animated.Value(1)).current;
-
   const scale = useSharedValue(0)
-  
-  // useEffect(() => {
-  //   Animated.spring(scaleAnim, {
-  //     toValue: focused ? 1.3 : 1,
-  //     useNativeDriver: true,
-  //     friction: 5,
-  //   }).start();
-  // }, [focused]);
 
-      useEffect(() => {
-          scale.value = withSpring(
-              typeof focused === "boolean" ? (focused ? 1 : 0) : focused, { duration: 350 }
-          )
-      }, [scale, focused]);
+  useEffect(() => {
+    scale.value = withSpring(
+      typeof focused === "boolean" ? (focused ? 1 : 0) : focused, { duration: 350 }
+    )
+  }, [scale, focused]);
 
 
   const animatedIconStyle = useAnimatedStyle(() => {
     const scaleValue = interpolate(scale.value, [0, 1], [1, 1.2]);
-    const top = interpolate(scale.value+1, [0,1], [1, 0])
+    const top = interpolate(scale.value + 1, [0, 1], [1, 0])
     return {
       transform: [
         { scale: scaleValue }
@@ -42,12 +33,6 @@ export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: 
       top
     };
   })
-
-  const animatedTextStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(1, [0, 1], [1, 0]);
-    return { opacity };
-  })
-
 
   return (
     <Pressable
@@ -66,7 +51,7 @@ export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: 
             width: 50,
             height: 50,
             borderRadius: 25,
-            backgroundColor:focused? '#FE7743':'#F2E5BF',
+            backgroundColor: focused ? '#FE7743' : '#F2E5BF',
             transform: [{ scale: focused ? 1.3 : 1, }],
           }}
         />

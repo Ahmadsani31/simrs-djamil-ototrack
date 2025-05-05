@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Entypo, FontAwesome5, Fontisto, MaterialIcons } from '@expo/vector-icons';
@@ -13,13 +13,13 @@ import { colors } from '@/constants/colors';
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import SkeletonItem from '@/components/SkeletonItem';
+import ButtonCostum from '@/components/ButtonCostum';
+import CardListPemakaian from '@/components/CardListPemakaian';
 
-import {ALERT_TYPE, Dialog, Toast} from 'react-native-alert-notification';
-
-interface Todo {
-  id: string;
-  title: string;
-  completed: boolean;
+interface DataAktif {
+  name: string;
+  no_polisi: string;
+  created_at: boolean;
 }
 
 interface DataKendaraan {
@@ -37,13 +37,21 @@ interface DataKendaraan {
 
 export default function Home() {
 
-  const [todos, setTodos] = useState<Todo[]>([]);
+  // const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [reservasi, setReservasi] = useState(false);
-  const [dataPemakaian, setDataPemakaian] = useState<DataKendaraan[]>([]);
+  const [dataListPemakaian, setDataListPemakaian] = useState<DataKendaraan[]>([]);
+  const [dataAktif, setDataAktif] = useState<DataAktif>();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [camera, setCamera] = useState(false);
+
+  const [date, setDate] = useState(new Date);
+  const [inputDate, setInputDate] = useState<string>();
 
   useEffect(() => {
+    console.log('load page');
+
     fetchDataAktif();
     fetchDataList('');
   }, []);
@@ -52,11 +60,11 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await secureApi.get(`reservasi/aktif`);
-      console.log('res data aktif ', res);
+      console.log('res data aktif ', res.data);
 
       if (res.status === true) {
         setReservasi(true);
-        setDataPemakaian(res.data);
+        setDataAktif(res.data);
       }
     } catch (error: any) {
       // console.error("Error fetching data:", error);
@@ -80,11 +88,12 @@ export default function Home() {
         },
       });
       console.log(response);
-      console.log(response.data.items);
+      // console.log(response.data.items);
+      setDataListPemakaian(response.data)
       // setTodos(response.data);
     } catch (error: any) {
 
-      console.log(JSON.stringify("Error reservasi/list :",error.response?.data?.message));
+      console.log(JSON.stringify("Error reservasi/list ", error.response?.data?.message));
 
       // Alert.alert('Error', 'Failed to fetch todos');
     } finally {
@@ -92,37 +101,14 @@ export default function Home() {
     }
   };
 
-  useFocusEffect(
-    // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
-    useCallback(() => {
-      // Invoked whenever the route is focused.
-
-      // Return function is invoked whenever the route gets out of focus.
-      return () => {
-        bottomSheetRef.current?.close();
-      };
-    }, [])
-  )
-
-  const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
     setRefreshing(true);
-    // dataPemakaian.push({
-    //   id: '12',
-    //   vehicleName: '12 Toyota Avanza',
-    //   userName: 'Ahmad Sani',
-    //   departureTime: '08:00',
-    //   returnTime: '17:00',
-    //   date: '2025-04-28',
-    // },)
     setInterval(() => {
       setRefreshing(false);
 
     }, 1000);
   };
-  const [camera, setCamera] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
@@ -135,11 +121,12 @@ export default function Home() {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  // callbacks
-  const handleClosePress = useCallback(() => {
-    bottomSheetRef.current?.close();
-    setCamera(false);
-
+  const handleSheetChanges = useCallback((index: number) => {
+    if (index === -1) {
+      console.log('BottomSheet closed with swipe down.');
+      // Lakukan aksi lain jika ditutup
+      setCamera(false);
+    }
   }, []);
 
   const handleSnapPress = useCallback(() => {
@@ -190,15 +177,12 @@ export default function Home() {
           text: 'OK', onPress: () => null
         },
       ]);
-    }finally{
+    } finally {
       setCamera(false);
       bottomSheetRef.current?.close();
     }
 
   };
-
-  const [date, setDate] = useState(new Date);
-  const [inputDate, setInputDate] = useState<string>();
 
   const onChange = (event: any, selectedDate: any) => {
     const dateTimestamp = event.nativeEvent.timestamp;
@@ -231,21 +215,16 @@ export default function Home() {
             {loading ? (
               <SkeletonItem />
             ) : reservasi ? (
-              <View className="p-5">
-                <View className="flex justify-between items-center mb-3">
-                  <Text className="section-title">Aktif Pemakaian</Text>
-                  <TouchableOpacity>
-                    <FontAwesome5 name="location-arrow" size={24} color="black" /> <Text>Reservasi</Text>
-                  </TouchableOpacity>
-                </View>
-                <View className="py-2" />
-                <View className="text-center">
-                  <Text>nama kendaraan</Text>
-                  <Text className="text-sm text-gray-950">no polisi</Text>
-                  <Text className="text-sm text-gray-500">
-                    date
-                  </Text>
-                </View>
+              <View className="bg-white p-4 rounded-lg">
+                <Text className='text-center'>Kendaraan yang sedang digunakan</Text>
+                <Text className='text-center font-bold text-3xl'>{dataAktif?.name}</Text>
+                <Text className='text-center font-bold text-xl'>{dataAktif?.no_polisi}</Text>
+                <TouchableOpacity onPress={() => router.push('/perjalanan')}
+                  className={`flex-row items-center justify-center ${colors.warning} py-3 px-6 my-4 rounded-lg`}
+                >
+                  <FontAwesome5 name="location-arrow" size={24} color="white" />
+                  <Text className="text-white font-bold ml-2">Detail Pemakaian</Text>
+                </TouchableOpacity>
               </View>
             ) : (
               <>
@@ -266,7 +245,7 @@ export default function Home() {
 
 
           <FlatList
-            data={dataPemakaian}
+            data={dataListPemakaian}
             style={{ marginTop: 20 }}
             keyExtractor={(item) => item.id.toString()}
             refreshControl={
@@ -286,27 +265,7 @@ export default function Home() {
               </Pressable>
             }
             renderItem={({ item }) => (
-              <View className="bg-white p-4 rounded-lg shadow mb-2">
-                <View className='flex-row items-center justify-between'>
-                  <Text className={`text-2xl font-bold text-black`}>
-                    {item.model}
-                  </Text>
-                  <Text className='text-secondary text-sm'>
-                    {item.no_polisi}
-                  </Text>
-                </View>
-                <Text className='font-medium text-lg'>
-                  {item.kegiatan}
-                </Text>
-                <View className='flex-row items-center justify-around mt-4'>
-                  <TouchableOpacity onPress={() => setModalVisible(true)}>
-                    <Text className="text-black bg-blue-300 p-2 rounded-lg">Jam Berangkat: {item.reservasi_in}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text className="text-black bg-amber-300 p-2 rounded-lg">Jam Pulang: {item.reservasi_out}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <CardListPemakaian props={item} />
             )}
             ListEmptyComponent={
               <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
@@ -316,18 +275,7 @@ export default function Home() {
           />
         </View>
 
-        <ModalRN
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-        >
-          <ModalRN.Header><Text className='font-bold'>Title</Text></ModalRN.Header>
-          <ModalRN.Content><Text>Content</Text></ModalRN.Content>
-          <ModalRN.Footer>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text className={`py-2 px-4 ${colors.warning} items-center rounded-lg text-white`}>Close</Text>
-            </TouchableOpacity>
-          </ModalRN.Footer>
-        </ModalRN>
+  
 
       </View>
       <BottomSheet
@@ -336,13 +284,10 @@ export default function Home() {
         index={-1}
         enablePanDownToClose={true}
         animationConfigs={animationConfigs}
+        onChange={handleSheetChanges}
       >
         <BottomSheetView className='flex-1 items-center bg-slate-300 justify-center'>
-          {camera && <BarcodeScanner
-            onScan={handleScan}
-            onClose={() => handleClosePress()}
-          />}
-
+          {camera && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
       </BottomSheet>
     </SafeAreaView>

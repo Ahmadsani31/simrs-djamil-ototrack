@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Platform, Linking, Pressable } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
@@ -8,9 +8,8 @@ const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
 
-export default function BarcodeScanner({ onScan, onClose }: {
+export default function BarcodeScanner({ onScan }: {
   onScan: (data: string) => void;
-  onClose: () => void;
 }) {
   const [scanned, setScanned] = useState(false);
   const scanLinePos = useRef(new Animated.Value(0)).current;
@@ -33,15 +32,22 @@ export default function BarcodeScanner({ onScan, onClose }: {
     animateScanLine();
   }, []);
 
-
-
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     setScanned(true);
     onScan(data);
   };
 
-  // Permission kamera
+  const openAppSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings(); // Android
+    }
+  };
 
+  console.log(permission);
+
+  // Permission kamera
   if (!permission) {
     // Camera permissions are still loading.
     return <View className='flex-1 w-full items-center justify-center bg-white'>
@@ -49,12 +55,21 @@ export default function BarcodeScanner({ onScan, onClose }: {
     </View>;
   }
 
+  if (permission.status === 'denied') {
+    return (
+      <View className='flex-1 w-full items-center justify-center bg-white'>
+        <Text className='text-xl text-center font-bold text-red-500'>Permission denied!, Please allow your permission camera</Text>
+        <ButtonCostum classname={colors.secondary} onPress={() => openAppSettings()} title="Grant permission" />
+      </View>
+    );
+  }
+
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
       <View className='flex-1 w-full items-center justify-center bg-white'>
         <Text className='font-medium text-xl'>We need your permission to show the camera</Text>
-        <ButtonCostum classname={colors.secondary} onPress={()=>requestPermission()} title="Grant permission" />
+        <ButtonCostum classname={colors.secondary} onPress={() => requestPermission()} title="Grant permission" />
       </View>
     );
   }
@@ -112,11 +127,6 @@ export default function BarcodeScanner({ onScan, onClose }: {
 
         {/* Text Instruksi */}
         <Text className='absolute top-24 font-bold text-2xl text-center text-white self-center'>Arahkan kamera ke barcode/QR code Kedaraan</Text>
-
-        {/* Tombol Close */}
-        <TouchableOpacity onPress={onClose} className='absolute top-5 right-5 rounded-full bg-red-500 p-2' >
-          <MaterialIcons name="close" size={30} color="white" />
-        </TouchableOpacity>
       </CameraView>
     </View>
   );

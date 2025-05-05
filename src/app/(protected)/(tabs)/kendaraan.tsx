@@ -2,6 +2,7 @@ import { Button, Dimensions, FlatList, Image, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import secureApi from "@/services/service";
 import SkeletonList from "@/components/SkeletonList";
+import SafeAreaView from "@/components/SafeAreaView";
 
 const { height } = Dimensions.get('window');
 
@@ -47,6 +48,7 @@ export default function KendaraanScreen() {
   }, []);
 
   return (
+    <SafeAreaView noTop>
     <View className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
       <View className="px-4">
@@ -68,6 +70,7 @@ export default function KendaraanScreen() {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 

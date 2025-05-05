@@ -1,8 +1,9 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useRef, useState } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
+import LoadingIndikator from './LoadingIndikator';
 // import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 // import { Asset } from 'expo-asset';
 
@@ -19,12 +20,14 @@ export default function ModalCamera({
 }: InputProps) {
 
   const [permission, requestPermission] = useCameraPermissions();
-
+  const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
 
   const takePicture = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({ base64:true,quality:0.6 });
+    setLoading(true);
+    const photo = await cameraRef.current?.takePictureAsync({ base64: true, quality: 0.6 });
     setUriImage(photo?.uri ?? null);
+    setLoading(false);
     onClose();
   };
 
@@ -34,6 +37,8 @@ export default function ModalCamera({
         visible={visible}
         animationType="fade"
       >
+        {loading && <LoadingIndikator/>}
+        
         <View className="flex-1 bg-slate-600 justify-center items-center ">
           {permission?.granted ? (
             <CameraView

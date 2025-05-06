@@ -4,13 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Pressable } from 'react-native-gesture-handler';
 
-interface AnimatedTabButtonProps {
-  icon: any;
-  label?: string;
-  accessibilityState: any;
-  onPress: () => void;
-}
-
 export function AnimatedTabButton({ icon, label, accessibilityState, onPress }: any) {
   const focused = accessibilityState.selected;
 

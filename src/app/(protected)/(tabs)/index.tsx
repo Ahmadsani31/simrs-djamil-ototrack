@@ -1,7 +1,7 @@
 import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Entypo, FontAwesome5, Fontisto, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { ModalRN } from '@/components/ModalRN';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
@@ -15,6 +15,7 @@ import secureApi from '@/services/service';
 import SkeletonItem from '@/components/SkeletonItem';
 import ButtonCostum from '@/components/ButtonCostum';
 import CardListPemakaian from '@/components/CardListPemakaian';
+import { useLoadingStore } from '@/stores/loadingStore';
 
 interface DataAktif {
   name: string;
@@ -37,8 +38,9 @@ interface DataKendaraan {
 
 export default function Home() {
 
-  // const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(false);
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [reservasi, setReservasi] = useState(false);
   const [dataListPemakaian, setDataListPemakaian] = useState<DataKendaraan[]>([]);
   const [dataAktif, setDataAktif] = useState<DataAktif>();
@@ -49,14 +51,16 @@ export default function Home() {
   const [date, setDate] = useState(new Date);
   const [inputDate, setInputDate] = useState<string>();
 
-  useEffect(() => {
-    console.log('load page');
-
-    fetchDataAktif();
-    fetchDataList('');
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // Refresh logic here
+      fetchDataAktif();
+      fetchDataList('');
+    }, [])
+  );
 
   const fetchDataAktif = async () => {
+    setIsLoading(true);
     setLoading(true);
     try {
       const res = await secureApi.get(`reservasi/aktif`);
@@ -72,13 +76,14 @@ export default function Home() {
       setReservasi(false);
 
     } finally {
+      setIsLoading(false);
       setLoading(false);
     }
   };
 
   const fetchDataList = async (tanggal: any) => {
-    setLoading(true)
-
+    setIsLoading(true)
+    setLoading(true);
     console.log('tanggal', tanggal);
 
     try {
@@ -93,17 +98,18 @@ export default function Home() {
       // setTodos(response.data);
     } catch (error: any) {
 
-      console.log(JSON.stringify("Error reservasi/list ", error.response?.data?.message));
-
+      console.log(JSON.stringify("Error reservasi/list ", error));
+      setDataListPemakaian([])
       // Alert.alert('Error', 'Failed to fetch todos');
     } finally {
+      setIsLoading(false);
       setLoading(false);
     }
   };
 
 
   const onRefresh = () => {
-    setRefreshing(true);
+    fetchDataList('');
     setInterval(() => {
       setRefreshing(false);
 
@@ -186,7 +192,9 @@ export default function Home() {
 
   const onChange = (event: any, selectedDate: any) => {
     const dateTimestamp = event.nativeEvent.timestamp;
-    fetchDataList(dateTimestamp);
+    console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
+    
+    fetchDataList(dayjs(selectedDate).format('YYYY-MM-DD'));
     const currentDate = selectedDate;
     setDate(currentDate);
     setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
@@ -194,6 +202,7 @@ export default function Home() {
 
   const toggleResetDate = () => {
     setInputDate('');
+    fetchDataList('');
   }
 
   const showMode = (currentMode: any) => {
@@ -212,10 +221,13 @@ export default function Home() {
         <View className='px-4'>
 
           <View className="mb-5">
-            {loading ? (
+            {isLoading ? (
               <SkeletonItem />
             ) : reservasi ? (
               <View className="bg-white p-4 rounded-lg">
+                <TouchableOpacity onPress={fetchDataAktif} className='absolute top-0 right-0'>
+                  <Ionicons name='reload-circle' size={32}/>
+                </TouchableOpacity>
                 <Text className='text-center'>Kendaraan yang sedang digunakan</Text>
                 <Text className='text-center font-bold text-3xl'>{dataAktif?.name}</Text>
                 <Text className='text-center font-bold text-xl'>{dataAktif?.no_polisi}</Text>
@@ -249,10 +261,11 @@ export default function Home() {
             style={{ marginTop: 20 }}
             keyExtractor={(item) => item.id.toString()}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh}  colors={['grey']}
+              progressBackgroundColor={'black'} />
             }
             stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 185 }}
+            contentContainerStyle={{ paddingBottom: 200 }}
             ListHeaderComponent={
               <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
                 <Fontisto className='absolute z-10 left-6 top-5' name="date" size={24} color={'black'} />

@@ -67,12 +67,9 @@ export function ModalRN({ visible, onClose, children }: ModalProps) {
     );
 }
 
-ModalRN.Header = function Header({ children,onClose }: { children: React.ReactNode,onClose: () => void }) {
+ModalRN.Header = function Header({ children }: { children: React.ReactNode }) {
     return (
         <View style={styles.header}>
-            <TouchableOpacity onPress={onClose} className='absolute z-10 top-0 right-0 '>
-                <Entypo name='circle-with-cross' size={28} />
-            </TouchableOpacity>
             {children}
         </View>
     );

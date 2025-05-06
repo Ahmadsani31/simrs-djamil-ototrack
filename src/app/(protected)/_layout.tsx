@@ -1,13 +1,20 @@
+import LoadingIndikator from "@/components/LoadingIndikator";
 import { PrivateRoute } from "@/components/PrivateRoute";
-import { router, Stack } from "expo-router";
+import { useLoadingStore } from "@/stores/loadingStore";
+import { router, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Alert, BackHandler } from "react-native";
+import { Alert, BackHandler, Image, Pressable, TouchableHighlight, View } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from "@/constants/colors";
 
 export const unstable_settings = {
     initialRouteName: "(tabs)", // anchor
 };
 
 export default function ProtectedLayout() {
+
+    const loading = useLoadingStore((state) => state.loading);
+    const route = useRouter();
 
     useEffect(() => {
         const backAction = () => {
@@ -21,12 +28,12 @@ export default function ProtectedLayout() {
                     'Apakah Anda yakin ingin keluar dari aplikasi?',
                     [
                         {
-                            text: 'Tidak',
+                            text: 'Batal',
                             onPress: () => null,
                             style: 'cancel',
                         },
                         {
-                            text: 'Ya',
+                            text: 'Keluar',
                             onPress: () => BackHandler.exitApp(),
                         },
                     ]
@@ -42,11 +49,33 @@ export default function ProtectedLayout() {
         );
 
         return () => backHandler.remove();
-    }, [router]);
+    }, []);
+
+    const backAction = () => {
+        console.log('bal=ck');
+
+        Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
+            {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+            },
+            { text: 'YES', onPress: () => router.back() },
+        ]);
+        return true;
+    };
 
     return (
         <PrivateRoute>
-            <Stack>
+            {loading && <LoadingIndikator />}
+            <Stack screenOptions={
+                {
+                    headerTitleAlign: 'center',
+                    headerStyle: {
+                        backgroundColor: '#205781',
+                    },
+                }
+            }>
                 <Stack.Screen
                     name="(tabs)"
                     options={{
@@ -56,10 +85,33 @@ export default function ProtectedLayout() {
                 <Stack.Screen
                     name="detail"
                     options={{
-                        headerShown: false,
+                        headerShown: true,
+                        title: 'Proses Pemakaian Kendaraan',
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
+                        headerLeft: () => (
+                            <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
+                        ),
                     }}
                 />
-
+                <Stack.Screen
+                    name="pegembalian"
+                    options={{
+                        title: 'Proses Pegembalian Kendaraan',
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
+                        headerShown: true,
+                        headerLeft: () => (
+                            <TouchableHighlight onPress={() => Alert.alert('gagal')} className={`${colors.primary} p-1 rounded-full`}>
+                                <Ionicons name="arrow-back" size={24} color={'white'} />
+                            </TouchableHighlight>
+                        ),
+                    }}
+                />
             </Stack>
         </PrivateRoute>
     );

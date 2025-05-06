@@ -18,6 +18,8 @@ import { useLoadingStore } from "@/stores/loadingStore";
 interface dataDetail {
   name: string;
   no_polisi: string;
+  kegiatan: string;
+  created_at: string
 }
 
 interface Coords {
@@ -26,14 +28,11 @@ interface Coords {
 }
 
 const validationSchema = yup.object().shape({
-  kegiatan: yup.string().required('Kegiatan harus diisi'),
   spidometer: yup.number().required('Spidometer harus diisi'),
 });
 
 
-export default function DetailScreen() {
-  const { uuid } = useLocalSearchParams();
-
+export default function PengembalianScreen() {
 
   const [reqLocation, setReqLocation] = useState<boolean>(false)
 
@@ -51,6 +50,24 @@ export default function DetailScreen() {
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
 
+  const fetchDataAktif = async () => {
+    setLoading(true);
+    try {
+      const res = await secureApi.get(`reservasi/aktif`);
+      console.log('res data aktif ', res.data);
+
+      if (res.status === true) {
+        setRow(res.data)
+      }
+    } catch (error: any) {
+      // console.error("Error fetching data:", error);
+      console.log("Error /reservasi/aktif", JSON.stringify(error.response?.data?.message));
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const backAction = () => {
     Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
       {
@@ -65,51 +82,30 @@ export default function DetailScreen() {
 
   useEffect(() => {
     loadLocation();
-
+    fetchDataAktif();
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [router]);
 
   const loadLocation = async () => {
     const reLoc = await reLocation.enable()
     setReqLocation(reLoc);
   }
 
-
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await secureApi.get(`/reservasi/detail?uniqued_id=${uuid}`);
-
-        console.log(res.data);
-        setRow(res.data)
-
-        setKendaraanID(res.data.id)
-
-      } catch (error: any) {
-        console.log("Error fetching data:", JSON.stringify(error.response?.data?.message));
-        // console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
-  }, [uuid]);
-
-  const handleSubmitKegiatan = async (values: FormikValues) => {
+  const handleSubmitExit = async (values: FormikValues) => {
     setLoading(true)
     if (!uri && values.spidometer == '') {
       Alert.alert('Peringatan!', 'Foto spidometer belum di ambil', [
-        { text: 'Tutup', onPress: () => null },
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => null },
       ]);
       return
     }
@@ -117,19 +113,24 @@ export default function DetailScreen() {
 
     if (!coordinate?.lat && coordinate?.long) {
       Alert.alert('Peringatan!', 'Error device location', [
-        { text: 'Tutup', onPress: () => null },
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'YES', onPress: () => null },
       ]);
       return
     }
 
     try {
+      const reservasi_id = await SecureStore.getItemAsync('reservasi_id');
 
       const formData = new FormData();
       formData.append('latitude', coordinate?.lat?.toString() || '');
       formData.append('longitude', coordinate?.long.toString() || '');
-      formData.append('kegiatan', values.kegiatan);
       formData.append('spidometer', values.spidometer);
-      formData.append('kendaraan_id', kendaraanID ? kendaraanID : '');
+      formData.append('reservasi_id', reservasi_id ? reservasi_id : '25');
       formData.append('fileImage', {
         uri: uri,
         name: 'spidometer-capture.jpg',
@@ -138,13 +139,24 @@ export default function DetailScreen() {
 
       console.log('formData', formData);
 
-      const response = await secureApi.postForm('/reservasi/save_detail', formData)
+      const response = await secureApi.postForm('/reservasi/return_kendaraan', formData)
+      console.log('response ', JSON.stringify(response.data));
 
-      console.log('response ', JSON.stringify(response.reservasi_id));
-
-      await SecureStore.setItemAsync('reservasi_id', JSON.stringify(response.reservasi_id));
-      // console.log(response.message);
-      router.replace('(protected)/perjalanan')
+      if (response.status === true) {
+        await SecureStore.deleteItemAsync('reservasi_id');
+        // console.log(response.message);
+        router.replace('(protected)')
+      } else {
+        Alert.alert('Peringatan!', response.message, [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          { text: 'YES', onPress: () => null },
+        ]);
+        // toast.error(response.message)
+      }
     } catch (error: any) {
       // alert(error.response.data.message)
       console.log('response error', JSON.stringify(error.response.data.message));
@@ -166,22 +178,22 @@ export default function DetailScreen() {
     <SafeAreaView noTop className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+        <ScrollView  contentContainerStyle={{ paddingBottom: 30 }}>
           <View className="m-4 p-4 bg-white rounded-lg">
             <View className="items-center mb-3 py-2">
               <Text className="text-5xl text-center font-bold">{row?.name}</Text>
               <Text className="font-medium text-center mt-3">{row?.no_polisi}</Text>
             </View>
             <View className="border border-b-2 w-full mb-4" />
+            <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
             <Formik
-              initialValues={{ kegiatan: '', spidometer: '' }}
+              initialValues={{ spidometer: '' }}
               validationSchema={validationSchema}
-              onSubmit={async (values) => await handleSubmitKegiatan(values)}
+              onSubmit={async (values) => await handleSubmitExit(values)}
             >
               {({ handleChange, handleSubmit, values, errors, touched }) => (
                 <>
-                  {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
-                  <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
+                  {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
                   {!uri ? (
                     <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
                       <AntDesign name="camera" size={32} />
@@ -205,12 +217,12 @@ export default function DetailScreen() {
                       <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
                     </>
                   )}
-                  <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
+                  {uri && <ButtonCostum classname={colors.primary} title="Proses Pengembalian Kendaraan" onPress={handleSubmit} />}
+
                 </>
               )}
             </Formik>
 
-            <ButtonCostum classname={colors.warning} title="Batal" onPress={backAction} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

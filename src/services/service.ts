@@ -2,6 +2,7 @@ import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { Alert } from 'react-native';
 // Ganti dengan base URL API kamu
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -31,10 +32,15 @@ api.interceptors.response.use(
   (error) => {
     const message = error.response?.data?.message || '';
     // Cek error token expired
-    if (error.response?.status === 401 && message.toLowerCase().includes('expired token')) {
+    console.log('error ',error.response?.status);
+    
+    if (error.response?.status === 401) {
       console.log('Token expired, logging out...');
-      SecureStore.deleteItemAsync('token');
-      router.dismissAll();
+      // SecureStore.deleteItemAsync('token');
+      // Alert.alert('Expired token')
+      // router.replace('/login');
+      const { logout } = useAuthStore.getState();
+      logout();
     }
 
     // console.log('error api interceptors ', error);

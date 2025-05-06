@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import ButtonCostum from './ButtonCostum';
 import dayjs from 'dayjs';
 import { ModalRN } from './ModalRN';
-import { colors } from '@/constants/colors';
 import secureApi from '@/services/service';
-import LoadingIndikator from './LoadingIndikator';
+import { useLoadingStore } from '@/stores/loadingStore';
 
 interface cardProps {
     props: any;
@@ -14,8 +13,8 @@ interface cardProps {
 export default function CardListPemakaian({ props }: cardProps) {
     const [modalVisible, setModalVisible] = useState(false);
     const [imgBase64, setImgBase64] = useState<Base64URLString>();
-    const [loading, setLoading] = useState(false);
 
+    const setLoading = useLoadingStore((state) => state.setLoading);
 
     const handleModalImageShow = async (id: any, type: any) => {
         console.log('show image modal');
@@ -45,10 +44,10 @@ export default function CardListPemakaian({ props }: cardProps) {
 
     return (
         <>
-      
+
             <View className='flex-row items-center bg-[#F2E5BF] justify-between px-4 rounded-t-lg'>
                 <Text className={` text-black`}>
-                    {dayjs(props.created_at).format("dddd ,DD MMMM YYYY")}
+                    {dayjs(props.created_at).format("dddd ,DD MMMM YYYY | HH:ss")}
                 </Text>
                 <ButtonCostum classname='bg-black' title='Detail' />
             </View>
@@ -95,73 +94,26 @@ export default function CardListPemakaian({ props }: cardProps) {
                     </TouchableOpacity>
                 </View>
             </View>
-            {loading ? <LoadingIndikator/> : (
-            <Modal
-               animationType="fade"
-               transparent={true}
-               className='bg-black/50'
-               visible={modalVisible}
-               
-               onRequestClose={() => {
-                 setModalVisible(!modalVisible);
-               }}>
-                <View style={styles.centeredView}>
-                <View style={styles.modalView}>
+            <ModalRN visible={modalVisible} onClose={() => {
+                setModalVisible(!modalVisible);
+            }}>
+                <ModalRN.Header>
+                    <Text>Tampil gambar spidometer</Text>
+                </ModalRN.Header>
+                <ModalRN.Content>
                     <Image
-                        className='w-96 h-96 mb-3 object-contain'
+                        className='w-full aspect-[3/4] rounded-lg'
                         source={{
                             uri: imgBase64
                         }} />
-                          <TouchableOpacity onPress={() => setModalVisible(false)}>
-                        <Text className={`py-2 px-4 ${colors.warning} items-center rounded-lg text-white`}>Close</Text>
+                </ModalRN.Content>
+                <ModalRN.Footer>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+
+                        <Text className={`py-2 px-4 bg-red-500 items-center rounded-lg text-white`}>Close</Text>
                     </TouchableOpacity>
-                </View>
-                </View>
-            </Modal>
-            )}
+                </ModalRN.Footer>
+            </ModalRN>
         </>
     );
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    margin: 10,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});

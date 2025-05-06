@@ -91,7 +91,6 @@ export default function LoginScreen() {
                 onChangeText={handleChange('email')}
                 error={touched.email ? errors.email : undefined}
                 className='bg-gray-200'
-                autoFocus={true}
               />
 
 

@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { LoginData, RegisterData, User } from '@/types/types';
 import { Alert } from 'react-native';
 import { restApi } from '@/services/auth';
+import { router } from 'expo-router';
 
 interface AuthState {
   token: string | null;
@@ -50,7 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ token, user, isLoading: false });
       return true;
     } catch (error: any) {
-      Alert.alert('Error', error.message as string);
+      Alert.alert('Warning!', error.response?.data?.message as string);
       console.log('Login error:', JSON.stringify(error.message));
       set({
         errorLogin: error.response?.data?.message || 'Login failed',
@@ -81,15 +82,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   // },
 
   logout: async () => {
-    const token = await SecureStore.getItemAsync('token');
     set({ isLoading: true });
+
+    const token = await SecureStore.getItemAsync('token');
     if (token) {
     const response =  await restApi.logout(token);
     console.log('response logout ', response);
-    set({ isLoading: false });
     }
     await SecureStore.deleteItemAsync('token');
-    set({ token: null, user: null });
+    set({ token: null, user: null,isLoading: false  });
+    router.replace('/login');
   },
 
   checkAuth: async () => {

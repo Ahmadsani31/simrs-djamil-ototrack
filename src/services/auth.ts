@@ -65,7 +65,6 @@ export const restApi = {
       {
         headers: {
           Authorization: `Bearer ${isToken}`,
-          'Content-Type': 'multipart/form-data'
         },
       }
     );

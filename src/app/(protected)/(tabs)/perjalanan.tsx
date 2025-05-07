@@ -1,25 +1,21 @@
-import { ActivityIndicator, Alert, Button, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Alert, Button, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import ButtonCostum from "@/components/ButtonCostum";
-import * as Location from 'expo-location'
-import { useLocationStore } from "@/stores/locationStore";
 
 import * as SecureStore from 'expo-secure-store';
-import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system";
 import { colors } from "@/constants/colors";
 import { ModalRN } from "@/components/ModalRN";
-import { Formik, FormikValues, useFormik } from "formik";
-import { Image } from "expo-image";
-import Input from "@/components/Input";
 import * as yup from 'yup';
 import { AntDesign } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
 import { reLocation } from "@/hooks/locationRequired";
 import secureApi from "@/services/service";
 import SafeAreaView from "@/components/SafeAreaView";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useLoadingStore } from "@/stores/loadingStore";
+import CheckpointScreen from "@/components/CheckpointScreen";
+import SkeletonItem from "@/components/SkeletonItem";
+import SkeletonList from "@/components/SkeletonList";
 
 const BACKGROUND_TASK = 'background-location-task';
 
@@ -28,6 +24,7 @@ const validationSchema = yup.object().shape({
 });
 
 interface dataDetail {
+  id: number;
   name: string;
   no_polisi: string;
   kegiatan: string;
@@ -41,15 +38,26 @@ export default function PerjalananScreen() {
   const [dialogCamera, setDialogCamera] = useState(false);
   const [dialogExit, setDialogExit] = useState(false);
 
-  const [uri, setUri] = useState<String | null>(null);
+  const [uri, setUri] = useState<string | null>(null);
   const setLoading = useLoadingStore((state) => state.setLoading);
   const [reqLocation, setReqLocation] = useState<boolean>(false)
   const [row, setRow] = useState<dataDetail>()
+  const [checkpointStatus, setCheckpointStatus] = useState(false);
+  const [loadingCheckpoint, setLoadingCheckpoint] = useState(true);
+  const [checkpointID, setCheckpointID] = useState("");
 
   useEffect(() => {
     loadLocation();
-    fetchDataAktif()
+    fetchDataAktif();
+
   }, [])
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Refresh logic here
+
+  //   }, [])
+  // );
 
   const fetchDataAktif = async () => {
     setLoading(true);
@@ -59,17 +67,42 @@ export default function PerjalananScreen() {
 
       if (res.status === true) {
         setRow(res.data)
+        fetchDataCheckpointAktif(res.data.id);
       }
     } catch (error: any) {
       // console.error("Error fetching data:", error);
-      console.log("Error /reservasi/aktif", JSON.stringify(error.response?.data?.message));
+      console.log("Error /reservasi/aktif ", JSON.stringify(error.response?.data?.message));
 
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async () => {
+  const fetchDataCheckpointAktif = async (reservasi_id: any) => {
+    console.log('id reservasi ', reservasi_id);
+
+    try {
+      const res = await secureApi.get(`checkpoint/aktif`, {
+        params: {
+          reservasi_id: reservasi_id,
+        },
+      });
+      console.log('res data checkpoint aktif ', res.data);
+
+      if (res.status === true) {
+        setCheckpointStatus(true)
+        setCheckpointID(res.data.checkpoint_id);
+      }
+    } catch (error: any) {
+      // console.error("Error fetching data:", error);
+      console.log("Error /checkpoint/aktif ", JSON.stringify(error.response?.data?.message));
+
+    } finally {
+      setLoadingCheckpoint(false);
+    }
+  };
+
+  const handleSubmitProsesBBM = async () => {
     setLoading(true)
     const coordinate = await reLocation.getCoordinate()
 
@@ -80,12 +113,11 @@ export default function PerjalananScreen() {
       return
     }
 
-    const reservasi_id = await SecureStore.getItemAsync('reservasi_id');
-
     const formData = new FormData();
+
     formData.append('latitude', coordinate?.lat?.toString() || '');
     formData.append('longitude', coordinate?.long.toString() || '');
-    formData.append('reservasi_id', reservasi_id ? reservasi_id : '12');
+    formData.append('reservasi_id', row?.id?.toString() || '');
     formData.append('fileImage', {
       uri: uri,
       name: 'spidometer-capture.jpg',
@@ -93,12 +125,14 @@ export default function PerjalananScreen() {
     } as any);
 
     console.log('formData', formData);
+
     try {
-      const response = await secureApi.postForm('/reservasi/save', formData)
+      const response = await secureApi.postForm('/checkpoint/save', formData)
+
       console.log('response ', JSON.stringify(response));
 
       if (response.status == true) {
-        router.replace('(protected)');
+        fetchDataCheckpointAktif('');
       } else {
         Alert.alert('Peringatan!', response.message, [
           { text: 'Tutup', onPress: () => null },
@@ -106,7 +140,7 @@ export default function PerjalananScreen() {
       }
 
     } catch (error: any) {
-      console.log('response ', JSON.stringify(error.response.data));
+      console.log('response checkpoint', JSON.stringify(error.response.data));
       Alert.alert('Warning!', error.response.data.message, [
         { text: 'Tutup', onPress: () => null },
       ]);
@@ -129,11 +163,9 @@ export default function PerjalananScreen() {
     setUri(null)
   }
 
-
-
-
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
+
   return (
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
@@ -159,26 +191,28 @@ export default function PerjalananScreen() {
             </View>
           )}
 
-          {row && (
-            <View className='px-4'>
-              <ScrollView style={{ marginBottom: 80 }}>
-                <View className="p-4 bg-white rounded-lg">
-                  <ButtonCostum classname={colors.primary} title="Proses Pengisiaan BBM" onPress={() => setDialogExit(!dialogExit)} />
-                  <ButtonCostum classname={colors.secondary} title="Pengembalian Kendaraan" onPress={() => router.push('pegembalian')} />
+          {loadingCheckpoint ? <SkeletonList loop={2} /> :
+            checkpointStatus ? <CheckpointScreen reservasiID={checkpointID} /> :
+              (
+                <View className='px-4'>
+                  <ScrollView style={{ marginBottom: 80 }}>
+                    <View className="p-4 bg-white rounded-lg">
+                      <ButtonCostum classname={colors.primary} title="Proses Pengisiaan BBM" onPress={() => setDialogExit(!dialogExit)} />
+                      <ButtonCostum classname={colors.secondary} title="Pengembalian Kendaraan" onPress={() => router.push('pegembalian')} />
+                    </View>
+                  </ScrollView>
                 </View>
-              </ScrollView>
-            </View>
-          )}
+              )}
 
         </KeyboardAvoidingView>
-
         <ModalRN
           visible={dialogExit}
           onClose={handleDialogExit}
         >
           <ModalRN.Header>
-            <Text className='font-bold text-center'>Proses Kembalikan Kendaraan</Text>
-            <Text className="text-center">Silahkan foto spidometer kendaraan yang terbaru</Text>
+            <Text className='font-bold text-center'>Proses Pengisian BBM Kendaraan</Text>
+            <Text className="text-center">Silahkan foto kondisi terkini saat melakukan proses pengisian BBM
+              Kendaraan</Text>
           </ModalRN.Header>
           <ModalRN.Content>
             {!uri ? (
@@ -187,11 +221,10 @@ export default function PerjalananScreen() {
                 <Text className="font-bold text-white ms-2">Open Camera</Text>
               </TouchableOpacity>
             ) : (
-              <View className="w-full rounded-lg bg-black my-4">
+              <View className="w-full rounded-lg bg-black">
                 <Image
-                  source={{ uri }}
-                  contentFit="contain"
-                  style={{ aspectRatio: 1 }}
+                  source={{ uri: uri || undefined }}
+                  className='w-full aspect-[3/4] rounded-lg'
                 />
                 <TouchableOpacity className="absolute right-2 top-2" onPress={() => setUri(null)}>
                   <AntDesign name="closecircleo" size={32} color="red" />
@@ -202,7 +235,7 @@ export default function PerjalananScreen() {
           <ModalRN.Footer>
             <View className="gap-2 flex-row">
               <ButtonCostum classname={colors.warning} title="Exit" onPress={handleDialogExit} />
-              {uri && <ButtonCostum classname={colors.primary} title="Submit" onPress={handleSubmit} />}
+              {uri && <ButtonCostum classname={colors.primary} title="Submit" onPress={handleSubmitProsesBBM} />}
 
             </View>
           </ModalRN.Footer>

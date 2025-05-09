@@ -114,12 +114,12 @@ export default function LoginScreen() {
           )}
         </Formik>
       </Animated.View>
-      <View className="mt-4 flex-row justify-center z-10">
+      {/* <View className="mt-4 flex-row justify-center z-10">
         <Text>Don't have an account? </Text>
         <Link href="/register" push className="text-[#205781] font-bold">
           Register
         </Link>
-      </View>
+      </View> */}
       <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#497D74] bottom-24 left-[-60] rounded-full shadow-lg" />
       <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
       </Animated.View>

@@ -5,6 +5,7 @@ import SkeletonList from "@/components/SkeletonList";
 import SafeAreaView from "@/components/SafeAreaView";
 import { useFocusEffect } from "expo-router";
 import { useLoadingStore } from "@/stores/loadingStore";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface KendaraanItemProps {
   model: string;
@@ -19,59 +20,57 @@ interface Kendaraan {
   kondisi: string;
 }
 
+const fetchData = async () => {
+  const response = await secureApi.get(`/kendaraan`);
+  return response.data
+};
+
 export default function KendaraanScreen() {
+
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [dataKendaraan, setDatakendaraan] = useState<Kendaraan[]>([])
+  const queryClient = useQueryClient()
   useFocusEffect(
     useCallback(() => {
       // Refresh logic here
-      fetchData();
+      // fetchData();
+      queryClient.invalidateQueries({ queryKey: ['kendaraan'] })
     }, [])
   );
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await secureApi.get(`/kendaraan`);
 
-      // console.log(res.data.data);
-
-      setDatakendaraan(res.data.data)
-
-    } catch (error: any) {
-      console.log("Error fetching data:", JSON.stringify(error.response?.data?.message));
-      // console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: kendaraan, isLoading, isError, error } = useQuery<Kendaraan[]>({
+    queryKey: ['kendaraan'],
+    queryFn: fetchData,
+  })
 
   return (
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
         <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
         <View className="px-4">
+          {isLoading ? <SkeletonList loop={10} /> : (
+            <FlatList
+              data={kendaraan}
+              bounces
+              style={{ flexGrow: 0 }}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ paddingBottom: 80 }}
+              stickyHeaderIndices={[0]}
+              ListHeaderComponent={
+                <View>
+                  <Text className="text-xl font-bold bg-[#F2E5BF] rounded-lg p-2">Data kendaraan terdaftar</Text>
+                </View>
+              }
+              renderItem={KendaraanItem}
+              ListEmptyComponent={
+                <View className="flex-1 mt-5 justify-center items-center bg-white p-5 rounded-lg">
+                  <Text>Belum ada pemakaian kendaraan</Text>
+                </View>
+              }
+            />
+          )}
 
-          <FlatList
-            data={dataKendaraan}
-            bounces
-            style={{ flexGrow: 0 }}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 80 }}
-            stickyHeaderIndices={[0]}
-            ListHeaderComponent={
-              <View>
-                <Text className="text-xl font-bold bg-[#F2E5BF] rounded-lg p-2">Data kendaraan terdaftar</Text>
-              </View>
-            }
-            renderItem={KendaraanItem}
-            ListEmptyComponent={
-              <View className="flex-1 mt-5 justify-center items-center bg-white p-5 rounded-lg">
-                <Text>Belum ada pemakaian kendaraan</Text>
-              </View>
-            }
-          />
         </View>
       </View>
     </SafeAreaView>

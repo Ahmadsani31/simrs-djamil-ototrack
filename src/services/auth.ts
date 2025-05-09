@@ -25,7 +25,7 @@ export const restApi = {
       jenisDevice = 'Emulator';
     }
 
-    console.log('Login function called with data:', JSON.stringify(data));
+    // console.log('Login function called with data:', JSON.stringify(data));
 
     const post = {
       username: data.email,
@@ -39,7 +39,7 @@ export const restApi = {
       jenisDevice:jenisDevice,
     };
 
-    console.log('data post',post);
+    // console.log('data post',post);
     
 
     const response = await api.post(`/auth/login`, post, {
@@ -50,7 +50,7 @@ export const restApi = {
     return response.data;
   },
   cekLogin: async (isToken: string) => {
-    console.log('isToken ', isToken);
+    // console.log('isToken ', isToken);
     const response = await api.get(`/user`, {
       headers: {
         Authorization: `Bearer ${isToken}`,
@@ -59,7 +59,7 @@ export const restApi = {
     return response.data;
   },
   logout: async (isToken: string) => {
-    console.log('isToken ', isToken);
+    // console.log('isToken ', isToken);
     const response = await api.delete(
       `/auth/logout`,
       {

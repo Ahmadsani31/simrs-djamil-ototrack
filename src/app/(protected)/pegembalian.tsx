@@ -2,7 +2,6 @@ import { Alert, BackHandler, Image, KeyboardAvoidingView, Modal, Platform, Press
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import Input from "@/components/Input";
-import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
 import { AntDesign } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
@@ -15,18 +14,6 @@ import * as SecureStore from 'expo-secure-store';
 import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
 
-interface dataDetail {
-  name: string;
-  no_polisi: string;
-  kegiatan: string;
-  created_at: string
-}
-
-interface Coords {
-  lat: string;
-  long: string;
-}
-
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
 });
@@ -34,39 +21,18 @@ const validationSchema = yup.object().shape({
 
 export default function PengembalianScreen() {
 
+  const { reservasi_id, name, no_polisi } = useLocalSearchParams();
+
   const [reqLocation, setReqLocation] = useState<boolean>(false)
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [kendaraanID, setKendaraanID] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const [row, setRow] = useState<dataDetail>()
-
-
   const [uri, setUri] = useState<string | null>(null);
-  const [blob, setBlob] = useState<String | null>(null);
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
   const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
-
-  const fetchDataAktif = async () => {
-    setLoading(true);
-    try {
-      const res = await secureApi.get(`reservasi/aktif`);
-      console.log('res data aktif ', res.data);
-
-      if (res.status === true) {
-        setRow(res.data)
-      }
-    } catch (error: any) {
-      // console.error("Error fetching data:", error);
-      console.log("Error /reservasi/aktif", JSON.stringify(error.response?.data?.message));
-
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const backAction = () => {
     Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
@@ -82,7 +48,6 @@ export default function PengembalianScreen() {
 
   useEffect(() => {
     loadLocation();
-    fetchDataAktif();
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
@@ -109,6 +74,7 @@ export default function PengembalianScreen() {
       ]);
       return
     }
+
     const coordinate = await reLocation.getCoordinate()
 
     if (!coordinate?.lat && coordinate?.long) {
@@ -124,20 +90,19 @@ export default function PengembalianScreen() {
     }
 
     try {
-      const reservasi_id = await SecureStore.getItemAsync('reservasi_id');
 
       const formData = new FormData();
       formData.append('latitude', coordinate?.lat?.toString() || '');
       formData.append('longitude', coordinate?.long.toString() || '');
       formData.append('spidometer', values.spidometer);
-      formData.append('reservasi_id', reservasi_id ? reservasi_id : '25');
+      formData.append('reservasi_id', reservasi_id.toString());
       formData.append('fileImage', {
         uri: uri,
         name: 'spidometer-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
 
       const response = await secureApi.postForm('/reservasi/return_kendaraan', formData)
       console.log('response ', JSON.stringify(response.data));
@@ -146,16 +111,6 @@ export default function PengembalianScreen() {
         await SecureStore.deleteItemAsync('reservasi_id');
         // console.log(response.message);
         router.replace('(protected)')
-      } else {
-        Alert.alert('Peringatan!', response.message, [
-          {
-            text: 'Cancel',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          { text: 'YES', onPress: () => null },
-        ]);
-        // toast.error(response.message)
       }
     } catch (error: any) {
       // alert(error.response.data.message)
@@ -178,11 +133,11 @@ export default function PengembalianScreen() {
     <SafeAreaView noTop className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-        <ScrollView  contentContainerStyle={{ paddingBottom: 30 }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
           <View className="m-4 p-4 bg-white rounded-lg">
             <View className="items-center mb-3 py-2">
-              <Text className="text-5xl text-center font-bold">{row?.name}</Text>
-              <Text className="font-medium text-center mt-3">{row?.no_polisi}</Text>
+              <Text className="text-5xl text-center font-bold">{name}</Text>
+              <Text className="font-medium text-center mt-3">{no_polisi}</Text>
             </View>
             <View className="border border-b-2 w-full mb-4" />
             <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
@@ -208,7 +163,6 @@ export default function PengembalianScreen() {
                         />
                         <TouchableOpacity className="absolute right-2 top-2" onPress={() => {
                           setUri(null)
-                          setBlob(null)
                           values.spidometer = '';
                         }}>
                           <AntDesign name="closecircleo" size={32} color="red" />

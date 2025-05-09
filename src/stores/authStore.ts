@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
 
   login: async (data: LoginData) => {
-    console.log('Login function called with data:', JSON.stringify(data));
+    // console.log('Login function called with data:', JSON.stringify(data));
 
     set({ isLoading: true, errorLogin: null });
 
@@ -45,14 +45,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login successful:', token, user);
+      // console.log('Login successful:', token, user);
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return true;
     } catch (error: any) {
-      Alert.alert('Warning!', error.response?.data?.message as string);
-      console.log('Login error:', JSON.stringify(error.message));
+      Alert.alert('Warning!', error.message as string);
+      // console.log('Login error:', JSON.stringify(error.message));
       set({
         errorLogin: error.response?.data?.message || 'Login failed',
         isLoading: false,
@@ -87,7 +87,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const token = await SecureStore.getItemAsync('token');
     if (token) {
     const response =  await restApi.logout(token);
-    console.log('response logout ', response);
+    // console.log('response logout ', response);
     }
     await SecureStore.deleteItemAsync('token');
     set({ token: null, user: null,isLoading: false  });
@@ -98,19 +98,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       const token = await SecureStore.getItemAsync('token');
-      console.log('Check auth token:', token);
+      // console.log('Check auth token:', token);
       if (token) {
         const response = await restApi.cekLogin(token);
         const user = response.data.user;
-        console.log('Check auth successful:', token, user);
+        // console.log('Check auth successful:', token, user);
 
         set({ token, user, isLoading: false });
       } else {
-        console.log('token not found');
+        // console.log('token not found');
         set({ isLoading: false });
       }
     } catch (error:any) {
-      console.log('Check User error:', JSON.stringify(error.response?.data?.message));
+      // console.log('Check User error:', JSON.stringify(error.response?.data?.message));
       await SecureStore.deleteItemAsync('token');
       set({ token: null, user: null, isLoading: false });
     }

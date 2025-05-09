@@ -13,31 +13,31 @@ export default function SkeletonItem() {
                 className="flex-row items-center space-x-4 p-4"
             >
                 {/* Avatar */}
-                <Skeleton
+                {/* <Skeleton
                     colorMode="light"
                     height={68}
                     width={68}
                     radius="round"
-                />
+                /> */}
 
                 {/* Text Lines */}
                 <View className="flex-1 space-y-2 ps-3 gap-2">
                     <Skeleton
                         colorMode="light"
-                        height={14}
+                        height={16}
                         width="100%"
                         radius="round"
                     />
                     <Skeleton
                         colorMode="light"
-                        height={14}
+                        height={16}
                         width="75%"
                         radius="round"
                     />
                     <Skeleton
                         colorMode="light"
-                        height={14}
-                        width="75%"
+                        height={16}
+                        width="85%"
                         radius="round"
                     />
                 </View>

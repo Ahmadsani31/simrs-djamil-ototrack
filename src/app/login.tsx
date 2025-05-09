@@ -13,7 +13,6 @@ import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
-import SkeletonItem from '@/components/SkeletonItem';
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Email harus diisi'),
@@ -54,15 +53,10 @@ export default function LoginScreen() {
   const { login, isLoading, error } = useAuthStore();
 
   const handleLogin = async (value: LoginData) => {
-    console.log(value);
-    try {
-      await login(value);
-      router.replace('/(protected)');
-    } catch (error) {
-      console.log('error screen login');
 
-      Alert.alert('Error', error as string);
-    }
+    await login(value);
+      router.replace('/(protected)');
+  
   };
 
 

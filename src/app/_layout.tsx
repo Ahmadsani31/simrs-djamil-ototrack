@@ -2,7 +2,10 @@ import { router, Slot, SplashScreen, Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
-
+import {
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect } from 'react';
@@ -17,6 +20,7 @@ import * as Device from 'expo-device';
 const BACKGROUND_TASK = 'background-location-task';
 
 SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient()
 
 export default function RootLayout() {
 
@@ -25,14 +29,14 @@ export default function RootLayout() {
 
     if (Device.isDevice) {
       console.log('real device');
-    }else{
+    } else {
       console.log('use emulator');
     }
 
 
     const requestPermissions = async () => {
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_TASK);
-      console.log('hasStartedLocationUpdatesAsync',hasStarted);
+      console.log('hasStartedLocationUpdatesAsync', hasStarted);
     };
 
     requestPermissions();
@@ -78,12 +82,14 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }} />
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar style="auto" />
+          <Stack screenOptions={{ headerShown: false }} />
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }
 

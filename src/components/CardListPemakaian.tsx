@@ -8,16 +8,17 @@ import { useLoadingStore } from '@/stores/loadingStore';
 
 interface cardProps {
     props: any;
+    onPress: () => void
 }
 
-export default function CardListPemakaian({ props }: cardProps) {
+export default function CardListPemakaian({ props, onPress }: cardProps) {
     const [modalVisible, setModalVisible] = useState(false);
     const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
     const setLoading = useLoadingStore((state) => state.setLoading);
 
     const handleModalImageShow = async (id: any, type: any) => {
-        console.log('show image modal');
+        // console.log('show image modal');
 
         setLoading(true);
         try {
@@ -49,29 +50,40 @@ export default function CardListPemakaian({ props }: cardProps) {
                 <Text className={` text-black`}>
                     {dayjs(props.created_at).format("dddd ,DD MMMM YYYY | HH:ss")}
                 </Text>
-                <ButtonCostum classname='bg-black' title='Detail' />
+                <ButtonCostum classname='bg-black' title='Detail' onPress={onPress} />
             </View>
             <View className="bg-white p-4 rounded-b-lg shadow mb-2">
-
                 <View className='items-center'>
-                    <Text className={`text-2xl font-bold text-black`}>
+                    <Text className={`text-xl font-bold text-black`}>
                         {props.model}
                     </Text>
                     <Text className='text-secondary text-sm'>
                         {props.no_polisi}
                     </Text>
                 </View>
-                <Text className='font-medium text-lg text-center'>
-                    {props.kegiatan}
-                </Text>
-                <View className='flex gap-2 justify-center mt-4'>
+                <View className='mt-2 bg-slate-200 rounded-lg p-1'>
+                    <Text className='font-medium text-center'>
+                        {props.kegiatan}
+                    </Text>
+                </View>
+                <View className='mt-2 bg-slate-200 rounded-lg p-1 flex-row justify-around items-center'>
+                    <View className='items-center'>
+                        <Text>Total Perjalanan</Text>
+                        <Text className='font-bold'>{props.total_spidometer} Km</Text>
+                    </View>
+                    <View className='items-center'>
+                        <Text>Lama Perjalanan</Text>
+                        <Text className='font-bold'>{props.selisih_waktu} Menit</Text>
+                    </View>
+                </View>
+                <View className='flex gap-2 justify-center mt-2'>
                     <TouchableOpacity onPress={() => handleModalImageShow(props.id, 'in')}>
                         <View className='flex-row items-center bg-blue-300 p-2 rounded-lg'>
-                            <View className='w-1/4'>
-                                <Text className='font-bold text-center text-2xl mx-5'>IN</Text>
+                            <View className='w-1/3'>
+                                <Text className='font-bold text-center text-2xl mx-5'>Pergi</Text>
                             </View>
                             <View>
-                                <Text className="text-black ">{dayjs(props.reservasi_in).format("dddd ,DD MMMM YYYY")}</Text>
+                                <Text className="text-black font-bold">{dayjs(props.reservasi_in).format("dddd ,DD MMMM YYYY")}</Text>
                                 <Text className="text-black ">Jam {dayjs(props.reservasi_in).format("HH:mm")}</Text>
                                 <Text className="text-black ">Spidometer {props.spidometer_in}</Text>
                             </View>
@@ -80,18 +92,19 @@ export default function CardListPemakaian({ props }: cardProps) {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleModalImageShow(props.id, 'out')}>
                         <View className='flex-row items-center bg-amber-300 p-2 rounded-lg'>
-                            <View className='w-1/4'>
-                                <Text className='font-bold text-center text-2xl mx-5'>OUT</Text>
+                            <View className='w-1/3'>
+                                <Text className='font-bold text-center text-2xl mx-5'>Pulang</Text>
                             </View>
 
                             <View>
-                                <Text className="text-black ">{dayjs(props.reservasi_out).format("dddd ,DD MMMM YYYY")}</Text>
+                                <Text className="text-black font-bold">{dayjs(props.reservasi_out).format("dddd ,DD MMMM YYYY")}</Text>
                                 <Text className="text-black ">Jam {dayjs(props.reservasi_out).format("HH:mm")}</Text>
                                 <Text className="text-black ">Spidometer {props.spidometer_out}</Text>
                             </View>
 
                         </View>
                     </TouchableOpacity>
+
                 </View>
             </View>
             <ModalRN visible={modalVisible} onClose={() => {

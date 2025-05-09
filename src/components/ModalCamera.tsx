@@ -48,7 +48,7 @@ export default function ModalCamera({
               }}
               mirror={true}
               ratio={"4:3"}
-              facing="front"
+              facing="back"
               ref={cameraRef} >
 
               <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">

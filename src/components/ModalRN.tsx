@@ -50,7 +50,7 @@ export function ModalRN({ visible, onClose, children }: ModalProps) {
     return (
         <ModalContext.Provider value={{ onClose }}>
             <RNModal transparent visible={true} animationType="none">
-                <TouchableWithoutFeedback onPress={onClose}>
+                {/* <TouchableWithoutFeedback onPress={onClose}> */}
                     <Animated.View style={[styles.overlay, { opacity }]}>
                         <TouchableWithoutFeedback>
                             <Animated.View
@@ -61,7 +61,7 @@ export function ModalRN({ visible, onClose, children }: ModalProps) {
                             </Animated.View>
                         </TouchableWithoutFeedback>
                     </Animated.View>
-                </TouchableWithoutFeedback>
+                {/* </TouchableWithoutFeedback> */}
             </RNModal>
         </ModalContext.Provider>
     );

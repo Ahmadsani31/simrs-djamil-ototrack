@@ -32,7 +32,8 @@ api.interceptors.response.use(
   (error) => {
     const message = error.response?.data?.message || '';
     // Cek error token expired
-    console.log('error ',error.response?.status);
+    // console.log('error ',error.response);
+    console.log('message from error service ',message);
     
     if (error.response?.status === 401) {
       console.log('Token expired, logging out...');

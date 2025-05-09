@@ -85,7 +85,7 @@ export default function ProtectedLayout() {
                 <Stack.Screen
                     name="detail"
                     options={{
-                        headerShown: true,
+                        headerShown: false,
                         title: 'Proses Pemakaian Kendaraan',
                         headerTintColor: '#fff',
                         headerTitleStyle: {

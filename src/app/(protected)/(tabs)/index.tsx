@@ -1,21 +1,19 @@
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable, ActivityIndicator } from 'react-native';
-import { useAuthStore } from '@/stores/authStore';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, Modal, TextInput, StyleSheet, Dimensions, Pressable, ActivityIndicator, Image, SectionList } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Entypo, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { ModalRN } from '@/components/ModalRN';
-import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFlatList, BottomSheetSectionList, BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
-import { dataPemakaian } from '@/data/Example';
 import SafeAreaView from '@/components/SafeAreaView';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { colors } from '@/constants/colors';
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import SkeletonItem from '@/components/SkeletonItem';
-import ButtonCostum from '@/components/ButtonCostum';
 import CardListPemakaian from '@/components/CardListPemakaian';
 import { useLoadingStore } from '@/stores/loadingStore';
+import DetailListScreen from '@/components/DetailListScreen';
+import SkeletonList from '@/components/SkeletonList';
 
 interface DataAktif {
   name: string;
@@ -34,7 +32,26 @@ interface DataKendaraan {
   spidometer_in: number;
   spidometer_out: number;
   total_spidometer: number;
+  selisih_waktu: any;
 }
+
+interface Checkpoint {
+  id: string;
+  image: string;
+  checkpoint_in: string;
+  created_at: string;
+  bbm: CheckpointBBM[];
+}
+
+interface CheckpointBBM {
+  id: string;
+  jenis: string;
+  uang?: string;
+  liter?: string;
+  image: string;
+  created_at: string;
+}
+
 
 export default function Home() {
 
@@ -47,6 +64,7 @@ export default function Home() {
 
   const [refreshing, setRefreshing] = useState(false);
   const [camera, setCamera] = useState(false);
+  const [selectedID, setSelectedID] = useState('');
 
   const [date, setDate] = useState(new Date);
   const [inputDate, setInputDate] = useState<string>();
@@ -64,7 +82,7 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await secureApi.get(`reservasi/aktif`);
-      console.log('res data aktif ', res.data);
+      // console.log('res data aktif ', res.data);
 
       if (res.status === true) {
         setReservasi(true);
@@ -92,7 +110,7 @@ export default function Home() {
           tanggal: tanggal,
         },
       });
-      console.log(response);
+      // console.log(response);
       // console.log(response.data.items);
       setDataListPemakaian(response.data)
       // setTodos(response.data);
@@ -116,6 +134,28 @@ export default function Home() {
     }, 1000);
   };
 
+  const [row, setRow] = useState<Checkpoint[]>();
+
+  const fetchData = async (reservasi_id: string) => {
+    setLoading(true)
+    try {
+      const response = await secureApi.get(`/checkpoint/reservasi`, {
+        params: {
+          id: reservasi_id,
+        },
+      });
+      if (response.status === true) {
+        const data = response.data
+        setRow(data)
+      }
+    } catch (error) {
+      setRow([])
+    } finally {
+      setLoading(false)
+    }
+
+  };
+
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -124,8 +164,12 @@ export default function Home() {
     stiffness: 500,
   });
 
+  const snapPoints = useMemo(() => ['100%', '50%'], []);
+
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetDetailRef = useRef<BottomSheet>(null);
+
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
@@ -135,9 +179,22 @@ export default function Home() {
     }
   }, []);
 
-  const handleSnapPress = useCallback(() => {
+  const handleSheetDetailChanges = useCallback((index: number) => {
+    if (index === -1) {
+      console.log('BottomSheet closed with swipe down.');
+      // Lakukan aksi lain jika ditutup
+      setCamera(false);
+    }
+  }, []);
+
+  const handleSnapPress = useCallback((value: any, id: any) => {
+
     setCamera(true);
     bottomSheetRef.current?.expand();
+  }, []);
+  const handleSnapPressDetail = useCallback(async (id: any) => {
+    await fetchData(id);
+    bottomSheetDetailRef.current?.expand();
   }, []);
 
 
@@ -151,8 +208,7 @@ export default function Home() {
         },
       });
       if (res.status === true) {
-        // toast.success('Barcode Scan Success')
-
+        setCamera(false);
         Alert.alert('Scan Successfully', 'Tekan OK untuk menlanjutkan proses..', [
           {
             text: 'Cancel',
@@ -184,7 +240,7 @@ export default function Home() {
         },
       ]);
     } finally {
-      setCamera(false);
+      
       bottomSheetRef.current?.close();
     }
 
@@ -192,8 +248,8 @@ export default function Home() {
 
   const onChange = (event: any, selectedDate: any) => {
     const dateTimestamp = event.nativeEvent.timestamp;
-    console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
-    
+    // console.log(dayjs(selectedDate).format('YYYY-MM-DD'));
+
     fetchDataList(dayjs(selectedDate).format('YYYY-MM-DD'));
     const currentDate = selectedDate;
     setDate(currentDate);
@@ -226,11 +282,11 @@ export default function Home() {
             ) : reservasi ? (
               <View className="bg-white p-4 rounded-lg">
                 <TouchableOpacity onPress={fetchDataAktif} className='absolute top-0 right-0'>
-                  <Ionicons name='reload-circle' size={32}/>
+                  <Ionicons name='reload-circle' size={32} />
                 </TouchableOpacity>
                 <Text className='text-center'>Kendaraan yang sedang digunakan</Text>
                 <Text className='text-center font-bold text-3xl'>{dataAktif?.name}</Text>
-                <Text className='text-center font-bold text-xl'>{dataAktif?.no_polisi}</Text>
+                <Text className='text-center font-semibold'>{dataAktif?.no_polisi}</Text>
                 <TouchableOpacity onPress={() => router.push('/perjalanan')}
                   className={`flex-row items-center justify-center ${colors.warning} py-3 px-6 my-4 rounded-lg`}
                 >
@@ -245,7 +301,7 @@ export default function Home() {
                   <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
 
                 </View>
-                <TouchableOpacity onPress={handleSnapPress}
+                <TouchableOpacity onPress={() => handleSnapPress('barcode', '')}
                   className={`flex-row items-center justify-center ${colors.primary} py-3 px-6 rounded-lg`}
                 >
                   <MaterialIcons name="qr-code-scanner" size={24} color="white" />
@@ -255,14 +311,12 @@ export default function Home() {
             )}
           </View>
 
-
           <FlatList
             data={dataListPemakaian}
-            style={{ marginTop: 20 }}
             keyExtractor={(item) => item.id.toString()}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh}  colors={['grey']}
-              progressBackgroundColor={'black'} />
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['grey']}
+                progressBackgroundColor={'black'} />
             }
             stickyHeaderIndices={[0]}
             contentContainerStyle={{ paddingBottom: 200 }}
@@ -278,7 +332,7 @@ export default function Home() {
               </Pressable>
             }
             renderItem={({ item }) => (
-              <CardListPemakaian props={item} />
+              <CardListPemakaian props={item} onPress={() => handleSnapPressDetail(item?.id)} />
             )}
             ListEmptyComponent={
               <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
@@ -287,9 +341,6 @@ export default function Home() {
             }
           />
         </View>
-
-  
-
       </View>
       <BottomSheet
         ref={bottomSheetRef}
@@ -302,6 +353,56 @@ export default function Home() {
         <BottomSheetView className='flex-1 items-center bg-slate-300 justify-center'>
           {camera && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
+      </BottomSheet>
+      <BottomSheet
+        ref={bottomSheetDetailRef}
+        snapPoints={snapPoints}
+        index={-1}
+        enablePanDownToClose
+        animationConfigs={animationConfigs}
+        onChange={handleSheetDetailChanges}
+      >
+
+        <BottomSheetSectionList
+          style={{ height: 300 }}
+          sections={(row || []).map((checkpoint) => ({
+            ...checkpoint,
+            data: checkpoint.bbm || [],
+          }))}
+          keyExtractor={(item, index) => index.toString()}
+          stickySectionHeadersEnabled={true}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          renderItem={({ item, index }) => (
+            <View className='px-4'>
+              <View className="p-2 bg-slate-200 rounded-lg mb-3">
+                <View className='flex-row justify-between items-center'>
+                  <Text>{index + 1}. Pengisiian BBM</Text>
+                  <Text>{dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}</Text>
+
+                </View>
+                <View className="flex-row ms-4">
+                  <Text>{item.jenis}</Text>
+                  <Text>{item.jenis == 'Voucher' ? ` : ${item.liter} Liter` : ` : Nominal Rp.${parseFloat(Number(item.uang).toFixed(2)).toLocaleString()}`}</Text>
+                </View>
+                <View className='p-4'>
+                  <Image className='w-full aspect-[3/4] rounded-lg' source={{ uri: item.image }} />
+                </View>
+              </View>
+            </View>
+
+          )}
+          renderSectionHeader={({ section: { checkpoint_in, created_at } }) => (
+            <View className="mx-4 p-4 bg-[#F2E5BF] my-3 rounded-lg flex-row items-center justify-between">
+              <Text className='font-bold'>Proses Pengisian BBM,</Text>
+              <Text>{dayjs(checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+            </View>
+          )}
+          ListEmptyComponent={
+            <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
+              <Text>Tidak ada data pengambilan BBM</Text>
+            </View>
+          }
+        />
       </BottomSheet>
     </SafeAreaView>
   );

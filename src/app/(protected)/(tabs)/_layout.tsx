@@ -7,7 +7,7 @@ import { AnimatedTabButton } from '@/components/AnimatedTabButton';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
 
-import RequiredPermission from '@/components/RequiredPermission';
+import Loader from '@/components/Loader';
 
 export default function TabsLayout() {
 
@@ -40,7 +40,7 @@ export default function TabsLayout() {
   }, []);
 
   if (!isReady) {
-    return <RequiredPermission />;
+    return <Loader />;
   }
 
 

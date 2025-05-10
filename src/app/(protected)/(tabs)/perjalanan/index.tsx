@@ -33,97 +33,82 @@ export default function IndexScreen() {
 
     useFocusEffect(
         useCallback(() => {
-            fetchDataReservasiAktif()
+            fetchData()
         }, [])
     );
 
-    const fetchDataReservasiAktif = async () => {
+    const fetchData = async () => {
         setIsLoadingAktif(true)
-        setLoading(true);
         try {
-            const response = await secureApi.get(`reservasi/aktif`);
-            setDataAktif(response.data)
-            setKendaraanAktif(true)
-            fetchDataCheckpoinAktif(response.data.id)
+
+            const response1 = await secureApi.get(`reservasi/aktif`);
+            if (response1.status == true) {
+                setDataAktif(response1.data)
+                setKendaraanAktif(true);
+            }
+
+            const response2 = await secureApi.get(`checkpoint/aktif`, {
+                params: {
+                    reservasi_id: dataAktif?.id,
+                },
+            });
+            if (response2.status == true) {
+                setCheckpointID(response2.data.checkpoint_id);
+                setCheckpointAktif(true);
+            }
         } catch (error: any) {
-            console.log('reservasi ', JSON.stringify(error.response.data.message));
-            setLoading(false);
-            setKendaraanAktif(false)
+            console.log('Terjadi error:', JSON.stringify(error.response.data.message));
         } finally {
             setIsLoadingAktif(false)
         }
     };
 
-    const fetchDataCheckpoinAktif = async (reservasi_id: string) => {
-        setIsLoadingCheckpoint(true)
-        try {
-            const response = await secureApi.get(`checkpoint/aktif`, {
-                params: {
-                    reservasi_id: reservasi_id,
-                },
-            });
-            setCheckpointID(response.data.checkpoint_id);
-            setCheckpointAktif(true);
-        } catch (error: any) {
-            setCheckpointID('');
-            setCheckpointAktif(false)
-            console.log('checkpoint ', JSON.stringify(error.response.data.message));
-        } finally {
-            setIsLoadingCheckpoint(false)
-            setLoading(false);
-        }
-
-    };
-
     return (
         <View className="flex-1 bg-slate-300">
             <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
-            <KeyboardAvoidingView behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-                <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-                    {isLoadingAktif ? <SkeletonList loop={1} /> :
-                        kendaraanAktif ?
-                            (
-                                <>
-                                    <View className="m-4 p-4 bg-[#F2E5BF] rounded-lg">
-                                        <View className="items-center mb-3 py-2">
-                                            <Text className="text-xl text-center text-teal-500 font-bold">Kendaraan Aktif</Text>
-                                            <Text className="text-xl text-center font-bold">{dataAktif?.name}</Text>
-                                            <View className="border border-b-2 w-full my-2" />
+            <View className='px-4'>
+                <KeyboardAvoidingView behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
+                    <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+                        {isLoadingAktif ? <SkeletonList loop={5} /> :
+                            kendaraanAktif ?
+                                (
+                                    <>
+                                        <View className="bg-[#F2E5BF] rounded-lg">
+                                            <View className="items-center mb-3 py-2">
+                                                <Text className="text-xl text-center text-teal-500 font-bold">Kendaraan Aktif</Text>
+                                                <Text className="text-xl text-center font-bold">{dataAktif?.name}</Text>
+                                                <View className="border border-b-2 w-full my-2" />
 
-                                            <Text className="font-medium text-sm text-center">{dataAktif?.no_polisi}</Text>
-                                            <View className=' bg-white rounded-lg p-1 w-full'>
-                                                <Text className='font-medium text-center'>
-                                                    {dataAktif?.kegiatan}
-                                                </Text>
+                                                <Text className="font-medium text-sm text-center">{dataAktif?.no_polisi}</Text>
+                                                <View className=' bg-white rounded-lg p-1 w-full'>
+                                                    <Text className='font-medium text-center'>
+                                                        {dataAktif?.kegiatan}
+                                                    </Text>
+                                                </View>
                                             </View>
                                         </View>
+                                        <View className='px-4'>
+                                            {
+                                                checkpointAktif ?
+                                                    <CheckpointScreen checkpoint_id={checkpointID} reservasi_id={dataAktif?.id} /> :
+                                                    <PerjalananScreen items={dataAktif} />
+                                            }
+                                        </View>
+                                    </>
+                                )
+                                :
+                                (
+                                    <View className="bg-white rounded-lg">
+                                        <View className="items-center mb-3 py-2">
+                                            <Text className="text-red-500 text-center font-bold">No Active</Text>
+                                            <Text className="text-xl text-center">Tidak ada kendaraan terpakai</Text>
+                                        </View>
                                     </View>
-                                    {
-                                        isLoadingCheckpoint ? <SkeletonList loop={3} /> : (
-                                            <View className='px-4'>
-                                                {
-                                                    checkpointAktif ?
-                                                        <CheckpointScreen checkpoint_id={checkpointID} reservasi_id={dataAktif?.id} /> :
-                                                        <PerjalananScreen items={dataAktif} />
-                                                }
-                                            </View>
-                                        )
-                                    }
-
-                                </>
-                            )
-                            :
-                            (
-                                <View className="m-4 p-4 bg-white rounded-lg">
-                                    <View className="items-center mb-3 py-2">
-                                        <Text className="text-red-500 text-center font-bold">No Active</Text>
-                                        <Text className="text-xl text-center">Tidak ada kendaraan terpakai</Text>
-                                    </View>
-                                </View>
-                            )
-                    }
-                </ScrollView>
-            </KeyboardAvoidingView>
+                                )
+                        }
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </View>
         </View>
     );
 }

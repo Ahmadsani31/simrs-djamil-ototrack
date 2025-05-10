@@ -1,30 +1,15 @@
-import { ActivityIndicator, Alert, Button, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {  Alert, Button, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
 import ButtonCostum from "@/components/ButtonCostum";
 
-import * as SecureStore from 'expo-secure-store';
 import { colors } from "@/constants/colors";
 import { ModalRN } from "@/components/ModalRN";
-import * as yup from 'yup';
 import { AntDesign } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
 import { reLocation } from "@/hooks/locationRequired";
 import secureApi from "@/services/service";
-import SafeAreaView from "@/components/SafeAreaView";
-import { router, useFocusEffect } from "expo-router";
-import { useLoadingStore } from "@/stores/loadingStore";
-import CheckpointScreen from "@/components/CheckpointScreen";
-import SkeletonItem from "@/components/SkeletonItem";
-import SkeletonList from "@/components/SkeletonList";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 
-interface dataAktif {
-  id: number;
-  name: string;
-  no_polisi: string;
-  kegiatan: string;
-  created_at: string
-}
 
 export default function PerjalananScreen({ items }: any) {
 

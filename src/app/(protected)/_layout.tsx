@@ -71,30 +71,13 @@ export default function ProtectedLayout() {
                     name="detail"
                     options={{
                         headerShown: false,
-                        title: 'Proses Pemakaian Kendaraan',
-                        headerTintColor: '#fff',
-                        headerTitleStyle: {
-                            fontWeight: 'bold',
-                        },
-                        headerLeft: () => (
-                            <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
-                        ),
                     }}
                 />
                 <Stack.Screen
                     name="pegembalian"
                     options={{
-                        title: 'Proses Pegembalian Kendaraan',
-                        headerTintColor: '#fff',
-                        headerTitleStyle: {
-                            fontWeight: 'bold',
-                        },
-                        headerShown: true,
-                        headerLeft: () => (
-                            <TouchableHighlight onPress={() => Alert.alert('gagal')} className={`${colors.primary} p-1 rounded-full`}>
-                                <Ionicons name="arrow-back" size={24} color={'white'} />
-                            </TouchableHighlight>
-                        ),
+                        headerShown: false,
+
                     }}
                 />
             </Stack>

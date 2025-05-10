@@ -4,7 +4,6 @@ import secureApi from "@/services/service";
 import SkeletonList from "@/components/SkeletonList";
 import SafeAreaView from "@/components/SafeAreaView";
 import { useFocusEffect } from "expo-router";
-import { useLoadingStore } from "@/stores/loadingStore";
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface KendaraanItemProps {
@@ -27,20 +26,18 @@ const fetchData = async () => {
 
 export default function KendaraanScreen() {
 
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
-  const queryClient = useQueryClient()
-  useFocusEffect(
-    useCallback(() => {
-      // Refresh logic here
-      // fetchData();
-      queryClient.invalidateQueries({ queryKey: ['kendaraan'] })
-    }, [])
-  );
+  // const queryClient = useQueryClient()
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Refresh logic here
+  //     // fetchData();
+  //     queryClient.invalidateQueries({ queryKey: ['kendaraan'] })
+  //   }, [])
+  // );
 
 
-  const { data: kendaraan, isLoading, isError, error } = useQuery<Kendaraan[]>({
-    queryKey: ['kendaraan'],
+  const { data, isLoading, isError, error } = useQuery<Kendaraan[]>({
+    queryKey: ['dataKendaraan'],
     queryFn: fetchData,
   })
 
@@ -51,7 +48,7 @@ export default function KendaraanScreen() {
         <View className="px-4">
           {isLoading ? <SkeletonList loop={10} /> : (
             <FlatList
-              data={kendaraan}
+              data={data}
               bounces
               style={{ flexGrow: 0 }}
               keyExtractor={(item, index) => index.toString()}
@@ -65,7 +62,7 @@ export default function KendaraanScreen() {
               renderItem={KendaraanItem}
               ListEmptyComponent={
                 <View className="flex-1 mt-5 justify-center items-center bg-white p-5 rounded-lg">
-                  <Text>Belum ada pemakaian kendaraan</Text>
+                  <Text>Tidak ada kendaraan Terdaftar</Text>
                 </View>
               }
             />

@@ -53,7 +53,7 @@ export default function CheckpointScreen({ checkpoint_id, reservasi_id }: any) {
   const queryClient = useQueryClient()
 
   const { data: bbm, isLoading, isError, error } = useQuery<Checkpoint[]>({
-    queryKey: ['bbm'],
+    queryKey: ['dataBbm',reservasi_id],
     queryFn: async () => await fetchData(reservasi_id),
     enabled: !!reservasi_id
   })

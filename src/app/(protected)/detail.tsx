@@ -24,11 +24,6 @@ interface dataDetail {
   no_polisi: string;
 }
 
-interface Coords {
-  lat: string;
-  long: string;
-}
-
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -45,8 +40,8 @@ const fetchData = async (uuid: string) => {
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
 
-  const { data: kendaraan, isLoading: loadingKendaraan, error } = useQuery<dataDetail>({
-    queryKey: ['kendaraan'],
+  const { data: dataDetail, isLoading: loadingKendaraan, error } = useQuery<dataDetail>({
+    queryKey: ['dataDetail',uuid],
     queryFn: () => fetchData(uuid.toString()),
     enabled: !!uuid
 
@@ -116,7 +111,7 @@ export default function DetailScreen() {
       formData.append('longitude', coordinate?.long.toString() || '');
       formData.append('kegiatan', values.kegiatan);
       formData.append('spidometer', values.spidometer);
-      formData.append('kendaraan_id', kendaraan?.id || '');
+      formData.append('kendaraan_id', dataDetail?.id || '');
       formData.append('fileImage', {
         uri: uri,
         name: 'spidometer-capture.jpg',
@@ -166,8 +161,8 @@ export default function DetailScreen() {
           {loadingKendaraan ? <SkeletonList loop={5} /> : (
             <View className="m-4 p-4 bg-white rounded-lg">
               <View className="items-center mb-3 py-2">
-                <Text className="text-5xl text-center font-bold">{kendaraan?.name}</Text>
-                <Text className="font-medium text-center mt-3">{kendaraan?.no_polisi}</Text>
+                <Text className="text-5xl text-center font-bold">{dataDetail?.name}</Text>
+                <Text className="font-medium text-center mt-3">{dataDetail?.no_polisi}</Text>
               </View>
               <View className="border border-b-2 w-full mb-4" />
               <Formik

@@ -1,9 +1,9 @@
-import { Alert, BackHandler, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, BackHandler, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import Input from "@/components/Input";
 import ButtonCostum from "@/components/ButtonCostum";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
 import SafeAreaView from "@/components/SafeAreaView";
 import secureApi from "@/services/service";
@@ -133,6 +133,15 @@ export default function PengembalianScreen() {
     <SafeAreaView noTop className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
+        <View className="flex-row items-center justify-around px-4 mt-4">
+          <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
+          <View className="w-64">
+            <Text className="text-2xl font-bold text-white text-center">Proses Pegembalian Kendaraan</Text>
+          </View>
+          <TouchableHighlight onPress={backAction} className={`${colors.primary} p-1 rounded-full`}>
+            <Entypo name="circle-with-cross" size={24} color={'white'} />
+          </TouchableHighlight>
+        </View>
         <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
           <View className="m-4 p-4 bg-white rounded-lg">
             <View className="items-center mb-3 py-2">

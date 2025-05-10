@@ -15,12 +15,13 @@ import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-r
 import useOnceEffect from '@/components/useOnceEffect';
 
 const validationSchema = yup.object().shape({
-  email: yup.string().required('Email harus diisi'),
+  username: yup.string().required('Username harus diisi'),
   password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
 });
 
 
 export default function LoginScreen() {
+
   const WiconBR = useSharedValue<number>(10);
   const HiconBR = useSharedValue<number>(10);
 
@@ -50,7 +51,7 @@ export default function LoginScreen() {
 
   const [showPassword, setShowPassword] = useState(true);
 
-  const { login, isLoading, error } = useAuthStore();
+  const { login, isLoading, errorLogin } = useAuthStore();
 
   const handleLogin = async (value: LoginData) => {
 
@@ -64,26 +65,25 @@ export default function LoginScreen() {
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
       <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute z-10 bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
       <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
-      <Animated.View className=' bg-white p-4 rounded-lg z-10'
-        entering={FadeInDown.duration(500).springify().withInitialValues({ transform: [{ translateY: 420 }] })}
+      <View className=' bg-white p-4 rounded-lg z-10'
       >
 
-        <Text className="text-5xl font-bold text-center my-6">Sing - In</Text>
-        {error && <ViewError plaintext={error} />}
+        <Text className="text-5xl font-bold text-center my-6">Sign - In</Text>
+        {errorLogin && <ViewError plaintext={errorLogin} />}
 
         <Formik
-          initialValues={{ email: '', password: '' }}
+          initialValues={{ username: '', password: '' }}
           validationSchema={validationSchema}
           onSubmit={async (values) => handleLogin(values)}
         >
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <>
               <Input
-                label="Email"
-                placeholder="Enter your email"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                error={touched.email ? errors.email : undefined}
+                label="Username"
+                placeholder="Enter your username"
+                value={values.username}
+                onChangeText={handleChange('username')}
+                error={touched.username ? errors.username : undefined}
                 className='bg-gray-200'
               />
 
@@ -113,7 +113,7 @@ export default function LoginScreen() {
             </>
           )}
         </Formik>
-      </Animated.View>
+      </View>
       {/* <View className="mt-4 flex-row justify-center z-10">
         <Text>Don't have an account? </Text>
         <Link href="/register" push className="text-[#205781] font-bold">

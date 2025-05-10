@@ -14,7 +14,6 @@ export const unstable_settings = {
 export default function ProtectedLayout() {
 
     const loading = useLoadingStore((state) => state.loading);
-    const route = useRouter();
 
     useEffect(() => {
         const backAction = () => {
@@ -50,20 +49,6 @@ export default function ProtectedLayout() {
 
         return () => backHandler.remove();
     }, []);
-
-    const backAction = () => {
-        console.log('bal=ck');
-
-        Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => router.back() },
-        ]);
-        return true;
-    };
 
     return (
         <PrivateRoute>

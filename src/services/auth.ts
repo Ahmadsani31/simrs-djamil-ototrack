@@ -28,7 +28,7 @@ export const restApi = {
     // console.log('Login function called with data:', JSON.stringify(data));
 
     const post = {
-      username: data.email,
+      username: data.username,
       password: data.password,
       manufacturer,
       modelName,

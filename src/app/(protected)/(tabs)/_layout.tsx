@@ -1,11 +1,48 @@
 import { Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
-import { useEffect, useRef } from 'react';
-import { Animated, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import { Entypo, Feather, Ionicons } from '@expo/vector-icons';
-import {AnimatedTabButton} from '@/components/AnimatedTabButton';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { AnimatedTabButton } from '@/components/AnimatedTabButton';
+
+import { Camera } from 'expo-camera';
+import * as Location from 'expo-location'
+
+import RequiredPermission from '@/components/RequiredPermission';
 
 export default function TabsLayout() {
+
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // Request location permission
+        const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
+        if (locationStatus !== 'granted') {
+          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
+          return;
+        }
+
+        // Request camera permission
+        const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+        if (cameraStatus !== 'granted') {
+          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses kamera untuk digunakan.');
+          return;
+        }
+
+        // Jika semua izin disetujui
+        setIsReady(true);
+      } catch (error) {
+        console.error('Error requesting permissions:', error);
+      }
+    })();
+
+  }, []);
+
+  if (!isReady) {
+    return <RequiredPermission />;
+  }
+
 
   return (
     <PrivateRoute>
@@ -38,7 +75,7 @@ export default function TabsLayout() {
           tabBarShowLabel: false,
           headerLeft: () => (
             <View className='px-5 flex-row items-center'>
-              <Image style={{width:40,height:40}} source={require('@asset/images/logo/logo-M-Djamil.png')}/>
+              <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
             </View>
           ),
         }}
@@ -46,7 +83,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            headerTitle: ()=>(
+            headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Home</Text>
             ),
             tabBarButton: (props) => <AnimatedTabButton {...props} icon="home-sharp" label='Home' />,
@@ -55,7 +92,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="perjalanan"
           options={{
-            headerTitle: ()=>(
+            headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Pemakaian Kendaraan</Text>
             ),
             tabBarButton: (props) => <AnimatedTabButton {...props} icon="speedometer-sharp" label='Job' />,
@@ -64,17 +101,17 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="kendaraan"
           options={{
-            headerTitle: ()=>(
+            headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Kendaraan</Text>
             ),
             tabBarButton: (props) => <AnimatedTabButton {...props} icon="car-sharp" label='Car' />,
           }}
         />
-        
+
         <Tabs.Screen
           name="profile"
           options={{
-            headerTitle: ()=>(
+            headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Profil</Text>
             ),
             tabBarButton: (props) => <AnimatedTabButton {...props} icon="person-sharp" label="Profil" />,

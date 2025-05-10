@@ -45,8 +45,6 @@ export default function BarcodeScanner({ onScan }: {
     }
   };
 
-  console.log(permission);
-
   // Permission kamera
   if (!permission) {
     // Camera permissions are still loading.

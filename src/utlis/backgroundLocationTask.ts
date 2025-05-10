@@ -54,7 +54,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           //   }
           // }
 
-      console.log('📍 Background Location:', latitude, longitude);
+      // console.log('📍 Background Location:', latitude, longitude);
     }
   }
 });

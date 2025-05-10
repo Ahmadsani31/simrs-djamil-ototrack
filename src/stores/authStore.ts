@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { LoginData, RegisterData, User } from '@/types/types';
-import { Alert } from 'react-native';
 import { restApi } from '@/services/auth';
 import { router } from 'expo-router';
 
@@ -15,7 +14,6 @@ interface AuthState {
   setToken: (token: string) => Promise<void>;
   setUser: (user: User) => void;
   login: (data: LoginData) => Promise<boolean>;
-  // register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -51,35 +49,16 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ token, user, isLoading: false });
       return true;
     } catch (error: any) {
-      Alert.alert('Warning!', error.message as string);
-      // console.log('Login error:', JSON.stringify(error.message));
+      // Alert.alert('Warning!', error.message as string);
+      console.log('Login error:', JSON.stringify(error));
       set({
-        errorLogin: error.response?.data?.message || 'Login failed',
+        errorLogin: error.response?.data?.message || 'Username atau password salah',
         isLoading: false,
       });
       return false;
     }
   },
 
-  // register: async (data: RegisterData) => {
-  //   console.log('Register function called with data:', JSON.stringify(data));
-  //   set({ isLoading: true, errorRegister: null });
-  //   try {
-  //     const response = await authService.register(data);
-  //     const token = response.data.token;
-  //     const user = response.data.user;
-  //     await SecureStore.setItemAsync('token', token);
-  //     set({ token, user, isLoading: false });
-  //   } catch (error: any) {
-  //     Alert.alert('Error', error.message as string);
-  //     console.log('Register error:', JSON.stringify(error));
-  //     set({
-  //       errorRegister: error.response?.data?.message || 'Registration failed',
-  //       isLoading: false,
-  //     });
-  //     throw error;
-  //   }
-  // },
 
   logout: async () => {
     set({ isLoading: true });

@@ -10,29 +10,21 @@ export interface AuthResponse {
 }
 
 export interface LoginData {
-    email: string;
-    password: string;
-  }
-
-  export interface RegisterData {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-  }
-
-  export interface TrackingData {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-  }
-
-
-
-
-export interface Todo {
-  id: string;
-  title: string;
-  completed: boolean;
+  username: string;
+  password: string;
 }
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface TrackingData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+

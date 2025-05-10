@@ -2,7 +2,7 @@
   "expo": {
     "name": "OtoTrack",
     "slug": "zustand-expo",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "scheme": "ototrack-scheme",
     "web": {
       "favicon": "./assets/icon.png",

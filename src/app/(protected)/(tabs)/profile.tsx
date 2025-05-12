@@ -27,22 +27,20 @@ export default function Profile() {
 
             <View className='bg-white items-center rounded-lg p-4'>
               <View className='my-3'>
-              <Image style={{
-                borderRadius: 100,
-                width: 150,
-                height: 150,
-              }} source={{
-                uri: 'https://placehold.co/400x400'
-              }} />
+                <Image style={{
+                  borderRadius: 100,
+                  width: 150,
+                  height: 150,
+                }} source={{
+                  uri: 'https://placehold.co/400x400'
+                }} />
               </View>
+              <View className='my-2 items-center'>
 
-              <Text className="text-xl font-bold mb-4">Profile Information</Text>
+                <Text className="text-xl font-bold mb-4">Profile Information</Text>
 
-              <View className='my-2'>
                 <Text className="text-lg">{user?.name || 'Not available'}</Text>
-              </View>
 
-              <View className='my-2'>
                 <Text className="text-lg">{user?.email || 'Not available'}</Text>
               </View>
 
@@ -53,7 +51,7 @@ export default function Profile() {
                 className={`${colors.danger} p-3 flex-row justify-center rounded items-center w-full`}
               >
                 <AntDesign name="logout" size={20} color="white" />
-                <Text className="text-white ms-3 font-medium">Logout</Text>
+                <Text className="text-white ms-3 font-bold">Logout</Text>
               </TouchableOpacity>
             </View>
           </View>

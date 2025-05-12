@@ -11,6 +11,7 @@ import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { Alert, BackHandler, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Updates from 'expo-updates';
 
 import '@/utlis/backgroundLocationTask';
 
@@ -21,6 +22,10 @@ const queryClient = new QueryClient()
 export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
+
+  useEffect(() => {
+    checkAppUpdate();
+  }, []);
 
   useEffect(() => {
     const backAction = () => {
@@ -56,6 +61,30 @@ export default function RootLayout() {
 
     return () => backHandler.remove();
   }, [router]);
+
+  const checkAppUpdate = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Alert.alert(
+          'Update Tersedia',
+          'Versi baru aplikasi tersedia. Aplikasi akan diperbarui.',
+          [
+            {
+              text: 'Update Sekarang',
+              onPress: async () => {
+                await Updates.fetchUpdateAsync();
+                await Updates.reloadAsync(); // Restart dengan update
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (e) {
+      console.warn('Gagal memeriksa pembaruan:', e);
+    }
+  };
 
   if (isLoading) {
     return <Loader />;

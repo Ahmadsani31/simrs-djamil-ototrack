@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SkeletonItem from './SkeletonItem'
 import { useQuery } from '@tanstack/react-query'
 import secureApi from '@/services/service';
@@ -7,30 +7,53 @@ import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { Entypo, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
+import * as SecureStore from 'expo-secure-store';
+import { dataAktif } from '@/types/types';
 
 const fetchData = async () => {
     const response = await secureApi.get(`reservasi/aktif`);
     return response.data
 };
 
-interface PemakaianAktif {
-    name: string;
-    no_polisi: string;
-}
-
 
 export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void }) {
 
-    const { data, isLoading, isError, error, refetch, isFetching } = useQuery<PemakaianAktif>({
-        queryKey: ['dataAktif'],
-        queryFn: fetchData,
-    })
+    // const { data, isLoading, isError, error, refetch, isFetching } = useQuery<PemakaianAktif>({
+    //     queryKey: ['dataAktif'],
+    //     queryFn: fetchData,
+    // })
+
+    const [rawData, setRawData] = useState<dataAktif>()
+    const [isLoading, setIsLoading] = useState(false)
+
+
+    useEffect(() => {
+
+        loadUsername();
+    }, []);
+
+    const loadUsername = async () => {
+        setIsLoading(true);
+        try {
+            const param = await SecureStore.getItemAsync('pemakaianAktif');
+            // console.log('Check auth token:', token);
+            if (param) {
+                const data = JSON.parse(param)
+                setRawData(data)
+            }
+        } catch (error) {
+            console.error('Failed to load username:', error);
+        } finally {
+            setIsLoading(false)
+        }
+    };
+
 
     if (isLoading) {
         return <SkeletonList loop={1} />
     }
 
-    if (isError) {
+    if (!rawData) {
         return (
             <View>
                 <View className='mb-4 '>
@@ -51,13 +74,13 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
 
     return (
         <View className="bg-white p-4 rounded-lg">
-            <TouchableOpacity onPress={() => refetch()} className='absolute top-0 right-0'>
+            <TouchableOpacity onPress={() => loadUsername()} className='absolute top-0 right-0'>
                 <Ionicons name='reload-circle' size={32} />
             </TouchableOpacity>
             <Text className='text-center'>Kendaraan yang sedang digunakan</Text>
-            <Text className='text-center font-bold text-3xl'>{data?.name}</Text>
-            <Text className='text-center font-semibold'>{data?.no_polisi}</Text>
-            <TouchableOpacity onPress={() => router.push('/perjalanan')}
+            <Text className='text-center font-bold text-3xl'>{rawData?.name}</Text>
+            <Text className='text-center font-semibold'>{rawData?.no_polisi}</Text>
+            <TouchableOpacity onPress={() => router.push('/(protected)/pemakaian')}
                 className={`flex-row items-center justify-center ${colors.warning} py-3 px-6 my-4 rounded-lg`}
             >
                 <FontAwesome5 name="location-arrow" size={24} color="white" />

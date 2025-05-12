@@ -29,10 +29,12 @@ export interface TrackingData {
 }
 
 
-export interface DataAktif {
-  name: string;
-  no_polisi: string;
-  created_at: boolean;
+export interface dataAktif {
+    id: number;
+    name: string;
+    no_polisi: string;
+    kegiatan: string;
+    created_at: string
 }
 
 export interface DataKendaraan {
@@ -47,22 +49,58 @@ export interface DataKendaraan {
   spidometer_out: number;
   total_spidometer: number;
   selisih_waktu: any;
+  spidometer_file_in:string;
+  spidometer_file_out:string;
 }
 
+
 export interface Checkpoint {
-  id: string;
-  image: string;
-  checkpoint_in: string;
-  created_at: string;
-  bbm: CheckpointBBM[];
+    id: number;
+    checkpoint_name: string;
+    image: string;
+    created_at: string;
+    data: CheckpointBBM[];
 }
 
 export interface CheckpointBBM {
-  id: string;
-  jenis: string;
-  uang?: string;
-  liter?: string;
-  image: string;
-  created_at: string;
+    id: number;
+    reservasi_id: string;
+    checkpoint_id: string;
+    checkpoint_name: string;
+    jenis: string;
+    uang: string;
+    liter: string;
+    image: string;
+    created_at: string;
 }
 
+export interface CheckpointReservasi {
+    id: number;
+    checkpoint_in: string;
+    image: string;
+    created_at: string;
+    data: bbmReservasi[];
+}
+
+export interface bbmReservasi {
+    id: number;
+    jenis: string;
+    uang: string;
+    liter: string;
+    image: string;
+    created_at: string;
+}
+
+
+export interface KendaraanItemProps {
+  model: string;
+  no_polisi: string;
+  kondisi: string;
+}
+
+export interface Kendaraan {
+  id: number;
+  model: string;
+  no_polisi: string;
+  kondisi: string;
+}

@@ -3,7 +3,7 @@ import { router, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import Input from "@/components/Input";
 import ButtonCostum from "@/components/ButtonCostum";
-import { AntDesign, Entypo } from '@expo/vector-icons';
+import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
 import SafeAreaView from "@/components/SafeAreaView";
 import secureApi from "@/services/service";
@@ -105,12 +105,12 @@ export default function PengembalianScreen() {
       // console.log('formData', formData);
 
       const response = await secureApi.postForm('/reservasi/return_kendaraan', formData)
-      console.log('response ', JSON.stringify(response.data));
+      // console.log('response ', JSON.stringify(response.data));
 
       if (response.status === true) {
-        await SecureStore.deleteItemAsync('reservasi_id');
+        await SecureStore.deleteItemAsync('pemakaianAktif');
         // console.log(response.message);
-        router.replace('(protected)')
+        router.replace('(tabs)')
       }
     } catch (error: any) {
       // alert(error.response.data.message)
@@ -130,7 +130,7 @@ export default function PengembalianScreen() {
 
   return (
 
-    <SafeAreaView noTop className="flex-1 bg-slate-300">
+    <SafeAreaView className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <KeyboardAvoidingView className="flex-1" behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
         <View className="flex-row items-center justify-around px-4 mt-4">
@@ -180,7 +180,12 @@ export default function PengembalianScreen() {
                       <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
                     </>
                   )}
-                  {uri && <ButtonCostum classname={colors.primary} title="Proses Pengembalian Kendaraan" onPress={handleSubmit} />}
+                  {uri && (
+                    <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center ${colors.secondary}`} onPress={() => handleSubmit()} >
+                      <Text className='text-white font-bold'>Proses Pengembalian Kendaraan</Text>
+                      <MaterialCommunityIcons name='car' size={22} color='white' />
+                    </TouchableOpacity>
+                  )}
 
                 </>
               )}

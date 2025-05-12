@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "OtoTrack",
+    "name": "OtoTrack Djamil",
     "slug": "zustand-expo",
-    "version": "1.4.4",
-    "scheme": "ototrack-scheme",
+    "version": "1.0.1",
+    "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon.png",
       "bundler": "metro"
@@ -32,6 +32,7 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "locationAlwaysPermission": "Allow $(PRODUCT_NAME) to use your location",
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": true
         }
@@ -53,22 +54,16 @@
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier":"com.nama.ototrack_app",
-      "icon":{
-        "dark":"./assets/ios-dark.png",
-        "light":"./assets/ios-light.png",
-        "tinted":"./assets/ios-tinted.png"
+      "bundleIdentifier": "com.nama.ototrack-djamil",
+      "icon": {
+        "dark": "./assets/ios-dark.png",
+        "light": "./assets/ios-light.png",
+        "tinted": "./assets/ios-tinted.png"
       }
     },
     "android": {
@@ -77,7 +72,7 @@
         "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nama.ototrack_app",
+      "package": "com.nama.ototrack-djamil",
       "minSdkVersion": 29,
       "targetSdkVersion": 34,
       "permissions": [
@@ -91,14 +86,12 @@
       ]
     },
     "newArchEnabled": true,
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "70657844-9c98-4d7a-9f9e-1a01e9dbb07e"
-      }
+    "owner": "darma31",
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
-    "owner": "darma31"
+    "updates": {
+      "url": "https://u.expo.dev/70657844-9c98-4d7a-9f9e-1a01e9dbb07e"
+    }
   }
 }

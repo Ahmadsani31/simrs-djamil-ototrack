@@ -1,4 +1,4 @@
-import { View, Text, Alert, Image } from 'react-native';
+import { View, Text, Alert, Image, Modal, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetSectionList, BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
@@ -8,13 +8,39 @@ import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import ScreenListPemakaian from '@/components/ScreenListPemakaian';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { Checkpoint } from '@/types/types';
+import { Checkpoint, CheckpointReservasi } from '@/types/types';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
+import { useQuery } from '@tanstack/react-query';
+import SkeletonList from '@/components/SkeletonList';
+import { AntDesign, Entypo } from '@expo/vector-icons';
+import ModalPreviewImage from '@/components/ModalPreviewImage';
+
+const fetchData = async (reservasi_id: string) => {
+  console.log('load detail checkpoint reservasi');
+  
+  const response = await secureApi.get(`/checkpoint/reservasi`, {
+    params: {
+      id: reservasi_id,
+    },
+  });
+  return response.data
+};
 
 
 export default function Home() {
 
   const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const [reservasiID, setReservasiID] = useState<string>('');
+  const [modalImageVisible, setModalImageVisible] = useState(false);
+  const [urlImageModal, setUrlImageModale] = useState<string>();
+
+  const { data: dataReservasi, isLoading, isError, error, refetch } = useQuery<CheckpointReservasi[]>({
+    queryKey: ['dataReservasi', reservasiID],
+    queryFn: async () => await fetchData(reservasiID),
+    enabled: !!reservasiID
+  })
+
 
   const [camera, setCamera] = useState(false);
 
@@ -23,28 +49,6 @@ export default function Home() {
       // Refresh logic here
     }, [])
   );
-
-  const [row, setRow] = useState<Checkpoint[]>();
-
-  const fetchData = async (reservasi_id: string) => {
-    setLoading(true)
-    try {
-      const response = await secureApi.get(`/checkpoint/reservasi`, {
-        params: {
-          id: reservasi_id,
-        },
-      });
-      if (response.status === true) {
-        const data = response.data
-        setRow(data)
-      }
-    } catch (error) {
-      setRow([])
-    } finally {
-      setLoading(false)
-    }
-
-  };
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
@@ -82,8 +86,9 @@ export default function Home() {
     setCamera(true);
     bottomSheetRef.current?.expand();
   }, []);
+  
   const handleSnapPressDetail = useCallback(async (id: any) => {
-    await fetchData(id);
+    setReservasiID(id);
     bottomSheetDetailRef.current?.expand();
   }, []);
 
@@ -132,6 +137,19 @@ export default function Home() {
   };
 
 
+  const handleModalPrevieImage = (uri: any) => {
+    setUrlImageModale(uri)
+    setModalImageVisible(true)
+  }
+
+
+  const handleCloseModalPrevieImage = () => {
+    setUrlImageModale('')
+    setModalImageVisible(false)
+  }
+
+
+
 
   return (
     <SafeAreaView noTop>
@@ -167,10 +185,7 @@ export default function Home() {
 
         <BottomSheetSectionList
           style={{ height: 300 }}
-          sections={(row || []).map((checkpoint) => ({
-            ...checkpoint,
-            data: checkpoint.bbm || [],
-          }))}
+          sections={dataReservasi || []}
           keyExtractor={(item, index) => index.toString()}
           stickySectionHeadersEnabled={true}
           contentContainerStyle={{ paddingBottom: 80 }}
@@ -178,7 +193,7 @@ export default function Home() {
             <View className='px-4'>
               <View className="p-2 bg-slate-200 rounded-lg mb-3">
                 <View className='flex-row justify-between items-center'>
-                  <Text>{index + 1}. Pengisiian BBM</Text>
+                  <Text>{index + 1}. Pengisiian BBM </Text>
                   <Text>{dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}</Text>
 
                 </View>
@@ -193,19 +208,34 @@ export default function Home() {
             </View>
 
           )}
-          renderSectionHeader={({ section: { checkpoint_in, created_at } }) => (
+          renderSectionHeader={({ section: { created_at, image } }) => (
             <View className="mx-4 p-4 bg-[#F2E5BF] my-3 rounded-lg flex-row items-center justify-between">
-              <Text className='font-bold'>Proses Pengisian BBM,</Text>
-              <Text>{dayjs(checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+              <View>
+                <Text className='font-bold'>Proses Pengisian BBM,</Text>
+                <Text>{dayjs(created_at).format('dddd ,DD MMMM YYYY')}</Text>
+              </View>
+              <View className='p-4'>
+                <Pressable onPress={() => handleModalPrevieImage(image)}>
+                    <Image className='size-32 rounded-lg' source={{ uri: image }} />
+                    <Text className='absolute bg-white/75 p-1 rounded-md top-1/3 left-4'>Clik to show</Text>
+                </Pressable>
+              </View>
+              <ModalPreviewImage title='Gambar Proses Pengisian BBM' visible={modalImageVisible} imgUrl={urlImageModal || ''} onPress={() => handleCloseModalPrevieImage()} />
             </View>
           )}
+
           ListEmptyComponent={
-            <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
-              <Text>Tidak ada data pengambilan BBM</Text>
-            </View>
+            isLoading ? <SkeletonList loop={10} /> : (
+              <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
+                <Text>Tidak ada data pengambilan BBM</Text>
+              </View>
+            )
           }
         />
       </BottomSheet>
+
     </SafeAreaView>
   );
 }
+
+

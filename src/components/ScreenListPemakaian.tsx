@@ -8,23 +8,21 @@ import { useLoadingStore } from '@/stores/loadingStore';
 import { useQuery } from '@tanstack/react-query';
 import { DataKendaraan } from '@/types/types';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { Fontisto } from '@expo/vector-icons';
+import { Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
+import ModalPreviewImage from './ModalPreviewImage';
+import { colors } from '@/constants/colors';
 
 const fetchData = async (tanggal: any) => {
 
     const formattedDate = tanggal.toISOString().split('T')[0];
 
-    try {
-        const response = await secureApi.get(`reservasi/list`, {
-            params: {
-                tanggal: formattedDate,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        return [];
-    }
+    const response = await secureApi.get(`reservasi/list`, {
+        params: {
+            tanggal: formattedDate,
+        },
+    });
+    return response.data;
 
 };
 
@@ -43,11 +41,10 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
 
 
-    const { data, isLoading, isError, error, refetch } = useQuery<DataKendaraan[]>({
+    const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
         queryKey: ['dataList', date],
         queryFn: () => fetchData(date),
         staleTime: 1000 * 60, // agar cache tetap fresh selama 1 menit
-        enabled: !!date,
     })
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -55,29 +52,13 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const setLoading = useLoadingStore((state) => state.setLoading);
 
-    const handleModalImageShow = async (id: any, type: any) => {
+    const handleModalImageShow = async (uri: any) => {
         // console.log('show image modal');
-
         setLoading(true);
-        try {
-            const res = await secureApi.get(`/reservasi/image`, {
-                params: {
-                    id: id,
-                    type: type,
-                },
-            });
-            // console.log(res.data.data);
+        setImgBase64(uri);
+        setModalVisible(true)
 
-            if (res.status === true) {
-                setImgBase64(res.data);
-            }
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-            setModalVisible(true)
-
-        }
+        setLoading(false);
 
     }
 
@@ -101,11 +82,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     };
 
-    // const toggleResetDate = () => {
-    //     setInputDate('');
-    //     refetch()
-    // }
-
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = () => {
         refetch()
@@ -118,7 +94,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     const handleCloseModal = () => {
 
     }
-
 
     if (isLoading) {
         return <SkeletonList loop={8} />
@@ -143,7 +118,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                             editable={false}
                             value={dayjs(date).format('dddd ,DD MMMM YYYY')}
                         />
-                        {/* {date && <Entypo className='absolute right-5 top-5' name='circle-with-cross' size={28} color={'black'} onPress={toggleResetDate} />} */}
                     </Pressable>
                 }
                 renderItem={({ item }) => (
@@ -152,7 +126,10 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                             <Text className={` text-black`}>
                                 {dayjs(item.created_at).format("dddd ,DD MMMM YYYY | HH:ss")}
                             </Text>
-                            <ButtonCostum classname='bg-black' title='Detail' onPress={() => onPress(item.id)} />
+                            <TouchableOpacity className={`flex-row gap-2 p-2 my-2 rounded-lg ${colors.secondary}`} onPress={() => onPress(item.id)}>
+                                <MaterialCommunityIcons name='gas-station' size={18} color='white'/>
+                                <Text className='text-white'>BBM</Text>
+                            </TouchableOpacity>
                         </View>
                         <View className="bg-white p-4 rounded-b-lg shadow mb-2">
                             <View className='items-center'>
@@ -179,7 +156,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                                 </View>
                             </View>
                             <View className='flex gap-2 justify-center mt-2'>
-                                <TouchableOpacity onPress={() => handleModalImageShow(item.id, 'in')}>
+                                <TouchableOpacity onPress={() => handleModalImageShow(item.spidometer_file_in)}>
                                     <View className='flex-row items-center bg-blue-300 p-2 rounded-lg'>
                                         <View className='w-1/3'>
                                             <Text className='font-bold text-center text-2xl mx-5'>Pergi</Text>
@@ -192,7 +169,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
                                     </View>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleModalImageShow(item.id, 'out')}>
+                                <TouchableOpacity onPress={() => handleModalImageShow(item.spidometer_file_out)}>
                                     <View className='flex-row items-center bg-amber-300 p-2 rounded-lg'>
                                         <View className='w-1/3'>
                                             <Text className='font-bold text-center text-2xl mx-5'>Pulang</Text>
@@ -209,6 +186,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
                             </View>
                         </View>
+                        <ModalPreviewImage title='Gambar Spidometer' visible={modalVisible} imgUrl={imgBase64||''} onPress={() => setModalVisible(false)}/>
                     </>
                 )}
                 ListEmptyComponent={
@@ -217,29 +195,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                     </View>
                 }
             />
-
-            <ModalRN
-                visible={modalVisible}
-                onClose={() => {
-                    setModalVisible(!modalVisible);
-                }}>
-                <ModalRN.Header>
-                    <Text>Tampil gambar spidometer</Text>
-                </ModalRN.Header>
-                <ModalRN.Content>
-                    <Image
-                        className='w-full aspect-[3/4] rounded-lg'
-                        source={{
-                            uri: imgBase64
-                        }} />
-                </ModalRN.Content>
-                <ModalRN.Footer>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
-
-                        <Text className={`py-2 px-4 bg-red-500 items-center rounded-lg text-white`}>Close</Text>
-                    </TouchableOpacity>
-                </ModalRN.Footer>
-            </ModalRN>
         </>
     );
 }

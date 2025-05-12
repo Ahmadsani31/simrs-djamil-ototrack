@@ -1,11 +1,9 @@
 import LoadingIndikator from "@/components/LoadingIndikator";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { useLoadingStore } from "@/stores/loadingStore";
-import { router, Stack, useRouter } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useEffect } from "react";
-import { Alert, BackHandler, Image, Pressable, TouchableHighlight, View } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from "@/constants/colors";
+import { Alert, BackHandler } from "react-native";
 
 export const unstable_settings = {
     initialRouteName: "(tabs)", // anchor

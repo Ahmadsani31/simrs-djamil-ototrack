@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, Image, Platform, Text, View } from 'react-native';
 import { AnimatedTabButton } from '@/components/AnimatedTabButton';
 
 import { Camera } from 'expo-camera';
@@ -22,6 +22,13 @@ export default function TabsLayout() {
           Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
           return;
         }
+
+        // if (Platform.OS === 'android') {
+        //   const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+        //   if (backgroundStatus !== 'granted') {
+        //     Alert.alert('Izin lokasi latar belakang diperlukan', 'Aktifkan izin di pengaturan untuk pelacakan penuh.');
+        //   }
+        // }
 
         // Request camera permission
         const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
@@ -90,7 +97,7 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="perjalanan"
+          name="pemakaian"
           options={{
             headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Pemakaian Kendaraan</Text>

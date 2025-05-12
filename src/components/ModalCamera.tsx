@@ -1,11 +1,15 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useRef, useState } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet, Text, ActivityIndicator, Dimensions } from 'react-native';
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
 import LoadingIndikator from './LoadingIndikator';
 // import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 // import { Asset } from 'expo-asset';
+
+const { width } = Dimensions.get('window');
+const CAMERA_RATIO = 4 / 3;
+const CAMERA_HEIGHT = width * CAMERA_RATIO;
 
 interface InputProps {
   visible: boolean;
@@ -37,24 +41,26 @@ export default function ModalCamera({
         visible={visible}
         animationType="fade"
       >
-        {loading && <LoadingIndikator/>}
-        
+        {loading && <LoadingIndikator />}
+
         <View className="flex-1 bg-slate-600 justify-center items-center ">
           {permission?.granted ? (
-            <CameraView
-              style={{
-                flex: 1,
-                width: "100%",
-              }}
-              mirror={true}
-              ratio={"4:3"}
-              facing="back"
-              ref={cameraRef} >
-
-              <View className="absolute bottom-4 w-full p-12 flex-row justify-between items-center">
-                <TouchableOpacity onPress={onClose}>
-                  <AntDesign name="closecircleo" size={42} color="red" />
+            <>
+              <CameraView
+                style={styles.camera}
+                mirror={true}
+                ratio={"4:3"}
+                facing="back"
+                ref={cameraRef}
+              />
+              <View className="absolute top-14 right-5">
+                <TouchableOpacity onPress={onClose} className='bg-white p-1 rounded-lg flex-row gap-2 justify-center items-center'>
+                  <AntDesign name="closecircleo" size={28} color="red" />
+                  <Text>Tutup</Text>
                 </TouchableOpacity>
+
+              </View>
+              <View className="absolute bottom-10 w-full p-12 items-center">
                 <TouchableOpacity onPress={takePicture}>
                   <View
                     style={[
@@ -72,7 +78,8 @@ export default function ModalCamera({
                   </View>
                 </TouchableOpacity>
               </View>
-            </CameraView>
+            </>
+
           ) :
             <View className='flex-1 w-full items-center justify-center bg-white'>
               <Text className='font-bold text-2xl'>Permissions needed!</Text>
@@ -105,5 +112,11 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 50,
+  },
+  camera: {
+    width: width,
+    height: CAMERA_HEIGHT,
+    justifyContent: 'space-between',
+    marginBottom: 100
   },
 });

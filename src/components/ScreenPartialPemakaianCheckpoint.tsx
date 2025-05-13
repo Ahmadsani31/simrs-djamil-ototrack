@@ -19,7 +19,7 @@ import ModalPreviewImage from "./ModalPreviewImage";
 
 const fetchData = async (reservasi_id: string, checkpoint_id: string) => {
     try {
-        const response = await secureApi.get(`/checkpoint/bbm`, {
+        const response = await secureApi.get(`/checkpoint/pemakaian`, {
             params: {
                 reservasi_id: reservasi_id,
                 checkpoint_id: checkpoint_id
@@ -185,7 +185,8 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                         <View className="flex-row rounded-lg mb-1 justify-between items-center">
                             <View>
                                 <Text className="font-bold">{item.checkpoint_name}</Text>
-                                <Text>{dayjs(item.created_at).format('dddd ,DD MMMM YYYY')}</Text>
+                                <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+                                <Text>Jam : {dayjs(item.checkpoint_in).format('HH:ss')}</Text>
                             </View>
                             <TouchableHighlight onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')} className='p-1 bg-gray-300 rounded-lg '>
                                 <View className='flex-row items-center justify-center'>
@@ -254,7 +255,7 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                             }}
                             renderButton={(selectedItem, isOpen) => {
                                 return (
-                                    <View className="items-center justify-center bg-gray-50 border border-gray-300 py-3 rounded-lg">
+                                    <View className="items-center justify-center bg-gray-200 border border-gray-300 py-3 rounded-lg">
                                         <Text>{selectedItem || 'Pilih Jenis Pengisian'}</Text>
                                     </View>
                                 );

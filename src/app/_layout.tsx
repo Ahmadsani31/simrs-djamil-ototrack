@@ -13,7 +13,10 @@ import { Alert, BackHandler, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Updates from 'expo-updates';
 
-import '@/utlis/backgroundLocationTask';
+import { Camera } from 'expo-camera';
+import * as Location from 'expo-location'
+
+// import '@/utlis/backgroundLocationTask';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,8 +25,32 @@ const queryClient = new QueryClient()
 export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    (async () => {
+      try {
+        // Request location permission
+        const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
+        if (locationStatus !== 'granted') {
+          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
+          return;
+        }
+
+        // Request camera permission
+        const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+        if (cameraStatus !== 'granted') {
+          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses kamera untuk digunakan.');
+          return;
+        }
+
+        // Jika semua izin disetujui
+        setIsReady(true);
+      } catch (error) {
+        console.error('Error requesting permissions:', error);
+      }
+    })();
+
     checkAppUpdate();
   }, []);
 
@@ -86,7 +113,7 @@ export default function RootLayout() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !isReady) {
     return <Loader />;
   }
 

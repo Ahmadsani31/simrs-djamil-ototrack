@@ -7,19 +7,17 @@ import SafeAreaView from '@/components/SafeAreaView';
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import ScreenListPemakaian from '@/components/ScreenListPemakaian';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { Checkpoint, CheckpointReservasi } from '@/types/types';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
 import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
-import { AntDesign, Entypo } from '@expo/vector-icons';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 
 const fetchData = async (reservasi_id: string) => {
   try {
-    const response = await secureApi.get(`/checkpoint/reservasi`, {
+    const response = await secureApi.get(`/checkpoint/pemakaian`, {
       params: {
-        id: reservasi_id,
+        reservasi_id: reservasi_id,
       },
     });
     return response.data
@@ -36,7 +34,7 @@ export default function Home() {
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [urlImageModal, setUrlImageModale] = useState<string>();
 
-  const { data: dataReservasi, isLoading, isError, error, refetch } = useQuery<CheckpointReservasi[]>({
+  const { data: dataReservasi, isLoading, isError, error, refetch } = useQuery<Checkpoint[]>({
     queryKey: ['dataReservasi', reservasiID],
     queryFn: async () => await fetchData(reservasiID),
     enabled: !!reservasiID
@@ -150,8 +148,6 @@ export default function Home() {
   }
 
 
-
-
   return (
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
@@ -209,11 +205,11 @@ export default function Home() {
             </View>
 
           )}
-          renderSectionHeader={({ section: { created_at, image } }) => (
+          renderSectionHeader={({ section: { checkpoint_in, image } }) => (
             <View className="mx-4 p-4 bg-[#F2E5BF] my-3 rounded-lg flex-row items-center justify-between">
               <View>
                 <Text className='font-bold'>Proses Pengisian BBM,</Text>
-                <Text>{dayjs(created_at).format('dddd ,DD MMMM YYYY')}</Text>
+                <Text>{dayjs(checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
               </View>
               <View className='p-4'>
                 <Pressable onPress={() => handleModalPrevieImage(image)}>

@@ -18,7 +18,7 @@ import ModalPreviewImage from './ModalPreviewImage';
 
 const fetchDataLog = async (reservasi_id: string) => {
     try {
-        const response = await secureApi.get(`/checkpoint/bbm`, {
+        const response = await secureApi.get(`/checkpoint/pemakaian`, {
             params: {
                 reservasi_id: reservasi_id,
             },
@@ -189,7 +189,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                             <View className="flex-row rounded-lg mb-1 justify-between items-center">
                                 <View>
                                     <Text className="font-bold">{item.checkpoint_name}</Text>
-                                    <Text>{dayjs(item.created_at).format('dddd ,DD MMMM YYYY')}</Text>
+                                    <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
                                 </View>
                                 <TouchableHighlight onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')} className='p-1 bg-gray-300 rounded-lg '>
                                     <View className='flex-row items-center'>

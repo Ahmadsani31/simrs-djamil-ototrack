@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Image, Dimensions } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
@@ -13,6 +13,7 @@ import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
+import Constants from 'expo-constants';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),
@@ -56,21 +57,28 @@ export default function LoginScreen() {
   const handleLogin = async (value: LoginData) => {
 
     await login(value);
-      router.replace('/(protected)');
-  
+    router.replace('/(protected)');
+
   };
+
+  const { width } = Dimensions.get('window');
 
 
   return (
-    <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
+    <SafeAreaView className="flex-1 justify-center bg-slate-300">
       <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
       <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
-      <View className=' bg-white p-4 rounded-lg z-10'>
-        <View className='items-center'>
-        <Image className='h-[85] w-[89] object-cover' source={require('@asset/images/logo/logo-M-Djamil.png')}/>
-
+      <View className='items-center mb-5'>
+        <View className='bg-white rounded-full p-2'>
+          <Image className='h-[85] w-[89] object-cover' source={require('@asset/images/logo/logo-M-Djamil.png')} />
         </View>
-        <Text className="text-5xl font-bold text-center my-6">Sign - In</Text>
+      </View>
+      <View className=' bg-white p-4 mx-4 mb-24 rounded-lg z-10'>
+        <View className='mb-3'>
+          <Text className="text-xl font-medium text-center">Pencatatan</Text>
+          <Text className="text-2xl font-bold text-center">Kendaraan Operasional</Text>
+          <Text className="text-xl font-bold text-center">RSUP. DR. M DJAMIL</Text>
+        </View>
         {errorLogin && <ViewError plaintext={errorLogin} />}
         <Formik
           initialValues={{ username: '', password: '' }}
@@ -115,8 +123,12 @@ export default function LoginScreen() {
           )}
         </Formik>
       </View>
+      <View className='absolute w-full items-center bottom-2'>
+        <Text className='text-sm font-medium'>Pencatatan Kendaraan</Text>
+        <Text className='text-xs font-bold'>Version. {Constants.expoConfig?.version}</Text>
+      </View>
       <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#497D74] bottom-24 left-[-60] rounded-full" />
-      <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bg-[#03A791] bottom-0 right-0  rounded-full"/>
+      <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bg-[#03A791] bottom-0 right-0  rounded-full" />
     </SafeAreaView>
   );
 }

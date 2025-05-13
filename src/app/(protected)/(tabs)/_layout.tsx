@@ -1,56 +1,9 @@
 import { Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
-import { useEffect, useState } from 'react';
-import { Alert, Image, Platform, Text, View } from 'react-native';
-import { AnimatedTabButton } from '@/components/AnimatedTabButton';
-
-import { Camera } from 'expo-camera';
-import * as Location from 'expo-location'
-
-import Loader from '@/components/Loader';
+import {Image, Text, View } from 'react-native';
 import CustomNavBar from '@/components/CustomNavBar';
 
 export default function TabsLayout() {
-
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        // Request location permission
-        const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
-        if (locationStatus !== 'granted') {
-          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
-          return;
-        }
-
-        // if (Platform.OS === 'android') {
-        //   const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-        //   if (backgroundStatus !== 'granted') {
-        //     Alert.alert('Izin lokasi latar belakang diperlukan', 'Aktifkan izin di pengaturan untuk pelacakan penuh.');
-        //   }
-        // }
-
-        // Request camera permission
-        const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
-        if (cameraStatus !== 'granted') {
-          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses kamera untuk digunakan.');
-          return;
-        }
-
-        // Jika semua izin disetujui
-        setIsReady(true);
-      } catch (error) {
-        console.error('Error requesting permissions:', error);
-      }
-    })();
-
-  }, []);
-
-  if (!isReady) {
-    return <Loader />;
-  }
-
 
   return (
     <PrivateRoute>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "OtoTrack Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon.png",
@@ -41,7 +41,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#232323",
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/splash-icon-light.png",
           "dark": {
             "image": "./assets/splash-icon-dark.png",
             "backgroundColor": "#000000"
@@ -60,6 +60,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.darma31.simrsdjamilototrack",
+      "buildNumber": "1",
       "icon": {
         "dark": "./assets/ios-dark.png",
         "light": "./assets/ios-light.png",
@@ -72,10 +73,18 @@
         "monochromeImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "versionCode": 1,
       "package": "com.darma31.simrsdjamilototrack",
       "minSdkVersion": 29,
       "targetSdkVersion": 34,
       "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -92,7 +101,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/70657844-9c98-4d7a-9f9e-1a01e9dbb07e"
+      "url": "https://u.expo.dev/39b7a571-7afd-4fae-ab4a-73ba8c38030d"
     },
     "extra": {
       "router": {

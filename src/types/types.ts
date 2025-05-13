@@ -57,8 +57,9 @@ export interface DataKendaraan {
 export interface Checkpoint {
     id: number;
     checkpoint_name: string;
+    checkpoint_in: string;
+    checkpoint_out: string;
     image: string;
-    created_at: string;
     data: CheckpointBBM[];
 }
 
@@ -66,7 +67,6 @@ export interface CheckpointBBM {
     id: number;
     reservasi_id: string;
     checkpoint_id: string;
-    checkpoint_name: string;
     jenis: string;
     uang: string;
     liter: string;

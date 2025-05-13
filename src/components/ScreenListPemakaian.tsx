@@ -14,12 +14,10 @@ import ModalPreviewImage from './ModalPreviewImage';
 import { colors } from '@/constants/colors';
 
 const fetchData = async (tanggal: any) => {
-
-    const formattedDate = tanggal.toISOString().split('T')[0];
-
+    console.log('respon load reservasi list');
     const response = await secureApi.get(`reservasi/list`, {
         params: {
-            tanggal: formattedDate,
+            tanggal: tanggal,
         },
     });
     return response.data;
@@ -37,20 +35,21 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     //     refetch()
     // }, [])
 
+    const setLoading = useLoadingStore((state) => state.setLoading);
+
+
     const [date, setDate] = useState(new Date);
-
-
+    const [inputDate, setInputDate] = useState('');
 
     const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
-        queryKey: ['dataList', date],
-        queryFn: () => fetchData(date),
-        staleTime: 1000 * 60, // agar cache tetap fresh selama 1 menit
+        queryKey: ['listPemakaian', inputDate],
+        queryFn: () => fetchData(inputDate),
+        enabled: !!inputDate
     })
 
     const [modalVisible, setModalVisible] = useState(false);
     const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
-    const setLoading = useLoadingStore((state) => state.setLoading);
 
     const handleModalImageShow = async (uri: any) => {
         // console.log('show image modal');
@@ -74,7 +73,8 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const onChange = (event: any, selectedDate: any) => {
         console.log(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
-
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        setInputDate(formattedDate)
         const currentDate = selectedDate;
         setDate(currentDate);
         // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
@@ -83,6 +83,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     };
 
     const [refreshing, setRefreshing] = useState(false);
+
     const onRefresh = () => {
         refetch()
         setInterval(() => {
@@ -90,14 +91,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
         }, 1000);
     };
-
-    const handleCloseModal = () => {
-
-    }
-
-    if (isLoading) {
-        return <SkeletonList loop={8} />
-    }
 
     return (
         <>
@@ -127,7 +120,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                                 {dayjs(item.created_at).format("dddd ,DD MMMM YYYY | HH:ss")}
                             </Text>
                             <TouchableOpacity className={`flex-row gap-2 p-2 my-2 rounded-lg ${colors.secondary}`} onPress={() => onPress(item.id)}>
-                                <MaterialCommunityIcons name='gas-station' size={18} color='white'/>
+                                <MaterialCommunityIcons name='gas-station' size={18} color='white' />
                                 <Text className='text-white'>BBM</Text>
                             </TouchableOpacity>
                         </View>
@@ -186,13 +179,14 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
                             </View>
                         </View>
-                        <ModalPreviewImage title='Gambar Spidometer' visible={modalVisible} imgUrl={imgBase64||''} onPress={() => setModalVisible(false)}/>
+                        <ModalPreviewImage title='Gambar Spidometer' visible={modalVisible} imgUrl={imgBase64 || ''} onPress={() => setModalVisible(false)} />
                     </>
                 )}
                 ListEmptyComponent={
-                    <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
-                        <Text>Belum ada pemakaian kendaraan</Text>
-                    </View>
+                    isLoading ? <SkeletonList loop={8} /> :
+                        <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
+                            <Text>Belum ada pemakaian kendaraan</Text>
+                        </View>
                 }
             />
         </>

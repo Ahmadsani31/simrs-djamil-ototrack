@@ -85,6 +85,7 @@
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ]
     },
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "owner": "darma31",
     "runtimeVersion": {

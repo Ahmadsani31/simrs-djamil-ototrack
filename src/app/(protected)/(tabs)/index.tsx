@@ -29,8 +29,6 @@ const fetchData = async (reservasi_id: string) => {
 
 export default function Home() {
 
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
   const [reservasiID, setReservasiID] = useState<string>('');
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [urlImageModal, setUrlImageModale] = useState<string>();

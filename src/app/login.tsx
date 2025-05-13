@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import SafeAreaView from '@/components/SafeAreaView';
@@ -63,14 +63,15 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1 justify-center p-4 bg-slate-300">
-      <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute z-10 bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
+      <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
       <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
-      <View className=' bg-white p-4 rounded-lg z-10'
-      >
+      <View className=' bg-white p-4 rounded-lg z-10'>
+        <View className='items-center'>
+        <Image className='h-[85] w-[89] object-cover' source={require('@asset/images/logo/logo-M-Djamil.png')}/>
 
+        </View>
         <Text className="text-5xl font-bold text-center my-6">Sign - In</Text>
         {errorLogin && <ViewError plaintext={errorLogin} />}
-
         <Formik
           initialValues={{ username: '', password: '' }}
           validationSchema={validationSchema}
@@ -84,7 +85,7 @@ export default function LoginScreen() {
                 value={values.username}
                 onChangeText={handleChange('username')}
                 error={touched.username ? errors.username : undefined}
-                className='bg-gray-200'
+                className='bg-gray-50'
               />
 
 
@@ -96,7 +97,7 @@ export default function LoginScreen() {
                   onChangeText={handleChange('password')}
                   secureTextEntry={showPassword}
                   error={touched.password ? errors.password : undefined}
-                  className='bg-gray-200'
+                  className='bg-gray-50'
                 />
                 <TouchableOpacity className='absolute top-9 right-3' onPress={() => setShowPassword(!showPassword)}>
                   {showPassword ? <Feather name='eye-off' size={24} /> : <Feather name='eye' size={24} />}
@@ -114,15 +115,8 @@ export default function LoginScreen() {
           )}
         </Formik>
       </View>
-      {/* <View className="mt-4 flex-row justify-center z-10">
-        <Text>Don't have an account? </Text>
-        <Link href="/register" push className="text-[#205781] font-bold">
-          Register
-        </Link>
-      </View> */}
-      <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#497D74] bottom-24 left-[-60] rounded-full shadow-lg" />
-      <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bottom-0 right-0 bg-[#03A791] rounded-full">
-      </Animated.View>
+      <Animated.View style={{ width: WiconBL, height: HiconBL }} className="absolute bg-[#497D74] bottom-24 left-[-60] rounded-full" />
+      <Animated.View style={{ width: WiconBR, height: HiconBR }} className="absolute bg-[#03A791] bottom-0 right-0  rounded-full"/>
     </SafeAreaView>
   );
 }

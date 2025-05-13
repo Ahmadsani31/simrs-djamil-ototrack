@@ -29,8 +29,6 @@ const fetchDataLog = async (reservasi_id: string) => {
 
 export default function ScreenPartialPemakaian({ items }: any) {
 
-
-
     const [isLoading, setIsLoading] = useState(false);
 
     const [checkpointAktif, setCheckpointAktif] = useState(false);

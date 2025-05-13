@@ -59,7 +59,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
 
     const fetchData = async () => {
         setIsLoading(true)
-        console.log('checkpoint:');
+        // console.log('checkpoint:');
         if (items) {
             try {
                 const response = await secureApi.get(`checkpoint/aktif`, {

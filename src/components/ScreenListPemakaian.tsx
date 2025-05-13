@@ -104,7 +104,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                         progressBackgroundColor={'black'} />
                 }
                 stickyHeaderIndices={[0]}
-                contentContainerStyle={{ paddingBottom: 200 }}
+                contentContainerStyle={{ paddingBottom: 190 }}
                 ListHeaderComponent={
                     <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
                         <Fontisto className='absolute z-10 left-6 top-5' name="date" size={24} color={'black'} />

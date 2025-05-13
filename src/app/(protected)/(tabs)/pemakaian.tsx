@@ -4,11 +4,16 @@ import * as SecureStore from 'expo-secure-store';
 import { useLoadingStore } from '@/stores/loadingStore';
 import ScreenPartialPemakaian from '@/components/ScreenPartialPemakaian';
 import { dataAktif } from '@/types/types';
+import { RefreshControl } from 'react-native-gesture-handler';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function PemakaianScreen() {
 
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0
     const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
+
+    const queryClient = useQueryClient()
+
 
     const setLoading = useLoadingStore((state) => state.setLoading);
 
@@ -33,31 +38,47 @@ export default function PemakaianScreen() {
         setLoading(false)
 
     };
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        queryClient.invalidateQueries({ queryKey: ['dataAllBbm', 'dataBbm'] });
+        fetchData();
+        setInterval(() => {
+            setRefreshing(false);
+
+        }, 1000);
+    };
 
     return (
         <View className="flex-1 bg-slate-300">
             <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
             <View className='px-4'>
                 <KeyboardAvoidingView behavior={keyboardBehavior} keyboardVerticalOffset={keyboardVerticalOffset}>
-                    <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+                    <ScrollView
+                        contentContainerStyle={{ paddingBottom: 70 }}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['grey']}
+                                progressBackgroundColor={'black'} />
+                        }
+                    >
                         {rowAktif ?
                             (
                                 <>
-                                <View className="bg-teal-300 rounded-lg mb-3">
-                                    <View className="items-center mb-3 py-3">
-                                        <Text className="text-center">Kendaraan Aktif</Text>
-                                        <Text className="text-3xl text-center font-bold">{rowAktif?.name}</Text>
-                                        {/* <View className="border border-b-2 w-full my-2" /> */}
+                                    <View className="bg-teal-300 rounded-lg mb-3">
+                                        <View className="items-center mb-3 py-3">
+                                            <Text className="text-center">Kendaraan Aktif</Text>
+                                            <Text className="text-3xl text-center font-bold">{rowAktif?.name}</Text>
+                                            {/* <View className="border border-b-2 w-full my-2" /> */}
 
-                                        <Text className="font-medium text-sm text-center mb-2">{rowAktif?.no_polisi}</Text>
-                                        <View className=' bg-white rounded-lg p-1 px-3'>
-                                            <Text className='font-medium text-center'>
-                                                {rowAktif?.kegiatan}
-                                            </Text>
+                                            <Text className="font-medium text-sm text-center mb-2">{rowAktif?.no_polisi}</Text>
+                                            <View className=' bg-white rounded-lg p-1 px-3'>
+                                                <Text className='font-medium text-center'>
+                                                    {rowAktif?.kegiatan}
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                                <ScreenPartialPemakaian items={rowAktif}/>
+                                    <ScreenPartialPemakaian items={rowAktif} />
                                 </>
                             )
                             :

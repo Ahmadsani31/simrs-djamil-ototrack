@@ -42,7 +42,7 @@ export default function KendaraanScreen() {
             bounces
             style={{ flexGrow: 0 }}
             keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={{ paddingBottom: 70 }}
             stickyHeaderIndices={[0]}
             ListHeaderComponent={
               <View>

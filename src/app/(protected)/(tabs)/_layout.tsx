@@ -8,6 +8,7 @@ import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
 
 import Loader from '@/components/Loader';
+import CustomNavBar from '@/components/CustomNavBar';
 
 export default function TabsLayout() {
 
@@ -54,21 +55,9 @@ export default function TabsLayout() {
   return (
     <PrivateRoute>
       <Tabs
+        tabBar={(props) => <CustomNavBar {...props} />}
         screenOptions={{
-          tabBarActiveTintColor: 'teal',
-          headerShadowVisible: false,
           headerTitleAlign: 'center',
-          tabBarStyle: {
-            position: 'absolute',
-            bottom: 20,
-            marginLeft: 20,
-            marginRight: 20,
-            borderRadius: 20,
-            backgroundColor: '#205781',
-            shadowRadius: 10,
-            borderTopWidth: 0,
-            shadowOffset: { width: 0, height: 200 },
-          },
           headerStyle: {
             backgroundColor: '#205781',
             elevation: 0,
@@ -79,7 +68,6 @@ export default function TabsLayout() {
             fontWeight: 'bold',
             color: '#fff',
           },
-          tabBarShowLabel: false,
           headerLeft: () => (
             <View className='px-5 flex-row items-center'>
               <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
@@ -90,39 +78,38 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
+            title:"Home",
             headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Home</Text>
-            ),
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="home-sharp" label='Home' />,
+            )
           }}
         />
         <Tabs.Screen
           name="pemakaian"
           options={{
+            title:"Pemakaian",
             headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Pemakaian Kendaraan</Text>
-            ),
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="speedometer-sharp" label='Job' />,
+            )
           }}
         />
         <Tabs.Screen
           name="kendaraan"
           options={{
+            title:"Kendaraan",
             headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Kendaraan</Text>
-            ),
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="car-sharp" label='Car' />,
+            )
           }}
         />
 
         <Tabs.Screen
           name="profile"
           options={{
+             title:"Profile",
             headerTitle: () => (
               <Text className='font-bold text-white text-xl'>Profil</Text>
-            ),
-            tabBarButton: (props) => <AnimatedTabButton {...props} icon="person-sharp" label="Profil" />,
-
+            )
           }}
         />
       </Tabs>

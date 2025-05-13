@@ -16,14 +16,17 @@ import { AntDesign, Entypo } from '@expo/vector-icons';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 
 const fetchData = async (reservasi_id: string) => {
-  console.log('load detail checkpoint reservasi');
-  
-  const response = await secureApi.get(`/checkpoint/reservasi`, {
-    params: {
-      id: reservasi_id,
-    },
-  });
-  return response.data
+  try {
+    const response = await secureApi.get(`/checkpoint/reservasi`, {
+      params: {
+        id: reservasi_id,
+      },
+    });
+    return response.data
+  } catch (error) {
+    return []
+  }
+
 };
 
 
@@ -84,7 +87,7 @@ export default function Home() {
     setCamera(true);
     bottomSheetRef.current?.expand();
   }, []);
-  
+
   const handleSnapPressDetail = useCallback(async (id: any) => {
     setReservasiID(id);
     bottomSheetDetailRef.current?.expand();
@@ -214,8 +217,8 @@ export default function Home() {
               </View>
               <View className='p-4'>
                 <Pressable onPress={() => handleModalPrevieImage(image)}>
-                    <Image className='size-32 rounded-lg' source={{ uri: image }} />
-                    <Text className='absolute bg-white/75 p-1 rounded-md top-1/3 left-4'>Clik to show</Text>
+                  <Image className='size-32 rounded-lg' source={{ uri: image }} />
+                  <Text className='absolute bg-white/75 p-1 rounded-md top-1/3 left-4'>Clik to show</Text>
                 </Pressable>
               </View>
               <ModalPreviewImage title='Gambar Proses Pengisian BBM' visible={modalImageVisible} imgUrl={urlImageModal || ''} onPress={() => handleCloseModalPrevieImage()} />

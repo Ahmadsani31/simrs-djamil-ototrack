@@ -18,13 +18,18 @@ import CustomNumberInput from "./CustomNumberInput";
 import ModalPreviewImage from "./ModalPreviewImage";
 
 const fetchData = async (reservasi_id: string, checkpoint_id: string) => {
-    const response = await secureApi.get(`/checkpoint/bbm`, {
-        params: {
-            reservasi_id: reservasi_id,
-            checkpoint_id: checkpoint_id
-        },
-    });
-    return response.data
+    try {
+        const response = await secureApi.get(`/checkpoint/bbm`, {
+            params: {
+                reservasi_id: reservasi_id,
+                checkpoint_id: checkpoint_id
+            },
+        });
+        return response.data
+    } catch (error) {
+        return []
+    }
+
 };
 
 

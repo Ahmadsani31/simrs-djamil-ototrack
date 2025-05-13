@@ -14,13 +14,18 @@ import ModalPreviewImage from './ModalPreviewImage';
 import { colors } from '@/constants/colors';
 
 const fetchData = async (tanggal: any) => {
-    console.log('respon load reservasi list');
-    const response = await secureApi.get(`reservasi/list`, {
-        params: {
-            tanggal: tanggal,
-        },
-    });
-    return response.data;
+    try {
+        const formattedDate = tanggal.toISOString().split('T')[0];
+        const response = await secureApi.get(`reservasi/list`, {
+            params: {
+                tanggal: formattedDate,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        return []
+    }
+
 
 };
 
@@ -39,12 +44,11 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
 
     const [date, setDate] = useState(new Date);
-    const [inputDate, setInputDate] = useState('');
 
     const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
-        queryKey: ['listPemakaian', inputDate],
-        queryFn: () => fetchData(inputDate),
-        enabled: !!inputDate
+        queryKey: ['listPemakaian', date],
+        queryFn: () => fetchData(date),
+        enabled: !!date
     })
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -73,8 +77,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const onChange = (event: any, selectedDate: any) => {
         console.log(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
-        const formattedDate = selectedDate.toISOString().split('T')[0];
-        setInputDate(formattedDate)
         const currentDate = selectedDate;
         setDate(currentDate);
         // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));

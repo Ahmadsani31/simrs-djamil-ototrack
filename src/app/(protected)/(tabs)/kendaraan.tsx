@@ -6,8 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Kendaraan, KendaraanItemProps } from "@/types/types";
 
 const fetchData = async () => {
-  const response = await secureApi.get(`/kendaraan`);
-  return response.data
+  try {
+    const response = await secureApi.get(`/kendaraan`);
+    return response.data
+  } catch (error) {
+    return []
+  }
+
 };
 
 export default function KendaraanScreen() {

@@ -1,27 +1,13 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import SkeletonItem from './SkeletonItem'
-import { useQuery } from '@tanstack/react-query'
-import secureApi from '@/services/service';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Entypo, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import * as SecureStore from 'expo-secure-store';
 import { dataAktif } from '@/types/types';
 
-const fetchData = async () => {
-    const response = await secureApi.get(`reservasi/aktif`);
-    return response.data
-};
-
-
 export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void }) {
-
-    // const { data, isLoading, isError, error, refetch, isFetching } = useQuery<PemakaianAktif>({
-    //     queryKey: ['dataAktif'],
-    //     queryFn: fetchData,
-    // })
 
     const [rawData, setRawData] = useState<dataAktif>()
     const [isLoading, setIsLoading] = useState(false)

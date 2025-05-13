@@ -14,7 +14,7 @@ import { colors } from "@/constants/colors";
 import * as SecureStore from 'expo-secure-store';
 import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
 import { Entypo } from '@expo/vector-icons';
 
@@ -30,10 +30,12 @@ const validationSchema = yup.object().shape({
 });
 
 const fetchData = async (uuid: string) => {
-
-  const response = await secureApi.get(`/reservasi/detail?uniqued_id=${uuid}`);
-  return response.data;
-
+  try {
+    const response = await secureApi.get(`/reservasi/detail?uniqued_id=${uuid}`);
+    return response.data;
+  } catch (error) {
+    return []
+  }
 };
 
 
@@ -196,8 +198,8 @@ export default function DetailScreen() {
                         <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
                       </>
                     )}
-                    {uri && 
-                    <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
+                    {uri &&
+                      <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
                     }
                   </>
                 )}

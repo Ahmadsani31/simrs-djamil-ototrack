@@ -17,13 +17,17 @@ import dayjs from 'dayjs';
 import ModalPreviewImage from './ModalPreviewImage';
 
 const fetchDataLog = async (reservasi_id: string) => {
+    try {
+        const response = await secureApi.get(`/checkpoint/bbm`, {
+            params: {
+                reservasi_id: reservasi_id,
+            },
+        });
+        return response.data
+    } catch (error) {
+        return []
+    }
 
-    const response = await secureApi.get(`/checkpoint/bbm`, {
-        params: {
-            reservasi_id: reservasi_id,
-        },
-    });
-    return response.data
 };
 
 
@@ -164,7 +168,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                     <MaterialCommunityIcons name='gas-station' size={22} color='white' />
                     <Text className='text-white font-bold'>Proses Pengisiaan BBM</Text>
                 </TouchableOpacity>
-                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center ${colors.secondary}`} onPress={() => router.push({
+                <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center ${colors.secondary}`} onPress={() => router.push({
                     pathname: 'pegembalian',
                     params: {
                         reservasi_id: items?.id,

@@ -57,11 +57,8 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const handleModalImageShow = async (uri: any) => {
         // console.log('show image modal');
-        setLoading(true);
         setImgBase64(uri);
         setModalVisible(true)
-
-        setLoading(false);
 
     }
 
@@ -72,6 +69,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
             onChange,
             mode: currentMode,
             is24Hour: true,
+            maximumDate: new Date()
         });
     };
 
@@ -96,6 +94,14 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     return (
         <>
+            <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
+                <Fontisto className='absolute z-10 left-6 top-5' name="date" size={24} color={'black'} />
+                <TextInput className='border border-gray-300 rounded-md bg-gray-100 py-4 ps-14'
+                    placeholder="Select Date"
+                    editable={false}
+                    value={dayjs(date).format('dddd ,DD MMMM YYYY')}
+                />
+            </Pressable>
             <FlatList
                 data={data}
                 keyExtractor={(item) => item.id.toString()}
@@ -103,18 +109,8 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['grey']}
                         progressBackgroundColor={'black'} />
                 }
-                stickyHeaderIndices={[0]}
-                contentContainerStyle={{ paddingBottom: 190 }}
-                ListHeaderComponent={
-                    <Pressable className='p-2 bg-white mb-2 rounded-lg' onPress={showMode}>
-                        <Fontisto className='absolute z-10 left-6 top-5' name="date" size={24} color={'black'} />
-                        <TextInput className='border border-gray-300 rounded-md bg-gray-100 py-4 ps-14'
-                            placeholder="Select Date"
-                            editable={false}
-                            value={dayjs(date).format('dddd ,DD MMMM YYYY')}
-                        />
-                    </Pressable>
-                }
+                // stickyHeaderIndices={[0]}
+                contentContainerStyle={{ paddingBottom: 270 }}
                 renderItem={({ item }) => (
                     <>
                         <View className='flex-row items-center bg-[#F2E5BF] justify-between px-4 rounded-t-lg'>

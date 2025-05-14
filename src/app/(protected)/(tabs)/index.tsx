@@ -12,6 +12,7 @@ import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
 import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
+import { useLoadingStore } from '@/stores/loadingStore';
 
 const fetchData = async (reservasi_id: string) => {
   try {
@@ -32,7 +33,10 @@ export default function Home() {
 
   const [reservasiID, setReservasiID] = useState<string>('');
   const [modalImageVisible, setModalImageVisible] = useState(false);
-  const [urlImageModal, setUrlImageModale] = useState<string>();
+  const [urlImageModal, setUrlImageModale] = useState<string>('');
+
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
 
   const { data: dataReservasi, isLoading, isError, error, refetch } = useQuery<Checkpoint[]>({
     queryKey: ['dataReservasi', reservasiID],
@@ -76,7 +80,6 @@ export default function Home() {
     if (index === -1) {
       console.log('BottomSheet closed with swipe down.');
       // Lakukan aksi lain jika ditutup
-      setCamera(false);
     }
   }, []);
 
@@ -147,7 +150,6 @@ export default function Home() {
     setModalImageVisible(false)
   }
 
-
   return (
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
@@ -217,7 +219,7 @@ export default function Home() {
                   <Text className='absolute bg-white/75 p-1 rounded-md top-1/3 left-4'>Clik to show</Text>
                 </Pressable>
               </View>
-              <ModalPreviewImage title='Gambar Proses Pengisian BBM' visible={modalImageVisible} imgUrl={urlImageModal || ''} onPress={() => handleCloseModalPrevieImage()} />
+              <ModalPreviewImage title='Gambar Proses Pengisian BBM' visible={modalImageVisible} imgUrl={urlImageModal} onPress={() => handleCloseModalPrevieImage()} />
             </View>
           )}
 

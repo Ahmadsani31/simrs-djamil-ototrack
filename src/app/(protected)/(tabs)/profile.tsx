@@ -12,17 +12,6 @@ export default function Profile() {
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
         <View className="bg-[#205781] rounded-br-[50]  rounded-bl-[50] shadow">
-          {/* <View className='items-center mb-3'>
-          <View className='items-center bg-white p-2 rounded-full w-52 h-52 justify-center'>
-            <Image style={{
-              borderRadius: 100,
-              width: 150,
-              height: 150,
-            }} source={{
-              uri: 'https://placehold.co/400x400'
-            }} />
-          </View>
-        </View> */}
           <View className='px-4'>
 
             <View className='bg-white items-center rounded-lg p-4'>
@@ -31,9 +20,7 @@ export default function Profile() {
                   borderRadius: 100,
                   width: 150,
                   height: 150,
-                }} source={{
-                  uri: 'https://placehold.co/400x400'
-                }} />
+                }} source={require('@asset/images/profile.png')} />
               </View>
               <View className='my-2 items-center'>
 

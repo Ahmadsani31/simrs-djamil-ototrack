@@ -190,6 +190,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                                 <View>
                                     <Text className="font-bold">{item.checkpoint_name}</Text>
                                     <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+                                    <Text>Jam : {dayjs(item.checkpoint_in).format('HH:ss')}</Text>
                                 </View>
                                 <TouchableHighlight onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')} className='p-1 bg-gray-300 rounded-lg '>
                                     <View className='flex-row items-center'>

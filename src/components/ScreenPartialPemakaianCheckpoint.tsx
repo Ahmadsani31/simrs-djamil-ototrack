@@ -167,7 +167,9 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
     return (
         <>
             <View className="p-4 bg-white rounded-lg">
-                <Text className="text-center py-2 font-medium text-lg">Proses Pengisian BBM</Text>
+                <View className="my-4">
+                    <Text className="text-center bg-red-400 rounded-lg font-medium text-lg">Dalam Proses Pengisian BBM</Text>
+                </View>
                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-indigo-500`} onPress={() => setDialogBbm(true)} >
                     <MaterialCommunityIcons name='gas-station' size={22} color='white' />
                     <Text className='text-white font-bold'>Pengisiaan BBM</Text>

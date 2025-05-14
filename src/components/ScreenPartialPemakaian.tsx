@@ -123,15 +123,16 @@ export default function ScreenPartialPemakaian({ items }: any) {
             console.log('resppon save ', response);
             handleDialogExit()
             handleReload();
+            setLoading(false)
+
         } catch (error: any) {
             console.log('response checkpoint', JSON.stringify(error.response.data));
             Alert.alert('Warning!', error.response.data.message, [
                 { text: 'Tutup', onPress: () => null },
             ]);
-
-        } finally {
             setLoading(false)
-        }
+
+        } 
 
     }
 

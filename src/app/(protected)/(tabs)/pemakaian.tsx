@@ -33,6 +33,8 @@ export default function PemakaianScreen() {
         if (param) {
             const data = JSON.parse(param)
             setRowAktif(data)
+        } else {
+            setRowAktif(undefined)
         }
 
         setLoading(false)

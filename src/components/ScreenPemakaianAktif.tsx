@@ -22,6 +22,9 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
         setIsLoading(true);
         try {
             const param = await SecureStore.getItemAsync('pemakaianAktif');
+            console.log('====================================');
+            console.log(param);
+            console.log('====================================');
             // console.log('Check auth token:', token);
             if (param) {
                 const data = JSON.parse(param)
@@ -29,6 +32,7 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
             }
         } catch (error) {
             console.error('Failed to load username:', error);
+            setRawData(undefined)
         } finally {
             setIsLoading(false)
         }

@@ -42,6 +42,13 @@ const fetchData = async (uuid: string) => {
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
 
+  if (!uuid) {
+        Alert.alert('Peringatan!', 'Kendaraan tidak aktif atau kendaraan tidak ada!', [
+      { text: 'Kembali', onPress: () => router.back() },
+    ]);
+  }
+
+
   const { data: dataDetail, isLoading: loadingKendaraan, error } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
     queryFn: () => fetchData(uuid.toString()),
@@ -49,12 +56,10 @@ export default function DetailScreen() {
 
   })
 
-  const [reqLocation, setReqLocation] = useState<boolean>(false)
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [modalVisible, setModalVisible] = useState(false);
-
 
   const [uri, setUri] = useState<string | null>(null);
 
@@ -74,7 +79,6 @@ export default function DetailScreen() {
   };
 
   useEffect(() => {
-    loadLocation();
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -84,10 +88,6 @@ export default function DetailScreen() {
     return () => backHandler.remove();
   }, []);
 
-  const loadLocation = async () => {
-    const reLoc = await reLocation.enable()
-    setReqLocation(reLoc);
-  }
 
   const handleSubmitKegiatan = async (values: FormikValues) => {
     setLoading(true)

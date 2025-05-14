@@ -158,6 +158,16 @@ export default function Home() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
+          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center`} onPress={() => router.push({
+            pathname: 'detail',
+            params: {
+              uuid: '5ac30936-0d80-48ea-a111-75174151d6bd'
+            }
+
+          })}>
+            <Text className='text-white font-bold'>Proses Pengembalian Kendaraan</Text>
+
+          </TouchableOpacity>
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>

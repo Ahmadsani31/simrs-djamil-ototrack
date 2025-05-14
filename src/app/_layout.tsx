@@ -25,6 +25,7 @@ const queryClient = new QueryClient()
 export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
+  
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export default function RootLayout() {
     }
   };
 
-  if (isLoading && !isReady) {
+  if (isLoading) {
     return <Loader />;
   }
 

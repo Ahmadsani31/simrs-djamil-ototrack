@@ -15,6 +15,8 @@ import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
+import LoadingIndikator from '@/components/LoadingIndikator';
+import RequiredPermission from '@/components/RequiredPermission';
 
 // import '@/utlis/backgroundLocationTask';
 
@@ -96,7 +98,7 @@ export default function RootLayout() {
       if (update.isAvailable) {
         Alert.alert(
           'Update Tersedia',
-          'Versi baru aplikasi tersedia. Aplikasi akan diperbarui.',
+          `Versi baru aplikasi tersedia. Aplikasi akan diperbarui. ${JSON.stringify(update.manifest)}`,
           [
             {
               text: 'Update Sekarang',
@@ -116,6 +118,10 @@ export default function RootLayout() {
 
   if (isLoading) {
     return <Loader />;
+  }
+
+  if (!isReady) {
+    return <RequiredPermission/>
   }
 
   return (

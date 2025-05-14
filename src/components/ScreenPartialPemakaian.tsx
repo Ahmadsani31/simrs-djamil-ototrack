@@ -107,20 +107,20 @@ export default function ScreenPartialPemakaian({ items }: any) {
 
         const formData = new FormData();
 
-        formData.append('latitude', coordinate?.lat?.toString() || '');
-        formData.append('longitude', coordinate?.long.toString() || '');
-        formData.append('reservasi_id', items?.id?.toString() || '');
+        formData.append('latitude', coordinate?.lat?.toString());
+        formData.append('longitude', coordinate?.long.toString());
+        formData.append('reservasi_id', items.id);
         formData.append('fileImage', {
             uri: uri,
             name: 'spidometer-capture.jpg',
             type: 'image/jpeg',
         } as any);
 
-        // console.log('formData', formData);
+        console.log('formData', formData);
 
         try {
-            const response = await secureApi.postForm('/checkpoint/save', formData)
-            console.log('resppon save ', response);
+            await secureApi.postForm('/checkpoint/save', formData)
+            console.log('save successfully');
             handleDialogExit()
             handleReload();
             setLoading(false)
@@ -249,7 +249,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                                 source={{ uri: uri || undefined }}
                                 className='w-full aspect-[3/4] rounded-lg'
                             />
-                            <ButtonCloseImage onPress={() => setUri(null)} />
+                            <ButtonCloseImage onPress={() => setUri(null)}  loading={loading} />
                         </View>
                     )}
                 </ModalRN.Content>

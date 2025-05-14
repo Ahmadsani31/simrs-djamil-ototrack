@@ -6,6 +6,7 @@ import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import * as SecureStore from 'expo-secure-store';
 import { dataAktif } from '@/types/types';
+import secureApi from '@/services/service';
 
 export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void }) {
 
@@ -15,23 +16,16 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
 
     useEffect(() => {
 
-        loadUsername();
+        cekDataAktif();
     }, []);
 
-    const loadUsername = async () => {
+    const cekDataAktif = async () => {
         setIsLoading(true);
         try {
-            const param = await SecureStore.getItemAsync('pemakaianAktif');
-            console.log('====================================');
-            console.log(param);
-            console.log('====================================');
-            // console.log('Check auth token:', token);
-            if (param) {
-                const data = JSON.parse(param)
-                setRawData(data)
-            }
+            const response = await secureApi.get(`reservasi/aktif`);
+            setRawData(response.data)
+
         } catch (error) {
-            console.error('Failed to load username:', error);
             setRawData(undefined)
         } finally {
             setIsLoading(false)
@@ -64,7 +58,7 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
 
     return (
         <View className="bg-white p-4 rounded-lg">
-            <TouchableOpacity onPress={() => loadUsername()} className='absolute top-0 right-0'>
+            <TouchableOpacity onPress={() => cekDataAktif()} className='absolute top-0 right-0'>
                 <Ionicons name='reload-circle' size={32} />
             </TouchableOpacity>
             <Text className='text-center'>Kendaraan yang sedang digunakan</Text>

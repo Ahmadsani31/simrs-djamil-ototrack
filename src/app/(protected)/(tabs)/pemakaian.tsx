@@ -6,6 +6,7 @@ import ScreenPartialPemakaian from '@/components/ScreenPartialPemakaian';
 import { dataAktif } from '@/types/types';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { useQueryClient } from '@tanstack/react-query';
+import secureApi from '@/services/service';
 
 export default function PemakaianScreen() {
 
@@ -25,21 +26,18 @@ export default function PemakaianScreen() {
 
 
     const fetchData = async () => {
-
         setLoading(true)
+        try {
+            const response = await secureApi.get(`reservasi/aktif`);
+            setRowAktif(response.data)
 
-        const param = await SecureStore.getItemAsync('pemakaianAktif');
-        // console.log('Check auth token:', token);
-        if (param) {
-            const data = JSON.parse(param)
-            setRowAktif(data)
-        } else {
+        } catch (error) {
             setRowAktif(undefined)
+        } finally {
+            setLoading(false)
         }
-
-        setLoading(false)
-
     };
+
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = () => {

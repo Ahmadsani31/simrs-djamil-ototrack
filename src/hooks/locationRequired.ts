@@ -1,11 +1,10 @@
 import * as Location from 'expo-location';
 import { Alert } from 'react-native';
 
-
 export const reLocation = {
   enable: async () => {
     let enabled = await Location.hasServicesEnabledAsync(); //returns true or false
-    console.log('enable coordinate ',enabled);
+    console.log('enable coordinate ', enabled);
     if (!enabled) {
       //if not enable
       Alert.alert('Location not enabled', 'Please enable your Location', [
@@ -21,31 +20,23 @@ export const reLocation = {
     return enabled;
   },
   getCoordinate: async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync(); //used for the pop up box where we give permission to use location
-    console.log('get coordinate ',status);
-    if (status !== 'granted') {
+    let location = await Location.getLastKnownPositionAsync();
 
-      const [status, requestPermission] = Location.useBackgroundPermissions();
-
-      Alert.alert('Permission denied', 'Allow the app to use the location services', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => requestPermission() },
-      ]);
+    if (!location) {
+      location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeInterval: 10000,
+        distanceInterval: 10,
+      });
     }
     //get current position lat and long
-    const { coords } = await Location.getCurrentPositionAsync();
+    console.log('location ', JSON.stringify(location));
 
-    if (coords) {
-      const { latitude, longitude } = coords;
+    const { latitude, longitude } = location.coords;
 
-      return {
-       lat: latitude,
-       long : longitude,
-      };
-    }
+    return {
+      lat: latitude,
+      long: longitude,
+    };
   },
 };

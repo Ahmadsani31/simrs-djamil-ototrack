@@ -61,7 +61,7 @@ export default function TabsLayout() {
           options={{
              title:"Profile",
             headerTitle: () => (
-              <Text className='font-bold text-white text-xl'>Profil</Text>
+              <Text className='font-bold text-white text-xl'>Profile Information</Text>
             )
           }}
         />

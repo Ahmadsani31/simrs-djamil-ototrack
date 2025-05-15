@@ -13,37 +13,13 @@ import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { useLoadingStore } from '@/stores/loadingStore';
-
-const fetchData = async (reservasi_id: string) => {
-  try {
-    const response = await secureApi.get(`/checkpoint/pemakaian`, {
-      params: {
-        reservasi_id: reservasi_id,
-      },
-    });
-    return response.data
-  } catch (error) {
-    return []
-  }
-
-};
-
+import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
 
 export default function Home() {
 
-  const [reservasiID, setReservasiID] = useState<string>('');
-  const [modalImageVisible, setModalImageVisible] = useState(false);
-  const [urlImageModal, setUrlImageModale] = useState<string>('');
+  const [reservasiID, setReservasiID] = useState(undefined);
 
   const setLoading = useLoadingStore((state) => state.setLoading);
-
-
-  const { data: dataReservasi, isLoading, isError, error, refetch } = useQuery<Checkpoint[]>({
-    queryKey: ['dataReservasi', reservasiID],
-    queryFn: async () => await fetchData(reservasiID),
-    enabled: !!reservasiID
-  })
-
 
   const [camera, setCamera] = useState(false);
 
@@ -61,7 +37,7 @@ export default function Home() {
     stiffness: 500,
   });
 
-  const snapPoints = useMemo(() => ['100%', '50%'], []);
+  const snapPoints = useMemo(() => ['100%'], []);
 
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -89,7 +65,7 @@ export default function Home() {
     bottomSheetRef.current?.expand();
   }, []);
 
-  const handleSnapPressDetail = useCallback(async (id: any) => {
+  const handleSnapPressDetail = useCallback((id: any) => {
     setReservasiID(id);
     bottomSheetDetailRef.current?.expand();
   }, []);
@@ -138,18 +114,6 @@ export default function Home() {
 
   };
 
-
-  const handleModalPrevieImage = (uri: any) => {
-    setUrlImageModale(uri)
-    setModalImageVisible(true)
-  }
-
-
-  const handleCloseModalPrevieImage = () => {
-    setUrlImageModale('')
-    setModalImageVisible(false)
-  }
-
   return (
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
@@ -158,6 +122,14 @@ export default function Home() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
+          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+            pathname: 'detail',
+            params: {
+              uuid: '53c31fcb-d085-48c2-881b-c311dc1a817f',
+            }
+          })}>
+            <Text className='text-white font-bold'>Bypass Qrcode</Text>
+          </TouchableOpacity>
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>
@@ -173,6 +145,7 @@ export default function Home() {
           {camera && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
       </BottomSheet>
+
       <BottomSheet
         ref={bottomSheetDetailRef}
         snapPoints={snapPoints}
@@ -181,56 +154,7 @@ export default function Home() {
         animationConfigs={animationConfigs}
         onChange={handleSheetDetailChanges}
       >
-
-        <BottomSheetSectionList
-          style={{ height: 300 }}
-          sections={dataReservasi || []}
-          keyExtractor={(item, index) => index.toString()}
-          stickySectionHeadersEnabled={true}
-          contentContainerStyle={{ paddingBottom: 80 }}
-          renderItem={({ item, index }) => (
-            <View className='px-4'>
-              <View className="p-2 bg-slate-200 rounded-lg mb-3">
-                <View className='flex-row justify-between items-center'>
-                  <Text>{index + 1}. Pengisiian BBM </Text>
-                  <Text>{dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}</Text>
-
-                </View>
-                <View className="flex-row ms-4">
-                  <Text>{item.jenis}</Text>
-                  <Text>{item.jenis == 'Voucher' ? ` : ${item.liter} Liter` : ` : Nominal Rp.${parseFloat(Number(item.uang).toFixed(2)).toLocaleString()}`}</Text>
-                </View>
-                <View className='p-4'>
-                  <Image className='w-full aspect-[3/4] rounded-lg' source={{ uri: item.image }} />
-                </View>
-              </View>
-            </View>
-
-          )}
-          renderSectionHeader={({ section: { checkpoint_in, image } }) => (
-            <View className="mx-4 p-4 bg-[#F2E5BF] my-3 rounded-lg flex-row items-center justify-between">
-              <View>
-                <Text className='font-bold'>Proses Pengisian BBM,</Text>
-                <Text>{dayjs(checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
-              </View>
-              <View className='p-4'>
-                <Pressable onPress={() => handleModalPrevieImage(image)}>
-                  <Image className='size-32 rounded-lg' source={{ uri: image }} />
-                  <Text className='absolute bg-white/75 p-1 rounded-md top-1/3 left-4'>Clik to show</Text>
-                </Pressable>
-              </View>
-              <ModalPreviewImage title='Gambar Proses Pengisian BBM' visible={modalImageVisible} imgUrl={urlImageModal} onPress={() => handleCloseModalPrevieImage()} />
-            </View>
-          )}
-
-          ListEmptyComponent={
-            isLoading ? <SkeletonList loop={10} /> : (
-              <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
-                <Text>Tidak ada data pengambilan BBM</Text>
-              </View>
-            )
-          }
-        />
+        <ListDetailSectionSheet reservasiID={reservasiID ?? ''} />
       </BottomSheet>
 
     </SafeAreaView>

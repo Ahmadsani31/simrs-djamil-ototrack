@@ -166,15 +166,15 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
 
     return (
         <>
-            <View className="p-4 bg-white rounded-lg">
+            <View className="p-4 bg-[#F2E5BF] border border-black rounded-lg">
                 <View className="my-4">
-                    <Text className="text-center bg-red-400 rounded-lg font-medium text-lg">Dalam Proses Pengisian BBM</Text>
+                    <Text className="text-center font-medium text-lg">Dalam Proses Pengisian BBM</Text>
                 </View>
                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-indigo-500`} onPress={() => setDialogBbm(true)} >
                     <MaterialCommunityIcons name='gas-station' size={22} color='white' />
                     <Text className='text-white font-bold'>Pengisiaan BBM</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center ${colors.warning}`} onPress={() => setDialogExit(true)}>
+                <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-red-500`} onPress={() => setDialogExit(true)}>
                     <Text className='text-white font-bold'>Keluar Dari Proses Pengisian BBM</Text>
                     <MaterialCommunityIcons name='exit-to-app' size={22} color='white' />
                 </TouchableOpacity>
@@ -312,7 +312,7 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                                 source={{ uri: uri || undefined }}
                                 className='w-full aspect-[3/4] rounded-lg'
                             />
-                            <TouchableOpacity className="absolute right-2 top-2" onPress={() => setUri(null)}>
+                            <TouchableOpacity className="absolute right-2 bg-white p-1 rounded-full top-2" onPress={() => setUri(null)}>
                                 <AntDesign name="closecircleo" size={32} color="red" />
                             </TouchableOpacity>
                         </View>

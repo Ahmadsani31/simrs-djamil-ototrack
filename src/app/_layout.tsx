@@ -98,7 +98,7 @@ export default function RootLayout() {
       if (update.isAvailable) {
         Alert.alert(
           'Update Tersedia',
-          `Versi baru aplikasi tersedia. Aplikasi akan diperbarui. ${JSON.stringify(update.manifest)}`,
+          `Versi baru aplikasi tersedia. Aplikasi akan diperbarui.`,
           [
             {
               text: 'Update Sekarang',

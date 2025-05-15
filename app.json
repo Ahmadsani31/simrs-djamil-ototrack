@@ -2,7 +2,7 @@
   "expo": {
     "name": "OtoTrack Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.1.2",
+    "version": "1.1.1",
     "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon.png",
@@ -97,12 +97,6 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "owner": "darma31",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/39b7a571-7afd-4fae-ab4a-73ba8c38030d"
-    },
     "extra": {
       "router": {
         "origin": false
@@ -110,6 +104,12 @@
       "eas": {
         "projectId": "39b7a571-7afd-4fae-ab4a-73ba8c38030d"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/39b7a571-7afd-4fae-ab4a-73ba8c38030d"
     }
   }
 }

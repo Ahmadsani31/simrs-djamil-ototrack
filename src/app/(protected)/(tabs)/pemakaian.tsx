@@ -45,7 +45,6 @@ export default function PemakaianScreen() {
         fetchData();
         setInterval(() => {
             setRefreshing(false);
-
         }, 1000);
     };
 

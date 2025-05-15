@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return true;
     } catch (error: any) {
       // Alert.alert('Warning!', error.message as string);
-      console.log('Login error:', JSON.stringify(error));
+      console.log('Login error:', error.message as string);
       set({
         errorLogin: error.response?.data?.message || 'Username atau password salah',
         isLoading: false,

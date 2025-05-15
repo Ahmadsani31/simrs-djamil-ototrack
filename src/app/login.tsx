@@ -61,8 +61,6 @@ export default function LoginScreen() {
 
   };
 
-  const { width } = Dimensions.get('window');
-
 
   return (
     <SafeAreaView className="flex-1 justify-center bg-slate-300">

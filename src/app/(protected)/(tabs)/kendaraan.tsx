@@ -37,18 +37,15 @@ export default function KendaraanScreen() {
       <View className="flex-1 bg-slate-300">
         <View className='absolute w-full bg-[#205781] h-44 rounded-br-[50]  rounded-bl-[50]' />
         <View className="px-4">
+          <View>
+            <Text className="text-lg font-medium bg-[#F2E5BF] rounded-lg p-2">Data kendaraan terdaftar</Text>
+          </View>
           <FlatList
             data={data}
             bounces
             style={{ flexGrow: 0 }}
             keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ paddingBottom: 70 }}
-            stickyHeaderIndices={[0]}
-            ListHeaderComponent={
-              <View>
-                <Text className="text-xl font-bold bg-[#F2E5BF] rounded-lg p-2">Data kendaraan terdaftar</Text>
-              </View>
-            }
+            contentContainerStyle={{ paddingBottom: 120 }}
             renderItem={KendaraanItem}
             ListEmptyComponent={
               isLoading ? <SkeletonList loop={10} /> : (

@@ -105,22 +105,25 @@ export default function ScreenPartialPemakaian({ items }: any) {
             return
         }
 
-        const formData = new FormData();
 
-        formData.append('latitude', coordinate?.lat?.toString());
-        formData.append('longitude', coordinate?.long.toString());
-        formData.append('reservasi_id', items.id);
-        formData.append('fileImage', {
-            uri: uri,
-            name: 'spidometer-capture.jpg',
-            type: 'image/jpeg',
-        } as any);
-
-        console.log('formData', formData);
 
         try {
-            await secureApi.postForm('/checkpoint/save', formData)
-            console.log('save successfully');
+            const formData = new FormData();
+
+            formData.append('latitude', coordinate?.lat?.toString());
+            formData.append('longitude', coordinate?.long.toString());
+            formData.append('reservasi_id', items.id);
+            formData.append('fileImage', {
+                uri: uri,
+                name: 'spidometer-capture.jpg',
+                type: 'image/jpeg',
+            } as any);
+
+            console.log('formData', formData);
+
+            const response = await secureApi.postForm('/checkpoint/save', formData)
+            console.log('response save ', JSON.stringify(response));
+
             handleDialogExit()
             handleReload();
             setLoading(false)
@@ -132,7 +135,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
             ]);
             setLoading(false)
 
-        } 
+        }
 
     }
 
@@ -249,13 +252,13 @@ export default function ScreenPartialPemakaian({ items }: any) {
                                 source={{ uri: uri || undefined }}
                                 className='w-full aspect-[3/4] rounded-lg'
                             />
-                            <ButtonCloseImage onPress={() => setUri(null)}  loading={loading} />
+                            <ButtonCloseImage onPress={() => setUri(null)} loading={loading} />
                         </View>
                     )}
                 </ModalRN.Content>
                 <ModalRN.Footer>
                     <View className="gap-2 flex-row">
-                        <ButtonCostum classname={colors.warning + ` w-full`} title="Exit" loading={loading} onPress={handleDialogExit} />
+                        <ButtonCostum classname={colors.warning + ` w-full`} title="Tutup" loading={loading} onPress={handleDialogExit} />
                         {uri && <ButtonCostum classname={colors.primary} title="Pengisian BBM" loading={loading} onPress={handleSubmitProsesBBM} />}
 
                     </View>

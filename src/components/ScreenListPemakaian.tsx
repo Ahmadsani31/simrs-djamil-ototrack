@@ -4,28 +4,28 @@ import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Entypo, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import ModalPreviewImage from './ModalPreviewImage';
 import { colors } from '@/constants/colors';
 
 const LIMIT = 5;
 
-const fetchData = async ({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: (string | { date: Date | undefined })[]; }) => {
+const fetchData = async ({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: (string | { date: string | undefined })[]; }) => {
     // queryKey is an array: [string, { date: Date | undefined }]
     const [_key, params] = queryKey;
-    const date = (params as { date?: Date }).date;
 
-    let formattedDate = '';
-    if (date) {
-        formattedDate = date.toISOString().split('T')[0];
-    }
+    // console.log(params);
+    
+    const date = (params as { date?: String }).date;
+
+
     try {
         const response = await secureApi.get(`reservasi/list`, {
             params: {
                 limit: LIMIT,
                 offset: pageParam,
-                tanggal: formattedDate,
+                tanggal: date,
             },
         });
         return {
@@ -50,12 +50,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     const [date, setDate] = useState<Date>();
     const [dateInput, setDateInput] = useState('');
 
-    // const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
-    //     queryKey: ['listPemakaian'],
-    //     queryFn: () => fetchData(),
-    //     // enabled: !!date
-    // })
-
     const {
         data,
         fetchNextPage,
@@ -65,7 +59,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
         isRefetching,
         isLoading,
     } = useInfiniteQuery({
-        queryKey: ['listPemakaian', { date: date }],
+        queryKey: ['listPemakaian', { date: dateInput }],
         queryFn: fetchData,
         getNextPageParam: (lastPage) => lastPage.nextOffset,
         initialPageParam: 0,
@@ -94,14 +88,20 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const onChange = (event: any, selectedDate: any) => {
         console.log(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
+        const formattedDate = selectedDate.toISOString().split('T')[0];
         const currentDate = selectedDate;
-        setDateInput(currentDate);
+        setDateInput(formattedDate);
         setDate(currentDate);
 
         // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
         // refetch()
 
     };
+
+    const handleResetTanggal = () =>{
+        setDateInput('');
+        refetch();
+    }
 
 
     const flatData = data?.pages.flatMap((page) => page.data) || [];
@@ -115,6 +115,12 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                     editable={false}
                     value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
                 />
+                {dateInput && (
+                    <TouchableOpacity onPress={handleResetTanggal} className='absolute top-5 right-3'>
+                    <Entypo name="circle-with-cross" size={28} color="black" />
+                </TouchableOpacity>
+                )}
+                
             </Pressable>
             <FlatList
                 data={flatData}

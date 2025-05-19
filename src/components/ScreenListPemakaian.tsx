@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ButtonCostum from './ButtonCostum';
 import dayjs from 'dayjs';
 import { ModalRN } from './ModalRN';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { DataKendaraan } from '@/types/types';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,20 +13,35 @@ import SkeletonList from './SkeletonList';
 import ModalPreviewImage from './ModalPreviewImage';
 import { colors } from '@/constants/colors';
 
-const fetchData = async (tanggal: any) => {
+const LIMIT = 5;
+
+const fetchData = async ({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: (string | { date: Date | undefined })[]; }) => {
+    // queryKey is an array: [string, { date: Date | undefined }]
+    const [_key, params] = queryKey;
+    const date = (params as { date?: Date }).date;
+
+    let formattedDate = '';
+    if (date) {
+        formattedDate = date.toISOString().split('T')[0];
+    }
     try {
-        const formattedDate = tanggal.toISOString().split('T')[0];
         const response = await secureApi.get(`reservasi/list`, {
             params: {
+                limit: LIMIT,
+                offset: pageParam,
                 tanggal: formattedDate,
             },
         });
-        return response.data;
+        return {
+            data: response.data,
+            nextOffset: response.data.length < LIMIT ? null : pageParam + LIMIT,
+        };
     } catch (error) {
-        return []
+        return {
+            data: [],
+            nextOffset: null,
+        };
     }
-
-
 };
 
 
@@ -39,17 +54,34 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     // useEffect(() => {
     //     refetch()
     // }, [])
+    const [offset, setOffset] = useState(0);
 
     const setLoading = useLoadingStore((state) => state.setLoading);
 
 
-    const [date, setDate] = useState(new Date);
+    const [date, setDate] = useState<Date>();
+    const [dateInput, setDateInput] = useState('');
 
-    const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
-        queryKey: ['listPemakaian', date],
-        queryFn: () => fetchData(date),
-        enabled: !!date
-    })
+    // const { data, isLoading, isError, error, refetch, } = useQuery<DataKendaraan[]>({
+    //     queryKey: ['listPemakaian'],
+    //     queryFn: () => fetchData(),
+    //     // enabled: !!date
+    // })
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch,
+        isRefetching,
+        isLoading,
+    } = useInfiniteQuery({
+        queryKey: ['listPemakaian', { date: date }],
+        queryFn: fetchData,
+        getNextPageParam: (lastPage) => lastPage.nextOffset,
+        initialPageParam: 0,
+    });
 
     const [modalVisible, setModalVisible] = useState(false);
     const [imgBase64, setImgBase64] = useState<Base64URLString>();
@@ -65,7 +97,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const showMode = (currentMode: any) => {
         DateTimePickerAndroid.open({
-            value: date,
+            value: date ?? new Date(),
             onChange,
             mode: currentMode,
             is24Hour: true,
@@ -76,21 +108,16 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     const onChange = (event: any, selectedDate: any) => {
         console.log(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
         const currentDate = selectedDate;
+        setDateInput(currentDate);
         setDate(currentDate);
+
         // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
-        refetch()
+        // refetch()
 
     };
 
-    const [refreshing, setRefreshing] = useState(false);
 
-    const onRefresh = () => {
-        refetch()
-        setInterval(() => {
-            setRefreshing(false);
-
-        }, 1000);
-    };
+    const flatData = data?.pages.flatMap((page) => page.data) || [];
 
     return (
         <>
@@ -99,15 +126,14 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                 <TextInput className='border border-gray-300 rounded-md bg-gray-100 py-4 ps-14'
                     placeholder="Select Date"
                     editable={false}
-                    value={dayjs(date).format('dddd ,DD MMMM YYYY')}
+                    value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
                 />
             </Pressable>
             <FlatList
-                data={data}
+                data={flatData}
                 keyExtractor={(item) => item.id.toString()}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['grey']}
-                        progressBackgroundColor={'black'} />
+                    <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
                 }
                 // stickyHeaderIndices={[0]}
                 contentContainerStyle={{ paddingBottom: 270 }}
@@ -181,11 +207,19 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                     </>
                 )}
                 ListEmptyComponent={
-                    isLoading ? <SkeletonList loop={8} /> :
-                        <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
-                            <Text>Belum ada pemakaian kendaraan</Text>
-                        </View>
+                    <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
+                        <Text>Belum ada pemakaian kendaraan</Text>
+                    </View>
                 }
+                onEndReached={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                    }
+                }}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={isLoading || isFetchingNextPage ? (
+                    <SkeletonList loop={8} />
+                ) : null}
             />
         </>
     );

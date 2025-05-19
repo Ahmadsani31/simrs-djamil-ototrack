@@ -122,14 +122,14 @@ export default function Home() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
-          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+          {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
               uuid: '53c31fcb-d085-48c2-881b-c311dc1a817f',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>

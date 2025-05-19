@@ -22,12 +22,21 @@ import RequiredPermission from '@/components/RequiredPermission';
 
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient()
+// Create a QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Optional: Configure global query options
+      staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+    },
+  },
+});
+
 
 export default function RootLayout() {
 
   const { isLoading } = useAutoLogin();
-  
+
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -121,8 +130,9 @@ export default function RootLayout() {
   }
 
   if (!isReady) {
-    return <RequiredPermission/>
+    return <RequiredPermission />
   }
+
 
   return (
     <QueryClientProvider client={queryClient}>

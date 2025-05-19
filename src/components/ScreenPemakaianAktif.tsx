@@ -39,7 +39,7 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
 
     if (!rawData) {
         return (
-            <View>
+            <>
                 <View className='mb-4 '>
                     <Text className="text-2xl font-bold text-center text-white">Scan Barcode Here</Text>
                     <Text className="text-sm text-center text-white">Silahkan scan qrcode yang ada pada masing-masing kendaraan</Text>
@@ -51,7 +51,7 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
                     <MaterialIcons name="qr-code-scanner" size={24} color="white" />
                     <Text className="text-white font-bold ml-2">Scan Barcode</Text>
                 </TouchableOpacity>
-            </View>
+            </>
         )
     }
 

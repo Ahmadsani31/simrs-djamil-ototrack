@@ -1,12 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import ButtonCostum from './ButtonCostum';
+import { useState } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import dayjs from 'dayjs';
-import { ModalRN } from './ModalRN';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { DataKendaraan } from '@/types/types';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
@@ -51,14 +47,6 @@ interface cardProps {
 
 export default function ScreenListPemakaian({ onPress }: cardProps) {
 
-    // useEffect(() => {
-    //     refetch()
-    // }, [])
-    const [offset, setOffset] = useState(0);
-
-    const setLoading = useLoadingStore((state) => state.setLoading);
-
-
     const [date, setDate] = useState<Date>();
     const [dateInput, setDateInput] = useState('');
 
@@ -93,7 +81,6 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
         setModalVisible(true)
 
     }
-
 
     const showMode = (currentMode: any) => {
         DateTimePickerAndroid.open({
@@ -206,20 +193,19 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                         <ModalPreviewImage title='Gambar Spidometer' visible={modalVisible} imgUrl={imgBase64 || ''} onPress={() => setModalVisible(false)} />
                     </>
                 )}
-                ListEmptyComponent={
-                    <View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
-                        <Text>Belum ada pemakaian kendaraan</Text>
-                    </View>
-                }
                 onEndReached={() => {
                     if (hasNextPage && !isFetchingNextPage) {
                         fetchNextPage();
                     }
                 }}
                 onEndReachedThreshold={0.5}
-                ListFooterComponent={isLoading || isFetchingNextPage ? (
+                ListEmptyComponent={isLoading || isFetchingNextPage ? (
                     <SkeletonList loop={8} />
-                ) : null}
+                ) :
+                    (<View className="flex-1 justify-center items-center bg-white p-5 rounded-lg">
+                        <Text>Belum ada pemakaian kendaraan</Text>
+                    </View>)
+                }
             />
         </>
     );

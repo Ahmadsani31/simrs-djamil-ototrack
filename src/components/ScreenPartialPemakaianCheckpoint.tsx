@@ -166,7 +166,7 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
 
     return (
         <>
-            <View className="p-4 bg-[#F2E5BF] border border-black rounded-lg">
+            <View className="p-4 bg-teal-300 border border-black rounded-lg">
                 <View className="my-4">
                     <Text className="text-center font-medium text-lg">Dalam Proses Pengisian BBM</Text>
                 </View>
@@ -179,40 +179,42 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                     <MaterialCommunityIcons name='exit-to-app' size={22} color='white' />
                 </TouchableOpacity>
             </View>
-            <Text className="font-bold mx-2 my-3">Log Pengisian BBM</Text>
             {isLoading && <SkeletonList loop={5} />}
             {dataBbm?.map((item) => item.data.length > 0 ?
                 (
-                    <View key={item.id} className="p-4 bg-[#F2E5BF] mb-2 rounded-lg">
-                        <View className="flex-row rounded-lg mb-1 justify-between items-center">
-                            <View>
-                                <Text className="font-bold">{item.checkpoint_name}</Text>
-                                <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
-                                <Text>Jam : {dayjs(item.checkpoint_in).format('HH:ss')}</Text>
-                            </View>
-                            <TouchableHighlight onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')} className='p-1 bg-gray-300 rounded-lg '>
-                                <View className='flex-row items-center justify-center'>
-                                    <Entypo name="images" size={24} color="black" />
-                                    <Text className='ms-2 text-center'>gambar pengisian</Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-                        {item.data.map((itx, ii) => (
-                            <View className="p-4 gap-2 bg-white rounded-lg mb-3" key={itx.id}>
-                                <View className="flex-row">
-                                    <Text className="font-bold">Dengan {itx.jenis}</Text>
-                                    <Text>{itx.jenis == 'Voucher' ? ` : ${itx.liter} Liter` : ` : Nominal Rp.${parseFloat(Number(itx.uang).toFixed(2)).toLocaleString()}`}</Text>
-                                </View>
+                    <View key={item.id}>
+                        <Text className="font-bold mx-2 my-3">Log Pengisian BBM</Text>
+                        <View className="p-4 bg-[#F2E5BF] mb-2 rounded-lg">
+                            <View className="flex-row rounded-lg mb-1 justify-between items-center">
                                 <View>
-                                    <TouchableHighlight onPress={() => handleShowImage(itx.image, 'Foto Bon / Struck pembelian BBM')} className='p-1 bg-gray-300 rounded-lg '>
-                                        <View className='flex-row items-center'>
-                                            <Entypo name="images" size={24} color="black" />
-                                            <Text className='ms-2 text-center'>gambar struk / bon</Text>
-                                        </View>
-                                    </TouchableHighlight>
+                                    <Text className="font-bold">{item.checkpoint_name}</Text>
+                                    <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+                                    <Text>Jam : {dayjs(item.checkpoint_in).format('HH:ss')}</Text>
                                 </View>
+                                <TouchableHighlight onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')} className='p-1 bg-gray-300 rounded-lg '>
+                                    <View className='flex-row items-center justify-center'>
+                                        <Entypo name="images" size={24} color="black" />
+                                        <Text className='ms-2 text-center'>gambar pengisian</Text>
+                                    </View>
+                                </TouchableHighlight>
                             </View>
-                        ))}
+                            {item.data.map((itx, ii) => (
+                                <View className="p-4 gap-2 bg-white rounded-lg mb-3" key={itx.id}>
+                                    <View className="flex-row">
+                                        <Text className="font-bold">Dengan {itx.jenis}</Text>
+                                        <Text>{itx.jenis == 'Voucher' ? ` : ${itx.liter} Liter` : ` : Nominal Rp.${parseFloat(Number(itx.uang).toFixed(2)).toLocaleString()}`}</Text>
+                                    </View>
+                                    <View>
+                                        <TouchableHighlight onPress={() => handleShowImage(itx.image, 'Foto Bon / Struck pembelian BBM')} className='p-1 bg-gray-300 rounded-lg '>
+                                            <View className='flex-row items-center'>
+                                                <Entypo name="images" size={24} color="black" />
+                                                <Text className='ms-2 text-center'>gambar struk / bon</Text>
+                                            </View>
+                                        </TouchableHighlight>
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
                     </View>
                 )
                 : (

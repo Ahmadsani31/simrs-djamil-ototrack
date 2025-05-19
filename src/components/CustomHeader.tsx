@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableOpacity, Image } from 'react-native'
 import { AntDesign } from '@expo/vector-icons';
 
 interface itemsProps {
@@ -13,9 +13,9 @@ export default function CustomHeader({ onPress, title }: itemsProps) {
             <View className="w-64">
                 <Text className="text-2xl font-bold text-white text-center">{title}</Text>
             </View>
-            <TouchableHighlight onPress={onPress} className={`bg-white p-1 rounded-full`}>
+            <TouchableOpacity onPress={onPress} className={`bg-white p-1 rounded-full`}>
                 <AntDesign name="closecircleo" size={24} color="red" />
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
     )
 }

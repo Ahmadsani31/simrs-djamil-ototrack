@@ -24,7 +24,7 @@ export const reLocation = {
 
     if (!location) {
       location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Location.Accuracy.High,
         timeInterval: 10000,
         distanceInterval: 10,
       });

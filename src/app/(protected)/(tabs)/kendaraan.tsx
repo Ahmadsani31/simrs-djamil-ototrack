@@ -4,6 +4,8 @@ import SkeletonList from "@/components/SkeletonList";
 import SafeAreaView from "@/components/SafeAreaView";
 import { useQuery } from "@tanstack/react-query";
 import { Kendaraan, KendaraanItemProps } from "@/types/types";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 const fetchData = async () => {
   try {
@@ -18,16 +20,14 @@ const fetchData = async () => {
 export default function KendaraanScreen() {
 
   // const queryClient = useQueryClient()
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // Refresh logic here
-  //     // fetchData();
-  //     queryClient.invalidateQueries({ queryKey: ['kendaraan'] })
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
 
-  const { data, isLoading, isError, error } = useQuery<Kendaraan[]>({
+  const { data, isLoading, isError, error,refetch } = useQuery<Kendaraan[]>({
     queryKey: ['dataKendaraan'],
     queryFn: fetchData,
   })

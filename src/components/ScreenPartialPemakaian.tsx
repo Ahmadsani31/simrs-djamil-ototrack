@@ -72,7 +72,6 @@ export default function ScreenPartialPemakaian({ items }: any) {
                 if (response.status == true) {
                     setCheckpointID(response.data.checkpoint_id)
                     setCheckpointAktif(true)
-
                 }
 
             } catch (error: any) {

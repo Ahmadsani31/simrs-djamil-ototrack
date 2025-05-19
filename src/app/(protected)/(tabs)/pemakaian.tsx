@@ -41,8 +41,9 @@ export default function PemakaianScreen() {
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = () => {
-        queryClient.invalidateQueries({ queryKey: ['dataAllBbm', 'dataBbm'] });
         fetchData();
+        queryClient.invalidateQueries({ queryKey: ['dataAllBbm'] });
+        queryClient.invalidateQueries({ queryKey: ['dataBbm'] });
         setInterval(() => {
             setRefreshing(false);
         }, 1000);

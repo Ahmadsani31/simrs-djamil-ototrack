@@ -3,9 +3,9 @@ import { useAuthStore } from '@/stores/authStore';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import SafeAreaView from '@/components/SafeAreaView';
-import { AntDesign, Feather } from '@expo/vector-icons';
+import { AntDesign, Feather, FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { ModalRN } from '@/components/ModalRN';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Formik, FormikValues, useFormik } from 'formik';
 import ButtonCostum from '@/components/ButtonCostum';
 import { colors } from '@/constants/colors';
@@ -13,6 +13,19 @@ import { colors } from '@/constants/colors';
 import * as yup from 'yup';
 import secureApi from '@/services/service';
 import Input from '@/components/Input';
+import { useQuery } from '@tanstack/react-query';
+import SkeletonList from '@/components/SkeletonList';
+import { useFocusEffect } from 'expo-router';
+
+const fetchData = async () => {
+  try {
+    const response = await secureApi.get(`/user/dashboard`);
+    return response.data
+  } catch (error) {
+    return []
+  }
+
+};
 
 const validationSchema = yup.object().shape({
   password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
@@ -21,12 +34,28 @@ const validationSchema = yup.object().shape({
     .required('Konfirmasi password wajib diisi')
 });
 
+type dataDashboard = {
+  pemakaianHariIni: number;
+  pemakaianHariSemua: number;
+}
+
 export default function Profile() {
   const { user, logout } = useAuthStore();
 
   const [isModal, setIsModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
+
+    useFocusEffect(
+      useCallback(() => {
+        refetch();
+      }, [])
+    );
+
+  const { data, isLoading, isError, error,refetch } = useQuery<dataDashboard>({
+    queryKey: ['dashboard'],
+    queryFn: fetchData,
+  })
 
   const formik = useFormik({
     initialValues: { password: '', password_confirmation: '' },
@@ -76,26 +105,54 @@ export default function Profile() {
         <View className="bg-[#205781] rounded-br-[50]  rounded-bl-[50] shadow">
           <View className='px-4'>
 
-            <View className='bg-white items-center rounded-lg p-4'>
+            <View className='bg-white flex-row gap-5 items-center justify-center rounded-lg p-4'>
               <View className='my-3'>
                 <Image style={{
                   borderRadius: 100,
-                  width: 150,
-                  height: 150,
+                  width: 80,
+                  height: 80,
                 }} source={require('@asset/images/profile.png')} />
               </View>
-              <View className='my-2 items-center'>
-                <Text className="text-lg">{user?.name || 'Not available'}</Text>
+              <View className='my-2'>
+                <Text className="text-lg font-bold underline">{user?.name || 'Not available'}</Text>
                 <Text className="text-lg">{user?.email || 'Not available'}</Text>
               </View>
 
             </View>
-            <View className='mt-5 mb-10'>
+            <View className='flex-row gap-5 items-center justify-center rounded-lg p-4'>
+              {isLoading ? <View className='flex-1'><SkeletonList loop={1} /></View> : (
+                <View className='w-48 bg-white rounded-lg p-2'>
+                  <Text>Pemakaian Hari ini</Text>
+                  <View className='my-2 flex-row gap-2 justify-between items-center'>
+                    <Text className='text-5xl font-bold  text-blue-500'>
+                      {data?.pemakaianHariIni}
+                    </Text>
+                    <FontAwesome5 name="car-side" size={34} color="black" />
+                  </View>
+                </View>
+
+              )}
+
+              {isLoading ? <View className='flex-1'><SkeletonList loop={1} /></View> : (
+                <View className='w-48 bg-white rounded-lg p-2'>
+                  <Text>Total Pemakaian</Text>
+                  <View className='my-2 flex-row gap-2 justify-between  items-center'>
+                    <Text className='text-5xl font-bold text-blue-500'>
+                      {data?.pemakaianHariSemua}
+                    </Text>
+                    <MaterialCommunityIcons name="notebook-check" size={34} color="black" />
+                  </View>
+                </View>
+              )}
+
+
+            </View>
+            <View className='mb-10'>
               <TouchableOpacity
                 onPress={() => setIsModal(true)}
                 className={`bg-teal-500 p-3 my-3 flex-row justify-center rounded items-center w-full`}
               >
-                <AntDesign name="logout" size={20} color="white" />
+                <MaterialIcons name="password" size={20} color="white" />
                 <Text className="text-white ms-3 font-bold">Update Password</Text>
               </TouchableOpacity>
               <TouchableOpacity

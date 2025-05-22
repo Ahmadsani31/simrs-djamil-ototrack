@@ -172,7 +172,7 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                 </View>
                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-indigo-500`} onPress={() => setDialogBbm(true)} >
                     <MaterialCommunityIcons name='gas-station' size={22} color='white' />
-                    <Text className='text-white font-bold'>Pengisiaan BBM</Text>
+                    <Text className='text-white font-bold'>Struk / Bon Pengisian</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-red-500`} onPress={() => setDialogExit(true)}>
                     <Text className='text-white font-bold'>Keluar Dari Proses Pengisian BBM</Text>
@@ -183,7 +183,7 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
             {dataBbm?.map((item) => item.data.length > 0 ?
                 (
                     <View key={item.id}>
-                        <Text className="font-bold mx-2 my-3">Log Pengisian BBM</Text>
+                        <Text className="font-bold mx-2 my-3">Log pengisian BBM saat ini</Text>
                         <View className="p-4 bg-[#F2E5BF] mb-2 rounded-lg">
                             <View className="flex-row rounded-lg mb-1 justify-between items-center">
                                 <View>

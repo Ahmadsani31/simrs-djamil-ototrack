@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface itemsProps {
     onPress: () => void;
@@ -8,13 +8,14 @@ interface itemsProps {
 
 export default function CustomHeader({ onPress, title }: itemsProps) {
     return (
-        <View className="flex-row items-center justify-around px-4 mt-4">
-            <Image style={{ width: 40, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
-            <View className="w-64">
-                <Text className="text-2xl font-bold text-white text-center">{title}</Text>
+        <View className="flex-row items-center justify-around mt-4">
+            <View className='p-1 bg-white rounded-lg'>
+                <Image style={{ width: 53, height: 30 }} source={require('@asset/images/logo/logo-home.png')} />
             </View>
-            <TouchableOpacity onPress={onPress} className={`bg-white p-1 rounded-full`}>
-                <AntDesign name="closecircleo" size={24} color="red" />
+            <Text className="text-2xl font-bold text-white">{title}</Text>
+            <TouchableOpacity onPress={onPress} className={`bg-white p-1 rounded-xl`}>
+                {/* <AntDesign name="closecircleo" size={24} color="red" /> */}
+                <MaterialCommunityIcons name="logout" size={24} color="red" />
             </TouchableOpacity>
         </View>
     )

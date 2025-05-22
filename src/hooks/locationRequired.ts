@@ -4,7 +4,7 @@ import { Alert } from 'react-native';
 export const reLocation = {
   enable: async () => {
     let enabled = await Location.hasServicesEnabledAsync(); //returns true or false
-    console.log('enable coordinate ', enabled);
+    // console.log('enable coordinate ', enabled);
     if (!enabled) {
       //if not enable
       Alert.alert('Location not enabled', 'Please enable your Location', [
@@ -30,7 +30,7 @@ export const reLocation = {
       });
     }
     //get current position lat and long
-    console.log('location ', JSON.stringify(location));
+    // console.log('location ', JSON.stringify(location));
 
     const { latitude, longitude } = location.coords;
 

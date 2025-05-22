@@ -148,7 +148,7 @@ export default function DetailScreen() {
 
     <SafeAreaView className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
-      <CustomHeader title="Detail Pemakaian Kendaraan" onPress={backAction} />
+      <CustomHeader title="Detail Kendaraan" onPress={backAction} />
       <ScrollView className="flex-1">
         {isError ? <SkeletonList loop={5} /> : (
           <View className="m-4 p-4 bg-white rounded-lg">

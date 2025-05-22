@@ -128,12 +128,15 @@ export default function ScreenPartialPemakaian({ items }: any) {
             setLoading(false)
 
         } catch (error: any) {
-            console.log('response checkpoint', JSON.stringify(error.response.data));
-            Alert.alert('Warning!', error.response.data.message, [
-                { text: 'Tutup', onPress: () => null },
-            ]);
+            if (error.response && error.response.data) {
+                const msg = error.response.data.message || "Terjadi kesalahan.";
+                Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
+            } else if (error.request) {
+                Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+            } else {
+                Alert.alert("Error", error.message);
+            }
             setLoading(false)
-
         }
 
     }
@@ -184,7 +187,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                     <MaterialCommunityIcons name='car' size={22} color='white' />
                 </TouchableOpacity>
             </View>
-            <Text className="font-bold my-3">Log Semua Pengisian BBM</Text>
+            <Text className="font-bold my-3">Log pengisian BBM</Text>
             {dataAllBbm ?
                 dataAllBbm?.map((item) => item.data.length > 0 ?
                     (

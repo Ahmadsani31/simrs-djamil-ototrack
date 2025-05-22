@@ -92,14 +92,14 @@ export default function PengembalianScreen() {
       router.replace('(tabs)')
     } catch (error: any) {
       // alert(error.response.data.message)
-      console.log('response error', JSON.stringify(error.response.data.message));
-      Alert.alert('Warning!', error.response.data.message, [
-        {
-          text: 'Tutup',
-          onPress: () => null,
-          style: 'cancel',
+        if (error.response && error.response.data) {
+          const msg = error.response.data.message || "Terjadi kesalahan.";
+          Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
+        } else if (error.request) {
+          Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+        } else {
+          Alert.alert("Error", error.message);
         }
-      ]);
     } finally {
       setLoading(false);
     }
@@ -110,7 +110,7 @@ export default function PengembalianScreen() {
 
     <SafeAreaView className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
-      <CustomHeader title="Proses Pegembalian Kendaraan" onPress={backAction} />
+      <CustomHeader title="Pegembalian Kendaraan" onPress={backAction} />
       <ScrollView className="flex-1">
         <View className="m-4 p-4 bg-white rounded-lg">
           <View className="items-center mb-3 py-2">

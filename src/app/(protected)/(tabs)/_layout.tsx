@@ -22,8 +22,8 @@ export default function TabsLayout() {
             color: '#fff',
           },
           headerLeft: () => (
-            <View className='px-5 flex-row items-center'>
-              <Image style={{ width: 42, height: 40 }} source={require('@asset/images/logo/logo-M-Djamil.png')} />
+            <View className='mx-4 p-1 bg-white rounded-lg flex-row items-center'>
+              <Image style={{ width: 53, height: 30 }} source={require('@asset/images/logo/logo-home.png')} />
             </View>
           ),
         }}

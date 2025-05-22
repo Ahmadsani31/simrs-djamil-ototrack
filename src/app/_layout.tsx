@@ -15,7 +15,6 @@ import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
-import LoadingIndikator from '@/components/LoadingIndikator';
 import RequiredPermission from '@/components/RequiredPermission';
 
 // import '@/utlis/backgroundLocationTask';

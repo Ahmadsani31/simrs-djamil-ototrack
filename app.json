@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "OtoTrack Djamil",
+    "name": "Oto-Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon.png",
@@ -13,6 +13,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-asset",
+      "expo-font",
       [
         "expo-secure-store",
         {
@@ -41,36 +43,39 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#232323",
-          "image": "./assets/splash-icon-light.png",
+          "image": "./assets/icon/splash-icon-light.png",
           "dark": {
-            "image": "./assets/splash-icon-dark.png",
+            "image": "./assets/icon/splash-icon-dark.png",
             "backgroundColor": "#000000"
           },
           "imageWidth": 200
         }
-      ],
-      "expo-asset",
-      "expo-font"
+      ]
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "assetBundlePatterns": [
       "**/*"
     ],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.darma31.simrsdjamilototrack",
       "buildNumber": "1",
       "icon": {
-        "dark": "./assets/ios-dark.png",
-        "light": "./assets/ios-light.png",
-        "tinted": "./assets/ios-tinted.png"
+        "dark": "./assets/icon/ios-dark.png",
+        "light": "./assets/icon/ios-light.png",
+        "tinted": "./assets/icon/ios-tinted.png"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "monochromeImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon/adaptive-icon.png",
+        "monochromeImage": "./assets/icon/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "versionCode": 1,
@@ -94,7 +99,7 @@
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ]
     },
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "owner": "darma31",
     "extra": {

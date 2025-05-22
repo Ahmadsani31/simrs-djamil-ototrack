@@ -67,15 +67,14 @@ export default function LoginScreen() {
       <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
       <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
       <View className='items-center mb-5'>
-        <View className='bg-white rounded-full p-2'>
-          <Image className='h-[85] w-[89] object-cover' source={require('@asset/images/logo/logo-M-Djamil.png')} />
+        <View className='bg-white/70 rounded-2xl p-2'>
+          <Image className='h-[80] w-[250] object-cover' source={require('@asset/images/logo/logo-djamil.png')} />
         </View>
       </View>
       <View className=' bg-white p-4 mx-4 mb-24 rounded-lg z-10'>
-        <View className='mb-3'>
+        <View className='mb-10 mt-5'>
           <Text className="text-xl font-medium text-center">Pencatatan</Text>
-          <Text className="text-2xl font-bold text-center">Kendaraan Operasional</Text>
-          <Text className="text-xl font-bold text-center">RSUP. DR. M DJAMIL</Text>
+          <Text className="font-mono text-2xl font-bold text-center">Kendaraan Operasional</Text>
         </View>
         {errorLogin && <ViewError plaintext={errorLogin} />}
         <Formik

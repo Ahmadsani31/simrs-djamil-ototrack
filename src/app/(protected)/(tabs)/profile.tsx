@@ -6,7 +6,7 @@ import SafeAreaView from '@/components/SafeAreaView';
 import { AntDesign, Feather, FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { ModalRN } from '@/components/ModalRN';
 import { useCallback, useState } from 'react';
-import { Formik, FormikValues, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import ButtonCostum from '@/components/ButtonCostum';
 import { colors } from '@/constants/colors';
 

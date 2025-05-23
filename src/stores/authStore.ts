@@ -51,25 +51,37 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       // Alert.alert('Warning!', error.message as string);
       console.log('Login error:', error.message as string);
-      set({
-        errorLogin: error.response?.data?.message || 'Username atau password salah',
-        isLoading: false,
-      });
+      if (error.response && error.response.data) {
+        const msg = error.response.data.message || 'Username atau password salah';
+        set({
+          errorLogin: msg,
+          isLoading: false,
+        });
+      } else if (error.request) {
+        set({
+          errorLogin: 'Tidak bisa terhubung ke server. Cek koneksi kamu.',
+          isLoading: false,
+        });
+      } else {
+        set({
+          errorLogin: error.message,
+          isLoading: false,
+        });
+      }
       return false;
     }
   },
-
 
   logout: async () => {
     set({ isLoading: true });
 
     const token = await SecureStore.getItemAsync('token');
     if (token) {
-    const response =  await restApi.logout(token);
-    // console.log('response logout ', response);
+      const response = await restApi.logout(token);
+      // console.log('response logout ', response);
     }
     await SecureStore.deleteItemAsync('token');
-    set({ token: null, user: null,isLoading: false  });
+    set({ token: null, user: null, isLoading: false });
     router.replace('/login');
   },
 
@@ -88,7 +100,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         // console.log('token not found');
         set({ isLoading: false });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       // console.log('Check User error:', JSON.stringify(error.response?.data?.message));
       await SecureStore.deleteItemAsync('token');
       set({ token: null, user: null, isLoading: false });

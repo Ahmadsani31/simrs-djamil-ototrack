@@ -1,4 +1,4 @@
-import { router, Slot, SplashScreen, Stack } from 'expo-router';
+import { router, SplashScreen, Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
@@ -15,8 +15,6 @@ import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
-import RequiredPermission from '@/components/RequiredPermission';
-
 // import '@/utlis/backgroundLocationTask';
 
 SplashScreen.preventAutoHideAsync();
@@ -124,13 +122,13 @@ export default function RootLayout() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !isReady) {
     return <Loader />;
   }
 
-  if (!isReady) {
-    return <RequiredPermission />
-  }
+  // if (!isReady) {
+  //   return <RequiredPermission />
+  // }
 
 
   return (

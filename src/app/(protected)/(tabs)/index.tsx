@@ -1,25 +1,17 @@
-import { View, Text, Alert, Image, Modal, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { View, Alert} from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import BottomSheet, { BottomSheetSectionList, BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect } from 'expo-router';
 import SafeAreaView from '@/components/SafeAreaView';
-import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import ScreenListPemakaian from '@/components/ScreenListPemakaian';
-import { Checkpoint, CheckpointReservasi } from '@/types/types';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
-import { useLoadingStore } from '@/stores/loadingStore';
 import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
 
 export default function Home() {
 
   const [reservasiID, setReservasiID] = useState(undefined);
-
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [camera, setCamera] = useState(false);
 
@@ -46,16 +38,9 @@ export default function Home() {
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
-      console.log('BottomSheet closed with swipe down.');
+      // console.log('BottomSheet closed with swipe down.');
       // Lakukan aksi lain jika ditutup
       setCamera(false);
-    }
-  }, []);
-
-  const handleSheetDetailChanges = useCallback((index: number) => {
-    if (index === -1) {
-      console.log('BottomSheet closed with swipe down.');
-      // Lakukan aksi lain jika ditutup
     }
   }, []);
 
@@ -72,7 +57,7 @@ export default function Home() {
 
 
   const handleScan = async (data: string) => {
-    console.log('Scanned data:', data);
+    // console.log('Scanned data:', data);
 
     try {
       const res = await secureApi.get(`reservasi/qrcode`, {
@@ -122,14 +107,14 @@ export default function Home() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
-          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+          {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
               uuid: '53c31fcb-d085-48c2-881b-c311dc1a817f',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>
@@ -152,7 +137,6 @@ export default function Home() {
         index={-1}
         enablePanDownToClose
         animationConfigs={animationConfigs}
-        onChange={handleSheetDetailChanges}
       >
         <ListDetailSectionSheet reservasiID={reservasiID ?? ''} />
       </BottomSheet>

@@ -1,5 +1,5 @@
-import { Alert, BackHandler, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { Alert, BackHandler, Image, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import Input from "@/components/Input";
 import InputArea from "@/components/InputArea";
@@ -11,12 +11,10 @@ import secureApi from "@/services/service";
 import { Formik, FormikValues } from "formik";
 import * as yup from 'yup';
 import { colors } from "@/constants/colors";
-import * as SecureStore from 'expo-secure-store';
 import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
-import { Entypo } from '@expo/vector-icons';
 import CustomHeader from "@/components/CustomHeader";
 
 interface dataDetail {

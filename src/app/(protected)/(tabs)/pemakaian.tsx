@@ -1,6 +1,5 @@
 import { View, Text, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import * as SecureStore from 'expo-secure-store';
 import { useLoadingStore } from '@/stores/loadingStore';
 import ScreenPartialPemakaian from '@/components/ScreenPartialPemakaian';
 import { dataAktif } from '@/types/types';
@@ -14,7 +13,6 @@ export default function PemakaianScreen() {
     const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : 'height'
 
     const queryClient = useQueryClient()
-
 
     const setLoading = useLoadingStore((state) => state.setLoading);
 

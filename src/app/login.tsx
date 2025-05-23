@@ -67,7 +67,7 @@ export default function LoginScreen() {
       <Animated.View style={{ width: WiconTL, height: HiconTL }} className="absolute bg-[#4F959D] top-[-80] left-[-80] rounded-full" />
       <Animated.View style={{ width: WiconTR, height: HiconTR }} className="absolute bg-[#205781] top-16 right-[-100] rounded-full" />
       <View className='items-center mb-5'>
-        <View className='bg-white/70 rounded-2xl p-2'>
+        <View className='bg-white/85 rounded-2xl p-2'>
           <Image className='h-[80] w-[250] object-cover' source={require('@asset/images/logo/logo-djamil.png')} />
         </View>
       </View>

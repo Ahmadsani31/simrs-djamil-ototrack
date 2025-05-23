@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { SplashScreen } from 'expo-router';
 import { useAuthStore } from '../stores/authStore';
+import { SplashScreen } from 'expo-router';
 
 export const useAutoLogin = () => {
   const { checkAuth, isLoading } = useAuthStore();

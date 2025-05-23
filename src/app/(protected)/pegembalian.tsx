@@ -1,9 +1,8 @@
-import { Alert, BackHandler, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { Alert, BackHandler, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import Input from "@/components/Input";
-import ButtonCostum from "@/components/ButtonCostum";
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
 import SafeAreaView from "@/components/SafeAreaView";
 import secureApi from "@/services/service";

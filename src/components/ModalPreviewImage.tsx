@@ -24,8 +24,9 @@ export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: p
                         <View className='m-3 items-center'>
                             <Text className='font-bold w-80 bg-white text-center p-1 rounded-md'>{title}</Text>
                         </View>
-
-                        <Image className='aspect-[3/4] w-full  border border-white rounded-lg' source={{ uri: imgUrl }} />
+                        <View className='bg-white rounded-lg p-1'>
+                            <Image className='aspect-[3/4] w-full  border border-white rounded-lg' source={{ uri: imgUrl }} />
+                        </View>
                     </View>
                 )}
 

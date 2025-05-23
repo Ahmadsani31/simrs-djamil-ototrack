@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
-import * as SecureStore from 'expo-secure-store';
 import { dataAktif } from '@/types/types';
 import secureApi from '@/services/service';
 

@@ -9,7 +9,7 @@ import ModalCamera from "@/components/ModalCamera";
 import { reLocation } from "@/hooks/locationRequired";
 import secureApi from "@/services/service";
 import SkeletonList from "@/components/SkeletonList";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import SelectDropdown from "react-native-select-dropdown";
 import Input from "@/components/Input";
 import dayjs from "dayjs";

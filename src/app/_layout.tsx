@@ -15,7 +15,8 @@ import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
-// import '@/utlis/backgroundLocationTask';
+
+import '@/utlis/backgroundLocationTask';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,11 +42,12 @@ export default function RootLayout() {
       try {
         // Request location permission
         const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
-        if (locationStatus !== 'granted') {
+         const bgStatus = await Location.requestBackgroundPermissionsAsync();
+        if (locationStatus !== 'granted' || bgStatus.status !== 'granted') {
           Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
           return;
         }
-
+           
         // Request camera permission
         const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
         if (cameraStatus !== 'granted') {

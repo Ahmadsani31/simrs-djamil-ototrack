@@ -1,9 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import { LocationObject } from 'expo-location';
 import { useLocationStore } from '@/stores/locationStore';
-// import { authService, tracking } from '@/services/api';
-import * as Device from 'expo-device';
-import * as SecureStore from 'expo-secure-store';
+import { calculateDistanceLocation } from './locationUtils';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -19,42 +17,56 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     const latest = locations[0];
 
     if (latest) {
-      console.log('location update ', latest.coords);
-      const { latitude, longitude } = latest.coords;
+      const store = useLocationStore.getState();
+      const last = store.coord;
 
-      const newCoord = {
+      console.log('location update ', latest.coords);
+      const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } =
+        latest.coords;
+      // Convert speed from m/s to km/h
+      const kmh = speed ? (speed * 3.6).toFixed(1) : '0.0';
+
+      await calculateDistanceLocation({
+        lastLatitude: last?.latitude ?? 0,
+        lastLongitude: last?.longitude ?? 0,
+        lat2: latitude,
+        lon2: longitude,
+      })
+        .then((distance) => {
+          console.log(`Distance between points: ${distance} meters`);
+
+          if (distance >= 10) {
+            const saveCoords = {
+              latitude,
+              longitude,
+              accuracy,
+              altitude,
+              altitudeAccuracy,
+              heading,
+              speed: kmh,
+              timestamp: Date.now(),
+            };
+            useLocationStore.getState().addToBatchCoordinate(saveCoords);
+          }
+        })
+        .catch((error) => {
+          console.error('Error calculating distance:', error);
+        });
+
+      const saveCoords = {
         latitude,
         longitude,
+        accuracy,
+        altitude,
+        altitudeAccuracy,
+        heading,
+        speed: kmh,
         timestamp: Date.now(),
       };
 
       // Akses Zustand store secara manual
-      useLocationStore.getState().addToBatchCoordinate(newCoord);
 
-      useLocationStore.getState().addToCoordinate(newCoord);
-          // const token = await SecureStore.getItemAsync('token');
-          // if (token) {
-          //   const manufacturer = Device.manufacturer;
-          //   const modelName = Device.modelName;
-          //   const osVersion = Device.osVersion;
-          //   const platformApiLevel = Device.platformApiLevel;
-          //   try {
-          //     await tracking.live_get({
-          //       manufacturer,
-          //       modelName,
-          //       osVersion,
-          //       platformApiLevel,
-          //       locations: newCoord,
-          //       timestamp: Date.now(),
-          //     });
-      
-          //     //   console.log('✅ Batch terkirim:', batch.length);
-          //   } catch (err) {
-          //     console.error('❌ Gagal kirim:', err);
-          //   }
-          // }
-
-      // console.log('📍 Background Location:', latitude, longitude);
+      useLocationStore.getState().addToCoordinate(saveCoords);
     }
   }
 });

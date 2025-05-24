@@ -1,5 +1,5 @@
-import { View, Alert} from 'react-native';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { View, Alert, TouchableOpacity, Text } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router, useFocusEffect } from 'expo-router';
@@ -9,17 +9,31 @@ import ScreenListPemakaian from '@/components/ScreenListPemakaian';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
 import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
 
+// import * as Location from 'expo-location';
+
+// const LOCATION_TASK_NAME = 'background-location-task';
+
 export default function Home() {
 
   const [reservasiID, setReservasiID] = useState(undefined);
 
   const [camera, setCamera] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      // Refresh logic here
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Refresh logic here
+  //   }, [])
+  // );
+
+  // useEffect(() => {
+
+  //   const requestLocationPermission = async () => {
+  //     const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+  //     console.log('Location background started:', hasStarted);
+  //   }
+  //   requestLocationPermission();
+  // }, []);
+
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
@@ -107,14 +121,14 @@ export default function Home() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
-          {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
               uuid: '53c31fcb-d085-48c2-881b-c311dc1a817f',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>

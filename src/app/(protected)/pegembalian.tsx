@@ -14,12 +14,20 @@ import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
 import CustomHeader from "@/components/CustomHeader";
 
+import { stopTracking } from '@/utlis/locationUtils'
+
+import { useLocationStore } from "@/stores/locationStore";
+
+
+
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
 });
 
 
 export default function PengembalianScreen() {
+
+  const { coords,clearCoordinates } = useLocationStore();
 
   const { reservasi_id, name, no_polisi } = useLocalSearchParams();
 
@@ -68,6 +76,10 @@ export default function PengembalianScreen() {
       return
     }
 
+    console.log('====================================');
+    console.log('coordinate', JSON.stringify(coords));
+    console.log('====================================');
+
     try {
 
       const formData = new FormData();
@@ -75,6 +87,7 @@ export default function PengembalianScreen() {
       formData.append('longitude', coordinate?.long.toString() || '');
       formData.append('spidometer', values.spidometer);
       formData.append('reservasi_id', reservasi_id.toString());
+      formData.append('coordinates', JSON.stringify(coords));
       formData.append('fileImage', {
         uri: uri,
         name: 'spidometer-capture.jpg',
@@ -83,7 +96,9 @@ export default function PengembalianScreen() {
 
       // console.log('formData', formData);
 
-      const response = await secureApi.postForm('/reservasi/return_kendaraan', formData)
+      await secureApi.postForm('/reservasi/return_kendaraan', formData)
+      clearCoordinates()
+      await stopTracking();
       // console.log('response ', JSON.stringify(response.data));
 
       await SecureStore.deleteItemAsync('pemakaianAktif');
@@ -91,14 +106,14 @@ export default function PengembalianScreen() {
       router.replace('(tabs)')
     } catch (error: any) {
       // alert(error.response.data.message)
-        if (error.response && error.response.data) {
-          const msg = error.response.data.message || "Terjadi kesalahan.";
-          Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
-        } else if (error.request) {
-          Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
-        } else {
-          Alert.alert("Error", error.message);
-        }
+      if (error.response && error.response.data) {
+        const msg = error.response.data.message || "Terjadi kesalahan.";
+        Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
+      } else if (error.request) {
+        Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+      } else {
+        Alert.alert("Error", error.message);
+      }
     } finally {
       setLoading(false);
     }

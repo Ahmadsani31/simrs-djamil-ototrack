@@ -17,6 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
 import CustomHeader from "@/components/CustomHeader";
 
+import { startTracking } from '@/utlis/locationUtils'
+
 interface dataDetail {
   id: string;
   name: string;
@@ -52,9 +54,6 @@ export default function DetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [uri, setUri] = useState<string | null>(null);
-
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 200;
-  const keyboardBehavior = Platform.OS === 'ios' ? 'padding' : undefined;
 
   const backAction = () => {
     Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
@@ -113,7 +112,8 @@ export default function DetailScreen() {
       // console.log('formData', formData);
 
       const response = await secureApi.postForm('/reservasi/save_detail', formData)
-
+      await startTracking();
+      
       console.log('response ', JSON.stringify(response));
 
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
@@ -121,14 +121,14 @@ export default function DetailScreen() {
       router.replace('(protected)/pemakaian')
     } catch (error: any) {
       // alert(error.response.data.message)
-       if (error.response && error.response.data) {
-          const msg = error.response.data.message || "Terjadi kesalahan.";
-          Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
-        } else if (error.request) {
-          Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
-        } else {
-          Alert.alert("Error", error.message);
-        }
+      if (error.response && error.response.data) {
+        const msg = error.response.data.message || "Terjadi kesalahan.";
+        Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
+      } else if (error.request) {
+        Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+      } else {
+        Alert.alert("Error", error.message);
+      }
     } finally {
       setLoading(false);
     }

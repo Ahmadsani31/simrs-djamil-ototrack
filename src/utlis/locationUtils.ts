@@ -14,7 +14,7 @@ export async function startTracking() {
     //location akan di ambil setiap 30 detik dan jarak 10 meter
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
       accuracy: Location.Accuracy.Highest,
-      timeInterval: 30000,
+      timeInterval: 20000,
       distanceInterval: 10,
       pausesUpdatesAutomatically: false,
       showsBackgroundLocationIndicator: true,

@@ -17,6 +17,8 @@ import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import { useFocusEffect } from 'expo-router';
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 const fetchData = async () => {
   try {
     const response = await secureApi.get(`/user/dashboard`);
@@ -171,6 +173,7 @@ export default function Profile() {
           <Text className='text-xl font-bold'>RSUP DR. M. DJAMIL PADANG</Text>
           <Text className='mt-4'>Vesion</Text>
           <Text className='text-sm'>{Constants.expoConfig?.version}</Text>
+          <Text className='text-xs'>{API_URL}</Text>
         </View>
       </View>
       <ModalRN

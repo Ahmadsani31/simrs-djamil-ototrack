@@ -40,16 +40,16 @@ export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  if (!uuid) {
+  const { data, isLoading, error, isError } = useQuery<dataDetail>({
+    queryKey: ['dataDetail', uuid],
+    queryFn: () => fetchData(uuid.toString()),
+  })
+
+  if (isError) {
     Alert.alert('Peringatan!', 'Kendaraan tidak aktif atau kendaraan tidak ada!', [
       { text: 'Kembali', onPress: () => router.back() },
     ]);
   }
-
-  const { data: dataDetail, isLoading: loadingKendaraan, error, isError } = useQuery<dataDetail>({
-    queryKey: ['dataDetail', uuid],
-    queryFn: () => fetchData(uuid.toString()),
-  })
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -100,7 +100,7 @@ export default function DetailScreen() {
     formData.append('longitude', coordinate?.long.toString() || '');
     formData.append('kegiatan', values.kegiatan);
     formData.append('spidometer', values.spidometer);
-    formData.append('kendaraan_id', dataDetail?.id || '');
+    formData.append('kendaraan_id', data?.id || '');
     formData.append('fileImage', {
       uri: uri,
       name: 'spidometer-capture.jpg',
@@ -113,14 +113,13 @@ export default function DetailScreen() {
 
       const response = await secureApi.postForm('/reservasi/save_detail', formData)
       await startTracking();
-      
+
       console.log('response ', JSON.stringify(response));
 
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       // console.log(response.message);
-      router.replace('(protected)/pemakaian')
+      router.replace('(tabs)/pemakaian')
     } catch (error: any) {
-      // alert(error.response.data.message)
       if (error.response && error.response.data) {
         const msg = error.response.data.message || "Terjadi kesalahan.";
         Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
@@ -135,11 +134,11 @@ export default function DetailScreen() {
 
   }
 
-  const textInputRef = useRef<TextInput>(null);
+  // const textInputRef = useRef<TextInput>(null);
 
   const setUriImageModal = (e: any) => {
     setUri(e)
-    textInputRef.current?.focus();
+    // textInputRef.current?.focus();
   }
 
   return (
@@ -148,58 +147,59 @@ export default function DetailScreen() {
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <CustomHeader title="Detail Kendaraan" onPress={backAction} />
       <ScrollView className="flex-1">
-        {isError ? <SkeletonList loop={5} /> : (
-          <View className="m-4 p-4 bg-white rounded-lg">
-            <View className="items-center mb-3 py-2">
-              <Text className="text-3xl text-center font-bold">{dataDetail?.name}</Text>
-              <Text className="font-medium text-center mt-3">{dataDetail?.no_polisi}</Text>
-            </View>
-            <View className="border border-b-2 w-full mb-4" />
-            <Formik
-              initialValues={{ kegiatan: '', spidometer: '' }}
-              validationSchema={validationSchema}
-              onSubmit={async (values) => await handleSubmitDetail(values)}
-            >
-              {({ handleChange, handleSubmit, values, errors, touched }) => (
-                <>
-                  {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
-                  <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
-                  {!uri ? (
-                    <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
-                      <AntDesign name="camera" size={32} />
-                      <Text className="font-bold text-white ms-2">Foto Spidometer Awal</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <>
-                      <View className="w-full rounded-lg bg-black my-4">
-                        <Image
-                          source={{ uri: uri || undefined }}
-                          className='w-full aspect-[3/4] rounded-lg'
-                        />
-                        <TouchableOpacity className="absolute right-1 bg-white rounded-full p-1 top-1" onPress={() => {
-                          setUri(null)
-                          values.spidometer = '';
-                        }}>
-                          <AntDesign name="closecircleo" size={32} color="red" />
-                        </TouchableOpacity>
-                      </View>
-                      <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer"
-                        inputMode={'numeric'}
-                        value={values.spidometer}
-                        error={touched.spidometer ? errors.spidometer : undefined}
-                        onChangeText={handleChange('spidometer')} />
-                    </>
-                  )}
-                  {uri &&
-                    <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
-                  }
-                </>
-              )}
-            </Formik>
+        <View className="m-4 p-4 bg-white rounded-lg">
+          {isLoading || isError ? <SkeletonList loop={5} /> : (
+            <>
+              <View className="items-center mb-3 py-2">
+                <Text className="text-3xl text-center font-bold">{data?.name}</Text>
+                <Text className="font-medium text-center mt-3">{data?.no_polisi}</Text>
+              </View>
+              <View className="border border-b-2 w-full mb-4" />
+              <Formik
+                initialValues={{ kegiatan: '', spidometer: '' }}
+                validationSchema={validationSchema}
+                onSubmit={async (values) => await handleSubmitDetail(values)}
+              >
+                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                  <>
+                    {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
+                    <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
+                    {!uri ? (
+                      <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
+                        <AntDesign name="camera" size={32} />
+                        <Text className="font-bold text-white ms-2">Foto Spidometer Awal</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <>
+                        <View className="w-full rounded-lg bg-black my-4">
+                          <Image
+                            source={{ uri: uri || undefined }}
+                            className='w-full aspect-[3/4] rounded-lg'
+                          />
+                          <TouchableOpacity className="absolute right-1 bg-white rounded-full p-1 top-1" onPress={() => {
+                            setUri(null)
+                            values.spidometer = '';
+                          }}>
+                            <AntDesign name="closecircleo" size={32} color="red" />
+                          </TouchableOpacity>
+                        </View>
+                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer"
+                          inputMode={'numeric'}
+                          value={values.spidometer}
+                          error={touched.spidometer ? errors.spidometer : undefined}
+                          onChangeText={handleChange('spidometer')} />
+                      </>
+                    )}
+                    {uri &&
+                      <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
+                    }
+                  </>
+                )}
+              </Formik>
+            </>
+          )}
 
-            {/* <ButtonCostum classname={colors.warning} title="Batal" onPress={backAction} /> */}
-          </View>
-        )}
+        </View>
       </ScrollView>
       <ModalCamera visible={modalVisible} onClose={() => setModalVisible(false)} setUriImage={(e) => setUriImageModal(e)} />
     </SafeAreaView>

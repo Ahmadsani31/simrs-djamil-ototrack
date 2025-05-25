@@ -13,14 +13,13 @@ export async function startTracking() {
   if (!isRunning) {
     //location akan di ambil setiap 30 detik dan jarak 10 meter
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-      accuracy: Location.Accuracy.Highest,
-      timeInterval: 20000,
-      distanceInterval: 10,
-      pausesUpdatesAutomatically: false,
+      accuracy: Location.Accuracy.High,
+      timeInterval: 5000,
+      distanceInterval: 5,
       showsBackgroundLocationIndicator: true,
       foregroundService: {
-        notificationTitle: 'Location Tracking',
-        notificationBody: 'Tracking your location in the background',
+        notificationTitle: 'Pemakaian Aktif',
+        notificationBody: 'Aplikasi aktif dan berjalan di background untuk pemakaian kendaraan',
         notificationColor: '#ececec',
         // Optional: Add a custom icon for the notification
         // notificationIcon: 'path/to/your/icon.png',

@@ -178,8 +178,6 @@ export default function ScreenPartialPemakaian({ items }: any) {
                     pathname: 'pegembalian',
                     params: {
                         reservasi_id: items?.id,
-                        name: items?.name,
-                        no_polisi: items?.no_polisi,
                     }
                 })}>
                     <Text className='text-white font-bold'>Proses Pengembalian Kendaraan</Text>

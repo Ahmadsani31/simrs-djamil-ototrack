@@ -9,7 +9,6 @@ import * as Location from 'expo-location';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
-
 export default function TabsLayout() {
 
   const [gps, setGps]= useState(false);

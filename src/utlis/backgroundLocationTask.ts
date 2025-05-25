@@ -35,7 +35,9 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         .then((distance) => {
           console.log(`Distance between points: ${distance} meters`);
 
-          if (distance >= 10) {
+          if (distance >= 5) {
+            console.log('Distance is greater than or equal to 5 meters, saving coordinates.');
+            
             const saveCoords = {
               latitude,
               longitude,

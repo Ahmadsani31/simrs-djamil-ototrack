@@ -167,7 +167,7 @@ export default function Profile() {
           <Text className='font-bold'>Aplikasi</Text>
           <Text className='text-lg font-bold'>Pencatatan Kendaraan Operasional</Text>
           <Text className='text-xl font-bold'>RSUP DR. M. DJAMIL PADANG</Text>
-          <Text className='mt-4'>Vesion</Text>
+          <Text className='mt-4'>Vesion async-storage</Text>
           <Text className='text-sm'>{Constants.expoConfig?.version}</Text>
           <Text className='text-xs'>{API_URL}</Text>
         </View>

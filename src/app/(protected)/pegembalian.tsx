@@ -9,7 +9,6 @@ import secureApi from "@/services/service";
 import { Formik, FormikValues } from "formik";
 import * as yup from 'yup';
 import { colors } from "@/constants/colors";
-import * as SecureStore from 'expo-secure-store';
 import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
 import CustomHeader from "@/components/CustomHeader";
@@ -21,14 +20,14 @@ import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
 import { dataDetail } from "@/types/types";
 
-
+import { getStoredCoords } from "@/lib/secureStorage";
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
 });
 
 const fetchData = async (reservasi_id: string) => {
-  const response = await secureApi.get(`/reservasi/cek_data_aktif`,{
+  const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
     params: {
       reservasi_id: reservasi_id,
     }
@@ -38,7 +37,8 @@ const fetchData = async (reservasi_id: string) => {
 
 export default function PengembalianScreen() {
 
-  const { coords, clearCoordinates } = useLocationStore();
+  const { clearCoordinates } = useLocationStore();
+
 
   const { reservasi_id } = useLocalSearchParams();
 
@@ -97,11 +97,16 @@ export default function PengembalianScreen() {
       ]);
       return
     }
+    const asyncCoords = await getStoredCoords();
 
     // console.log('====================================');
     // console.log('coordinate', JSON.stringify(coords));
     // console.log('====================================');
 
+    // console.log('====================================');
+    // console.log('trackingData', asyncCoords);
+    // console.log('====================================');
+    // return
     try {
 
       const formData = new FormData();
@@ -109,7 +114,7 @@ export default function PengembalianScreen() {
       formData.append('longitude', coordinate?.long.toString() || '');
       formData.append('spidometer', values.spidometer);
       formData.append('reservasi_id', reservasi_id.toString());
-      formData.append('coordinates', JSON.stringify(coords));
+      formData.append('coordinates', JSON.stringify(asyncCoords));
       formData.append('fileImage', {
         uri: uri,
         name: 'spidometer-capture.jpg',

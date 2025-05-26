@@ -59,7 +59,7 @@ export default function ModalCamera({
                     <Text>Tutup</Text>
                   </TouchableOpacity>
                 </View>
-                <View className="absolute bottom-0 w-full bg-black/50 p-16 items-center">
+                <View className="absolute bottom-0 w-full bg-black/50 p-14 items-center">
                   <TouchableOpacity onPress={takePicture}>
                     <View
                       style={[
@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    width: width,
-    height: CAMERA_HEIGHT,
+    // width: width,
+    // height: CAMERA_HEIGHT,
     aspectRatio:CAMERA_RATIO
     // justifyContent: 'space-between',
     // marginBottom: 100

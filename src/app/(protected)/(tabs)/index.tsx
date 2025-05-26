@@ -1,4 +1,4 @@
-import { View, Alert} from 'react-native';
+import { View, Alert, TouchableOpacity, Text} from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';

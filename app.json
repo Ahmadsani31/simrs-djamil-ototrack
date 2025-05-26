@@ -87,8 +87,6 @@
       },
       "versionCode": 1,
       "package": "com.darma31.simrsdjamilototrack",
-      "minSdkVersion": 29,
-      "targetSdkVersion": 34,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -98,11 +96,7 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION",
         "android.permission.POST_NOTIFICATIONS"
-      ],
-      "foregroundService": {
-        "notificationTitle": "Tracking berjalan",
-        "notificationBody": "Aplikasi memantau lokasi kamu..."
-      }
+      ]
     },
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

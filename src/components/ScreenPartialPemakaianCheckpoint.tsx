@@ -1,7 +1,7 @@
 import { Alert, Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import ButtonCostum from "@/components/ButtonCostum";
-
+import { Picker } from '@react-native-picker/picker';
 import { colors } from "@/constants/colors";
 import { ModalRN } from "@/components/ModalRN";
 import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,7 +10,6 @@ import { reLocation } from "@/hooks/locationRequired";
 import secureApi from "@/services/service";
 import SkeletonList from "@/components/SkeletonList";
 import { useQuery } from "@tanstack/react-query";
-import SelectDropdown from "react-native-select-dropdown";
 import Input from "@/components/Input";
 import dayjs from "dayjs";
 import { Checkpoint } from "@/types/types";
@@ -40,11 +39,6 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
         queryFn: async () => await fetchData(reservasi_id, checkpoint_id),
         enabled: !!checkpoint_id
     })
-
-    const DataDropwdown = [
-        'Voucher',
-        'Uang',
-    ];
 
     // console.log(JSON.stringify(bbm));
 
@@ -164,6 +158,8 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
         setImgUrl('')
     }
 
+    const [selectedValue, setSelectedValue] = useState();
+
     return (
         <>
             <View className="p-4 bg-teal-300 border border-black rounded-lg">
@@ -250,33 +246,16 @@ export default function ScreenPartialPemakaianCheckpoint({ checkpoint_id, reserv
                     </Text>
                 </ModalRN.Header>
                 <ModalRN.Content>
-                    <View className="my-3">
-                        <SelectDropdown
-                            data={DataDropwdown}
-                            defaultValue={jenis}
-                            onSelect={(selectedItem, index) => {
-                                setJenis(selectedItem);
-                            }}
-                            renderButton={(selectedItem, isOpen) => {
-                                return (
-                                    <View className="items-center justify-center bg-gray-200 border border-gray-300 py-3 rounded-lg">
-                                        <Text>{selectedItem || 'Pilih Jenis Pengisian'}</Text>
-                                    </View>
-                                );
-                            }}
-                            renderItem={(item, index, isSelected) => {
-                                return (
-                                    <View
-                                        style={{
-                                            ...styles.dropdownItemStyle,
-                                            ...(isSelected && { backgroundColor: '#D2D9DF' }),
-                                        }}>
-                                        <Text>{item}</Text>
-                                    </View>
-                                );
-                            }}
-                            dropdownStyle={styles.dropdownMenuStyle}
-                        />
+                    <View className="my-3 border-b bg-gray-100 rounded-lg">
+                        <Picker
+                            selectedValue={jenis}
+                            onValueChange={(itemValue, itemIndex) =>
+                                setJenis(itemValue)
+                            }>
+                            <Picker.Item label="Pilih Jenis Pengisian" value=" " />
+                            <Picker.Item label="Voucher" value="Voucher" />
+                            <Picker.Item label="Uang" value="Uang" />
+                        </Picker>
                     </View>
                     {jenis === 'Voucher' && (
                         <Input

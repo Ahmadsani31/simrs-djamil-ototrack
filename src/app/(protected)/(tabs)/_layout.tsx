@@ -46,8 +46,8 @@ export default function TabsLayout() {
             </View>
           ),
           headerRight: () => (
-            <View className='mx-4 p-1 bg-white rounded-lg flex-row items-center'>
-              <MaterialIcons name={`${gps ? 'gps-fixed' : 'gps-off'}`} size={24} color={`${gps ? 'green' : 'black'}`} />
+            <View className={`mx-4 p-1  ${gps ? 'bg-white' : 'bg-gray-500'} rounded-lg flex-row items-center`}>
+              <MaterialIcons name={`${gps ? 'gps-fixed' : 'gps-off'}`} size={14} color={`${gps ? 'green' : 'black'}`} />
             </View>
           ),
         }}

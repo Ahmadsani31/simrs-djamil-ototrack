@@ -53,31 +53,30 @@ export default function ModalCamera({
                 facing="back"
                 ref={cameraRef}
               />
-              <View className="absolute top-14 right-5">
-                <TouchableOpacity onPress={onClose} className='bg-white p-1 rounded-lg flex-row gap-2 justify-center items-center'>
-                  <AntDesign name="closecircleo" size={28} color="red" />
-                  <Text>Tutup</Text>
-                </TouchableOpacity>
-
-              </View>
-              <View className="absolute bottom-10 w-full p-12 items-center">
-                <TouchableOpacity onPress={takePicture}>
-                  <View
-                    style={[
-                      styles.shutterBtn,
-                    ]}
-                  >
+                <View className="absolute top-5 right-5">
+                  <TouchableOpacity onPress={onClose} className='bg-white p-1 rounded-lg flex-row gap-2 justify-center items-center'>
+                    <AntDesign name="closecircleo" size={28} color="red" />
+                    <Text>Tutup</Text>
+                  </TouchableOpacity>
+                </View>
+                <View className="absolute bottom-0 w-full bg-black/50 p-16 items-center">
+                  <TouchableOpacity onPress={takePicture}>
                     <View
                       style={[
-                        styles.shutterBtnInner,
-                        {
-                          backgroundColor: "white",
-                        },
+                        styles.shutterBtn,
                       ]}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+                    >
+                      <View
+                        style={[
+                          styles.shutterBtnInner,
+                          {
+                            backgroundColor: "white",
+                          },
+                        ]}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
             </>
 
           ) :
@@ -114,9 +113,11 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   camera: {
+    flex: 1,
     width: width,
     height: CAMERA_HEIGHT,
-    justifyContent: 'space-between',
-    marginBottom: 100
+    aspectRatio:CAMERA_RATIO
+    // justifyContent: 'space-between',
+    // marginBottom: 100
   },
 });

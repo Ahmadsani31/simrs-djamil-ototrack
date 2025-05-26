@@ -20,11 +20,11 @@ const fetchData = async () => {
 export default function KendaraanScreen() {
 
   // const queryClient = useQueryClient()
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     refetch();
+  //   }, [])
+  // );
 
 
   const { data, isLoading, isError, error,refetch } = useQuery<Kendaraan[]>({

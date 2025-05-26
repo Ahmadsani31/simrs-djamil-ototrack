@@ -16,6 +16,7 @@ import Input from '@/components/Input';
 import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import { useFocusEffect } from 'expo-router';
+import { dataDashboard } from '@/types/types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -35,11 +36,6 @@ const validationSchema = yup.object().shape({
     .oneOf([yup.ref('password')], 'Konfirmasi password tidak cocok')
     .required('Konfirmasi password wajib diisi')
 });
-
-type dataDashboard = {
-  pemakaianHariIni: number;
-  pemakaianHariSemua: number;
-}
 
 export default function Profile() {
   const { user, logout } = useAuthStore();

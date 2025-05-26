@@ -4,8 +4,6 @@ import SkeletonList from "@/components/SkeletonList";
 import SafeAreaView from "@/components/SafeAreaView";
 import { useQuery } from "@tanstack/react-query";
 import { Kendaraan, KendaraanItemProps } from "@/types/types";
-import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
 
 const fetchData = async () => {
   try {

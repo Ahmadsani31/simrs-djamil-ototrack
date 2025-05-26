@@ -16,7 +16,7 @@ import * as Updates from 'expo-updates';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
 
-import '@/utlis/backgroundLocationTask';
+import '@/utils/backgroundLocationTask';
 
 SplashScreen.preventAutoHideAsync();
 

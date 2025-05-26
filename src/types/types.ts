@@ -104,3 +104,14 @@ export interface Kendaraan {
   no_polisi: string;
   kondisi: string;
 }
+
+export interface dataDetail {
+  id: string;
+  name: string;
+  no_polisi: string;
+}
+
+export interface dataDashboard {
+  pemakaianHariIni: number;
+  pemakaianHariSemua: number;
+}

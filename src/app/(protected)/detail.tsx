@@ -17,13 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
 import CustomHeader from "@/components/CustomHeader";
 
-import { startTracking } from '@/utlis/locationUtils'
-
-interface dataDetail {
-  id: string;
-  name: string;
-  no_polisi: string;
-}
+import { startTracking } from '@/utils/locationUtils'
+import { dataDetail } from "@/types/types";
 
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),

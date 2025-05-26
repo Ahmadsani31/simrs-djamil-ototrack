@@ -1,8 +1,8 @@
-import { View, Alert, TouchableOpacity, Text } from 'react-native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Alert} from 'react-native';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
 import ScreenListPemakaian from '@/components/ScreenListPemakaian';
@@ -24,16 +24,6 @@ export default function Home() {
   //     // Refresh logic here
   //   }, [])
   // );
-
-  // useEffect(() => {
-
-  //   const requestLocationPermission = async () => {
-  //     const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-  //     console.log('Location background started:', hasStarted);
-  //   }
-  //   requestLocationPermission();
-  // }, []);
-
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,

@@ -7,7 +7,6 @@ import ModalPreviewImage from './ModalPreviewImage';
 import SkeletonList from './SkeletonList';
 import { useQuery } from '@tanstack/react-query';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 
 interface itemsProps {
     reservasiID: string
@@ -28,8 +27,6 @@ const fetchData = async (reservasi_id: string) => {
 };
 
 export default function ListDetailSectionSheet({ reservasiID }: itemsProps) {
-
-      const setLoading = useLoadingStore((state) => state.setLoading);
 
     const { data, isLoading, isError, error, refetch } = useQuery<Checkpoint[]>({
         queryKey: ['dataReservasi', reservasiID],

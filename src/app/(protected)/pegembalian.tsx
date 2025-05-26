@@ -14,11 +14,12 @@ import { reLocation } from "@/hooks/locationRequired";
 import { useLoadingStore } from "@/stores/loadingStore";
 import CustomHeader from "@/components/CustomHeader";
 
-import { stopTracking } from '@/utlis/locationUtils'
+import { stopTracking } from '@/utils/locationUtils'
 
 import { useLocationStore } from "@/stores/locationStore";
 import { useQuery } from "@tanstack/react-query";
 import SkeletonList from "@/components/SkeletonList";
+import { dataDetail } from "@/types/types";
 
 
 
@@ -34,12 +35,6 @@ const fetchData = async (reservasi_id: string) => {
   });
   return response.data;
 };
-
-interface dataDetail {
-  id: string;
-  name: string;
-  no_polisi: string;
-}
 
 export default function PengembalianScreen() {
 

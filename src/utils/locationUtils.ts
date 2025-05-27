@@ -14,14 +14,19 @@ export async function startTracking() {
   if (!isRunning) {
     //location akan di ambil setiap 30 detik dan jarak 10 meter
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-      accuracy: Location.Accuracy.High,
-      timeInterval: 3000,
-      distanceInterval: 3,
+      accuracy: Location.Accuracy.Highest, // ubah ke akurasi tertinggi
+      timeInterval: 1000, // update setiap 1 detik
+      distanceInterval: 0, // update sekecil apapun gerakan
+      deferredUpdatesDistance: 0, // kirim langsung, jangan tunggu
+      deferredUpdatesTimeout: 1000, // maksimum delay 1 detik
+      pausesUpdatesAutomatically: false, // terus update walau idle
       showsBackgroundLocationIndicator: true,
       foregroundService: {
         notificationTitle: 'Pemakaian Aktif',
         notificationBody: 'Aplikasi aktif dan berjalan di background untuk pemakaian kendaraan',
-        notificationColor: '#ececec',
+        notificationColor: '#04b8a3',
+        killServiceOnDestroy: false, // jangan matikan service saat aplikasi ditutup
+        
         // Optional: Add a custom icon for the notification
         // notificationIcon: 'path/to/your/icon.png',
       },

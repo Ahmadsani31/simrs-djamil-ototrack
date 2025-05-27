@@ -72,7 +72,7 @@ export default function LoginScreen() {
         </View>
       </View>
       <View className=' bg-white p-4 mx-4 mb-24 rounded-lg z-10'>
-        <View className='mb-5 mt-5'>
+        <View className='mb-5 mt-2'>
           <Text className="text-xl font-medium text-center">Pencatatan</Text>
           <Text className="font-mono text-2xl font-bold text-center">Kendaraan Operasional</Text>
         </View>

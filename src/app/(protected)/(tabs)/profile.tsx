@@ -18,7 +18,7 @@ import SkeletonList from '@/components/SkeletonList';
 import { useFocusEffect } from 'expo-router';
 import { dataDashboard } from '@/types/types';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+// const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const fetchData = async () => {
   try {
@@ -163,13 +163,13 @@ export default function Profile() {
             </View>
           </View>
         </View>
-        <View className='flex-1 items-center justify-center mb-20'>
+        <View className='flex-1 items-center justify-center'>
           <Text className='font-bold'>Aplikasi</Text>
-          <Text className='text-lg font-bold'>Pencatatan Kendaraan Operasional</Text>
-          <Text className='text-xl font-bold'>RSUP DR. M. DJAMIL PADANG</Text>
-          <Text className='mt-4'>Vesion async-storage</Text>
+          <Text className='font-bold'>Pencatatan Kendaraan Operasional</Text>
+          <Text className='text-lg font-bold'>RSUP DR. M. DJAMIL PADANG</Text>
+          <Text className='mt-4'>Vesion</Text>
           <Text className='text-sm'>{Constants.expoConfig?.version}</Text>
-          <Text className='text-xs'>{API_URL}</Text>
+          {/* <Text className='text-xs'>{API_URL}</Text> */}
         </View>
       </View>
       <ModalRN

@@ -18,7 +18,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
     if (latest) {
       const store = useLocationStore.getState();
-      // const last = store.coord;
+      const last = store.coord;
 
       console.log('location update ', latest.coords);
       const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } =
@@ -26,35 +26,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
       // Convert speed from m/s to km/h
       const kmh = speed ? (speed * 3.6).toFixed(1) : '0.0';
 
-      // await calculateDistanceLocation({
-      //   lastLatitude: last?.latitude ?? 0,
-      //   lastLongitude: last?.longitude ?? 0,
-      //   lat2: latitude,
-      //   lon2: longitude,
-      // })
-      //   .then((distance) => {
-      //     console.log(`Distance between points: ${distance} meters`);
-
-      //     if (distance >= 5) {
-      //       console.log('Distance is greater than or equal to 5 meters, saving coordinates.');
-            
-      //       const saveCoords = {
-      //         latitude,
-      //         longitude,
-      //         accuracy,
-      //         altitude,
-      //         altitudeAccuracy,
-      //         heading,
-      //         speed: kmh,
-      //         timestamp: Date.now(),
-      //       };
-      //       useLocationStore.getState().addToBatchCoordinate(saveCoords);
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error('Error calculating distance:', error);
-      //   });
-
+      
       const saveCoords = {
         latitude,
         longitude,
@@ -66,8 +38,28 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         timestamp: Date.now(),
       };
 
+
+      await calculateDistanceLocation({
+        lastLatitude: last?.latitude ?? 0,
+        lastLongitude: last?.longitude ?? 0,
+        lat2: latitude,
+        lon2: longitude,
+      })
+        .then((distance) => {
+          console.log(`Distance between points: ${distance} meters`);
+
+          if (distance >= 3) {
+            console.log('Distance is greater than or equal to 3 meters, saving coordinates.');
+            // Simpan koordinat ke dalam store
+            useLocationStore.getState().addToBatchCoordinate(saveCoords);
+          }
+        })
+        .catch((error) => {
+          console.error('Error calculating distance:', error);
+        });
+
       // Akses Zustand store secara manual
-      useLocationStore.getState().addToBatchCoordinate(saveCoords);
+      // useLocationStore.getState().addToBatchCoordinate(saveCoords);
       useLocationStore.getState().addToCoordinate(saveCoords);
     }
   }

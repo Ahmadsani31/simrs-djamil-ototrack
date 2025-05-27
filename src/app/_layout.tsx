@@ -15,6 +15,7 @@ import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
+import * as Notifications from 'expo-notifications';
 
 import '@/utils/backgroundLocationTask';
 
@@ -42,12 +43,12 @@ export default function RootLayout() {
       try {
         // Request location permission
         const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
-         const bgStatus = await Location.requestBackgroundPermissionsAsync();
+        const bgStatus = await Location.requestBackgroundPermissionsAsync();
         if (locationStatus !== 'granted' || bgStatus.status !== 'granted') {
           Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
           return;
         }
-           
+
         // Request camera permission
         const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
         if (cameraStatus !== 'granted') {
@@ -63,7 +64,35 @@ export default function RootLayout() {
     })();
 
     checkAppUpdate();
+    registerForPushNotificationsAsync();
   }, []);
+
+  async function registerForPushNotificationsAsync() {
+    const { status } = await Notifications.getPermissionsAsync();
+    let finalStatus = status;
+
+    if (status !== 'granted') {
+      const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      finalStatus = newStatus;
+    }
+
+    if (finalStatus !== 'granted') {
+      Alert.alert(
+        'Notifikasi Diperlukan',
+        `Aplikasi memerlukan izin notifikasi untuk digunakan.`,
+        [
+          {
+            text: 'Request notifikasi',
+            onPress: async () => {
+              await Notifications.requestPermissionsAsync();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
+  }
 
   useEffect(() => {
     const backAction = () => {
@@ -106,7 +135,7 @@ export default function RootLayout() {
       if (update.isAvailable) {
         Alert.alert(
           'Update Tersedia',
-          `Versi baru aplikasi tersedia. Aplikasi akan diperbarui.`,
+          `Versi baru aplikasi tersedia. Silahkan Update dan Aplikasi akan diperbarui.`,
           [
             {
               text: 'Update Sekarang',

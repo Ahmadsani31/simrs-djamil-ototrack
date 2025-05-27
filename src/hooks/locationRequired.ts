@@ -23,10 +23,10 @@ export const reLocation = {
     let location = await Location.getLastKnownPositionAsync();
 
     if (!location) {
-      location = await Location.getCurrentPositionAsync({
+    location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
-        timeInterval: 10000,
-        distanceInterval: 10,
+        timeInterval: 1000,
+        distanceInterval: 0,
       });
     }
     //get current position lat and long

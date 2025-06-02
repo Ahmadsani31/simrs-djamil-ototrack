@@ -1,24 +1,30 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react'
+import { router, useFocusEffect } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import { dataAktif } from '@/types/types';
 import secureApi from '@/services/service';
+import { stopTracking } from '@/utils/locationUtils'
+import { useLocationStore } from "@/stores/locationStore";
 
 export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void }) {
 
     const [rawData, setRawData] = useState<dataAktif>()
     const [isLoading, setIsLoading] = useState(false)
 
+    useFocusEffect(
+        useCallback(() => {
+            cekDataAktif();
+        }, [])
+    );
+    // useEffect(() => {
 
-    useEffect(() => {
-
-        cekDataAktif();
-    }, []);
+    // }, []);
 
     const cekDataAktif = async () => {
+        console.log('cekDataAktif called');
         setIsLoading(true);
         try {
             const response = await secureApi.get(`reservasi/aktif`);
@@ -26,6 +32,9 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
 
         } catch (error) {
             setRawData(undefined)
+
+            useLocationStore.getState().clearCoordinates();
+            await stopTracking();
         } finally {
             setIsLoading(false)
         }

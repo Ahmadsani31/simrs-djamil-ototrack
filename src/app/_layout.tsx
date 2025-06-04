@@ -133,6 +133,10 @@ export default function RootLayout() {
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
+        const metadata = Updates.manifest;
+        console.log('====================================');
+        console.log('Update Tersedia:', metadata);
+        console.log('====================================');
         Alert.alert(
           'Update Tersedia',
           `Versi baru aplikasi tersedia. Silahkan Update dan Aplikasi akan diperbarui.`,

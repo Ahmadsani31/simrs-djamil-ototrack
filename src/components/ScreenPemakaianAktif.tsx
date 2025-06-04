@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { router, useFocusEffect } from 'expo-router';
 import { colors } from '@/constants/colors';
@@ -6,7 +6,7 @@ import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import { dataAktif } from '@/types/types';
 import secureApi from '@/services/service';
-import { stopTracking } from '@/utils/locationUtils'
+import { startTracking, stopTracking } from '@/utils/locationUtils'
 import { useLocationStore } from "@/stores/locationStore";
 
 export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void }) {
@@ -24,17 +24,25 @@ export default function ScreenPemakaianAktif({ onPress }: { onPress: () => void 
     // }, []);
 
     const cekDataAktif = async () => {
-        console.log('cekDataAktif called');
+        // console.log('cekDataAktif called');
         setIsLoading(true);
         try {
             const response = await secureApi.get(`reservasi/aktif`);
-            setRawData(response.data)
 
-        } catch (error) {
+            if (response.status == true) {
+                setRawData(response.data)
+                 await startTracking();
+            } else {
+                setRawData(undefined)
+                useLocationStore.getState().clearCoordinates();
+                await stopTracking();
+            }
+
+        } catch (error: any) {
             setRawData(undefined)
-
-            useLocationStore.getState().clearCoordinates();
-            await stopTracking();
+            if (error.request) {
+                Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+            }
         } finally {
             setIsLoading(false)
         }

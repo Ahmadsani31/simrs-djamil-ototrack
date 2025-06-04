@@ -6,24 +6,22 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 
 import * as Location from 'expo-location';
+import { statusTrackingStore } from '@/stores/statusTrackingStore';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
 export default function TabsLayout() {
 
-  const [gps, setGps]= useState(false);
-
+  const trackingStatus = statusTrackingStore((state) => state.trackingStatus);
   useEffect(() => {
 
     const requestLocationPermission = async () => {
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-      setGps(hasStarted);
+      statusTrackingStore.getState().setTrackingStatus(hasStarted);
       console.log('Location background started:', hasStarted);
     }
     requestLocationPermission();
   }, []);
-
-
   return (
     <PrivateRoute>
       <Tabs
@@ -46,8 +44,8 @@ export default function TabsLayout() {
             </View>
           ),
           headerRight: () => (
-            <View className={`mx-4 p-1  ${gps ? 'bg-white' : 'bg-gray-500'} rounded-lg flex-row items-center`}>
-              <MaterialIcons name={`${gps ? 'gps-fixed' : 'gps-off'}`} size={14} color={`${gps ? 'green' : 'black'}`} />
+            <View className={`mx-4 p-1  ${trackingStatus ? 'bg-white' : 'bg-gray-500'} rounded-lg flex-row items-center`}>
+              <MaterialIcons name={`${trackingStatus ? 'gps-fixed' : 'gps-off'}`} size={14} color={`${trackingStatus ? 'green' : 'black'}`} />
             </View>
           ),
         }}

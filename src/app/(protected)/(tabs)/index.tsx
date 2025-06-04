@@ -1,4 +1,4 @@
-import { View, Alert, TouchableOpacity, Text} from 'react-native';
+import { View, Alert, TouchableOpacity, Text } from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
@@ -90,12 +90,15 @@ export default function Home() {
     } catch (error: any) {
       // console.log('Error fetching data:', error);
       // toast.info(error.response.data.message);
-      const message = error.response.data.message;
-      Alert.alert('Perhatian!', message, [
-        {
-          text: 'Tutup', onPress: () => null, style: 'cancel'
-        },
-      ]);
+      if (error.response && error.response.data) {
+        const msg = error.response.data.message || "Terjadi kesalahan.";
+        Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);
+      } else if (error.request) {
+        Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+      } else {
+        Alert.alert("Error", error.message);
+      }
+
     } finally {
 
       bottomSheetRef.current?.close();
@@ -114,7 +117,7 @@ export default function Home() {
           {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
-              uuid: '53c31fcb-d085-48c2-881b-c311dc1a817f',
+              uuid: '1e5d0ffa-468d-455a-b20b-b90d7254f8f5',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>

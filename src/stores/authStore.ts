@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { LoginData, RegisterData, User } from '@/types/types';
 import { restApi } from '@/services/auth';
 import { router } from 'expo-router';
+import { Alert } from 'react-native';
 
 interface AuthState {
   token: string | null;
@@ -102,6 +103,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch (error: any) {
       // console.log('Check User error:', JSON.stringify(error.response?.data?.message));
+      if (error.request) {
+        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
+      }
       await SecureStore.deleteItemAsync('token');
       set({ token: null, user: null, isLoading: false });
     }

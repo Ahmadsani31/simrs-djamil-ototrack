@@ -1,4 +1,4 @@
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useLoadingStore } from '@/stores/loadingStore';
 import ScreenPartialPemakaian from '@/components/ScreenPartialPemakaian';
@@ -27,10 +27,17 @@ export default function PemakaianScreen() {
         setLoading(true)
         try {
             const response = await secureApi.get(`reservasi/aktif`);
-            setRowAktif(response.data)
+            if (response.status === true) {
+                setRowAktif(response.data)
+            } else {
+                setRowAktif(undefined)
+            }
 
-        } catch (error) {
+        } catch (error: any) {
             setRowAktif(undefined)
+            if (error.request) {
+                Alert.alert("Network Error", "Tidak bisa terhubung ke server. Cek koneksi kamu.");
+            }
         } finally {
             setLoading(false)
         }

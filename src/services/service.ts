@@ -30,11 +30,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || '';
+    // const message = error.response?.data?.message || '';
     // Cek error token expired
     // console.log('error ',error.response);
     // console.log('message from error service ',message);
-    
+
     if (error.response?.status === 401) {
       console.log('Token expired, logging out...');
       // SecureStore.deleteItemAsync('token');
@@ -96,7 +96,7 @@ const secureApi = {
       },
     });
     return response.data;
-  }
+  },
 };
 
 export default secureApi;

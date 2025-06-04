@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
@@ -49,6 +49,10 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const [date, setDate] = useState<Date>();
     const [dateInput, setDateInput] = useState('');
+    
+    useEffect(() => {
+        refetch();
+    }, []);
 
     const {
         data,

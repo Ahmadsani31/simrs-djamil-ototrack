@@ -33,9 +33,14 @@ const fetchData = async (uuid: string) => {
 
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
+
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const { data, isLoading, error, isError } = useQuery<dataDetail>({
+  useEffect(() => {
+    refetch();
+  },[uuid]);
+
+  const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
     queryFn: () => fetchData(uuid.toString()),
   })
@@ -115,6 +120,8 @@ export default function DetailScreen() {
       // console.log(response.message);
       router.replace('(tabs)/pemakaian')
     } catch (error: any) {
+      console.log(error.response.data);
+
       if (error.response && error.response.data) {
         const msg = error.response.data.message || "Terjadi kesalahan.";
         Alert.alert("Warning!", msg, [{ text: "Tutup", style: "cancel" }]);

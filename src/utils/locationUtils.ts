@@ -1,3 +1,4 @@
+import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 const LOCATION_TASK_NAME = 'background-location-task';
@@ -26,11 +27,13 @@ export async function startTracking() {
         notificationBody: 'Aplikasi aktif dan berjalan di background untuk pemakaian kendaraan',
         notificationColor: '#04b8a3',
         killServiceOnDestroy: false, // jangan matikan service saat aplikasi ditutup
-        
+
         // Optional: Add a custom icon for the notification
         // notificationIcon: 'path/to/your/icon.png',
       },
     });
+    statusTrackingStore.getState().setTrackingStatus(true);
+    console.log('Location tracking started');
   }
 }
 
@@ -39,6 +42,7 @@ export async function stopTracking() {
   if (isRunning) {
     await AsyncStorage.removeItem('tracking-data');
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+    statusTrackingStore.getState().setTrackingStatus(false);
   }
 }
 

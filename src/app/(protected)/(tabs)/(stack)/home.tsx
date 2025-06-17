@@ -13,7 +13,7 @@ import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
 
-export default function Home() {
+export default function HomeScreen() {
 
   const [reservasiID, setReservasiID] = useState(undefined);
 
@@ -117,7 +117,7 @@ export default function Home() {
           {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
-              uuid: '1e5d0ffa-468d-455a-b20b-b90d7254f8f5',
+              uuid: 'ce87741a-f197-4dc4-ac42-0a368ced8a0a',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>

@@ -175,7 +175,7 @@ export default function ScreenPartialPemakaian({ items }: any) {
                     <Text className='text-white font-bold'>Proses Pengisiaan BBM</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center ${colors.secondary}`} onPress={() => router.push({
-                    pathname: 'pegembalian',
+                    pathname: 'pengembalian',
                     params: {
                         reservasi_id: items?.id,
                     }

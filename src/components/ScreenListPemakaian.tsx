@@ -8,6 +8,7 @@ import { Entypo, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from './SkeletonList';
 import ModalPreviewImage from './ModalPreviewImage';
 import { colors } from '@/constants/colors';
+import InputDate from './InputDate';
 
 const LIMIT = 5;
 
@@ -16,7 +17,7 @@ const fetchData = async ({ pageParam = 0, queryKey }: { pageParam?: number; quer
     const [_key, params] = queryKey;
 
     // console.log(params);
-    
+
     const date = (params as { date?: String }).date;
 
 
@@ -49,7 +50,7 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
 
     const [date, setDate] = useState<Date>();
     const [dateInput, setDateInput] = useState('');
-    
+
     useEffect(() => {
         refetch();
     }, []);
@@ -91,18 +92,22 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
     };
 
     const onChange = (event: any, selectedDate: any) => {
-        console.log(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
-        const formattedDate = selectedDate.toISOString().split('T')[0];
-        const currentDate = selectedDate;
-        setDateInput(formattedDate);
-        setDate(currentDate);
+
+        if (event.type == 'set') {
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            const currentDate = selectedDate;
+            setDateInput(formattedDate);
+            setDate(currentDate);
+        }
+
+
 
         // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
         // refetch()
 
     };
 
-    const handleResetTanggal = () =>{
+    const handleResetTanggal = () => {
         setDateInput('');
         refetch();
     }
@@ -121,10 +126,9 @@ export default function ScreenListPemakaian({ onPress }: cardProps) {
                 />
                 {dateInput && (
                     <TouchableOpacity onPress={handleResetTanggal} className='absolute top-5 right-3'>
-                    <Entypo name="circle-with-cross" size={28} color="black" />
-                </TouchableOpacity>
+                        <Entypo name="circle-with-cross" size={28} color="black" />
+                    </TouchableOpacity>
                 )}
-                
             </Pressable>
             <FlatList
                 data={flatData}

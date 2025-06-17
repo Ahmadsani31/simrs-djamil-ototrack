@@ -44,13 +44,13 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
 
-    useFocusEffect(
-      useCallback(() => {
-        refetch();
-      }, [])
-    );
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
-  const { data, isLoading, isError, error,refetch } = useQuery<dataDashboard>({
+  const { data, isLoading, isError, error, refetch } = useQuery<dataDashboard>({
     queryKey: ['dashboard'],
     queryFn: fetchData,
   })
@@ -114,6 +114,7 @@ export default function Profile() {
               <View className='my-2'>
                 <Text className="text-lg font-bold underline">{user?.name || 'Not available'}</Text>
                 <Text className="text-lg">{user?.email || 'Not available'}</Text>
+                <Text className="text-lg">Role : {user?.role || 'Not available'}</Text>
               </View>
 
             </View>
@@ -146,13 +147,16 @@ export default function Profile() {
 
             </View>
             <View className='mb-10'>
-              <TouchableOpacity
-                onPress={() => setIsModal(true)}
-                className={`bg-teal-500 p-3 my-3 flex-row justify-center rounded items-center w-full`}
-              >
-                <MaterialIcons name="password" size={20} color="white" />
-                <Text className="text-white ms-3 font-bold">Update Password</Text>
-              </TouchableOpacity>
+              {user?.role === 'driver' ? (
+                <TouchableOpacity
+                  onPress={() => setIsModal(true)}
+                  className={`bg-teal-500 p-3 my-3 flex-row justify-center rounded items-center w-full`}
+                >
+                  <MaterialIcons name="password" size={20} color="white" />
+                  <Text className="text-white ms-3 font-bold">Update Password</Text>
+                </TouchableOpacity>
+              ) : null}
+
               <TouchableOpacity
                 onPress={logout}
                 className={`bg-red-400 p-3 my-3 flex-row justify-center rounded items-center w-full`}

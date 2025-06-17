@@ -151,7 +151,7 @@ export default function PengembalianScreen() {
 
     <SafeAreaView className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
-      <CustomHeader title="Pegembalian Kendaraan" onPress={backAction} />
+      <CustomHeader title="Pengembalian Kendaraan" onPress={backAction} />
       <ScrollView className="flex-1">
         <View className="m-4 p-4 bg-white rounded-lg">
           {isLoading || isError ? <SkeletonList loop={5} /> : (
@@ -189,7 +189,7 @@ export default function PengembalianScreen() {
                             <AntDesign name="closecircleo" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
-                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={errors.spidometer} onChangeText={handleChange('spidometer')} />
+                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={ touched.spidometer ? errors.spidometer : undefined} onChangeText={handleChange('spidometer')} />
                       </>
                     )}
                     {uri && (

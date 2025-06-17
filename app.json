@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oto RS-Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon.png",
@@ -58,6 +58,12 @@
           "color": "#ffffff",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
     ],

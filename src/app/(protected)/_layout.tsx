@@ -3,11 +3,11 @@ import { PrivateRoute } from "@/components/PrivateRoute";
 import { useLoadingStore } from "@/stores/loadingStore";
 import { router, Stack } from "expo-router";
 import { useEffect } from "react";
-import { Alert, BackHandler } from "react-native";
+import { Alert, BackHandler, Text } from "react-native";
 
-export const unstable_settings = {
-    initialRouteName: "(tabs)", // anchor
-};
+// export const unstable_settings = {
+//     initialRouteName: "(tabs)", // anchor
+// };
 
 export default function ProtectedLayout() {
 
@@ -72,10 +72,19 @@ export default function ProtectedLayout() {
                     }}
                 />
                 <Stack.Screen
-                    name="pegembalian"
+                    name="pengembalian"
                     options={{
                         headerShown: false,
 
+                    }}
+                />
+                <Stack.Screen
+                    name="pengembalianManual"
+                    options={{
+                        title: "Pengembalian Manual",
+                        headerTitle: () => (
+                            <Text className='font-bold text-white text-xl'>Pengembalian Manual</Text>
+                        )
                     }}
                 />
             </Stack>

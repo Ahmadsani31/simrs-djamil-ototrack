@@ -9,6 +9,8 @@ import Animated, {
   FadeOut,
   LinearTransition,
 } from "react-native-reanimated";
+import { useAuthStore } from "@/stores/authStore";
+import { useEffect, useState } from "react";
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -16,70 +18,76 @@ const AnimatedTouchableOpacity =
 const PRIMARY_COLOR = "#205781";
 const SECONDARY_COLOR = "#fff";
 
+
 const CustomNavBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
+
   return (
     <View style={styles.container}>
-      {state.routes.map((route, index) => {
-        if (["_sitemap", "+not-found"].includes(route.name)) return null;
+      {state.routes
+        // .filter(route => !role.includes(route.name))
+        .map((route, index) => {
 
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+          if (["_sitemap", "+not-found"].includes(route.name)) return null;
 
-        const isFocused = state.index === index;
+          const { options } = descriptors[route.key];
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+                ? options.title
+                : route.name;
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
-          }
-        };
+          const isFocused = state.index === index;
 
-        return (
-          <AnimatedTouchableOpacity
-            layout={LinearTransition.springify().mass(0.5)}
-            key={route.key}
-            onPress={onPress}
-            style={[
-              styles.tabItem,
-              { backgroundColor: isFocused ? SECONDARY_COLOR : "transparent" },
-            ]}
-          >
-            {getIconByRouteName(
-              route.name,
-              isFocused ? 'black' : SECONDARY_COLOR
-            )}
-            {isFocused && (
-              <Animated.Text
-                entering={FadeIn.duration(200)}
-                exiting={FadeOut.duration(200)}
-                style={styles.text}
-              >
-                {label as string}
-              </Animated.Text>
-            )}
-          </AnimatedTouchableOpacity>
-        );
-      })}
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name, route.params);
+            }
+          };
+
+          return (
+            <AnimatedTouchableOpacity
+              layout={LinearTransition.springify().mass(0.5)}
+              key={route.key}
+              onPress={onPress}
+              style={[
+                styles.tabItem,
+                { backgroundColor: isFocused ? SECONDARY_COLOR : "transparent" },
+              ]}
+            >
+              {getIconByRouteName(
+                route.name,
+                isFocused ? 'black' : SECONDARY_COLOR
+              )}
+              {isFocused && (
+                <Animated.Text
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                  style={styles.text}
+                >
+                  {label as string}
+                </Animated.Text>
+              )}
+            </AnimatedTouchableOpacity>
+          );
+        })}
     </View>
   );
 
   function getIconByRouteName(routeName: string, color: string) {
     switch (routeName) {
-      case 'index':
+      case '(stack)':
         return <Ionicons name='home-sharp' size={20} color={color} />
       case 'pemakaian':
         return <Ionicons name='speedometer-sharp' size={20} color={color} />
@@ -88,7 +96,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
       case 'profile':
         return <Ionicons name='person-sharp' size={20} color={color} />
       default:
-        return <Ionicons name='home-sharp' size={20} color={color} />
+        return null
     }
   }
 }
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     paddingHorizontal: 10,
-    marginHorizontal:8,
+    marginHorizontal: 8,
     borderRadius: 20,
   },
   text: {

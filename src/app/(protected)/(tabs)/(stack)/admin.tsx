@@ -203,16 +203,16 @@ export default function AdminScreen() {
 
                       <View className="flex flex-row">
 
-                        <TouchableOpacity className={`flex-row gap-2 p-2 my-2 rounded-lg justify-center items-center ${colors.primary}`} onPress={() => router.push({
+                        <Link asChild push className={`flex-row gap-2 p-2 my-2 rounded-lg justify-center items-center ${colors.primary}`} href={{
                           pathname: '/pengembalianManual',
                           params: {
                             reservasi_id: item?.id,
                             user_id: item?.user_id,
                           }
-                        })}>
-                          <FontAwesome5 name="car-side" size={18} color="white" />
-                          <Text className='text-white font-medium'>Pengembalian</Text>
-                        </TouchableOpacity>
+                        }}>
+                            <Text className='font-medium'>Pengembalian</Text>
+                        </Link>
+           
                       </View>
                     </>
                   ) : null}

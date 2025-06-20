@@ -81,6 +81,7 @@ export default function ProtectedLayout() {
                 <Stack.Screen
                     name="pengembalianManual"
                     options={{
+                        presentation: 'modal',
                         title: "Pengembalian Manual",
                         headerTitle: () => (
                             <Text className='font-bold text-white text-xl'>Pengembalian Manual</Text>

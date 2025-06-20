@@ -7,15 +7,14 @@ import { useEffect, useState } from 'react';
 
 import * as Location from 'expo-location';
 import { statusTrackingStore } from '@/stores/statusTrackingStore';
-import { useAuthStore } from '@/stores/authStore';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
 export default function TabsLayout() {
 
   const trackingStatus = statusTrackingStore((state) => state.trackingStatus);
-  useEffect(() => {
 
+  useEffect(() => {
     const requestLocationPermission = async () => {
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
       statusTrackingStore.getState().setTrackingStatus(hasStarted);

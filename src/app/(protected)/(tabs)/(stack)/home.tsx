@@ -2,12 +2,13 @@ import { View, Alert, TouchableOpacity, Text } from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
 import ScreenListPemakaian from '@/components/ScreenListPemakaian';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
 import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
+import { useAuthStore } from '@/stores/authStore';
 
 // import * as Location from 'expo-location';
 

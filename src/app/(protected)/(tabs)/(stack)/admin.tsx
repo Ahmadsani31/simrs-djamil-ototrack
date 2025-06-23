@@ -3,12 +3,12 @@ import secureApi from '@/services/service';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { TextInput, Text, View, Pressable, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
-import { AntDesign, Entypo, FontAwesome5, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo,  Fontisto } from '@expo/vector-icons';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/SkeletonList';
-import { Link, router, useRootNavigationState, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 
 const LIMIT = 5;
 
@@ -61,18 +61,6 @@ export default function AdminScreen() {
     getNextPageParam: (lastPage) => lastPage.nextOffset,
     initialPageParam: 0,
   });
-
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imgBase64, setImgBase64] = useState<Base64URLString>();
-
-
-  const handleModalImageShow = async (uri: any) => {
-    // console.log('show image modal');
-    setImgBase64(uri);
-    setModalVisible(true)
-
-  }
 
   const showMode = (currentMode: any) => {
     DateTimePickerAndroid.open({

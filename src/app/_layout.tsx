@@ -1,7 +1,8 @@
-import { router, SplashScreen, Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import {
   QueryClient,
   QueryClientProvider,
@@ -21,6 +22,11 @@ import '@/utils/backgroundLocationTask';
 
 SplashScreen.preventAutoHideAsync();
 
+// Set the animation options. This is optional.
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 // Create a QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -11,7 +11,7 @@ import { Alert, BackHandler, Text } from "react-native";
 
 export default function ProtectedLayout() {
 
-    const loading = useLoadingStore((state) => state.loading);
+    const loading = useLoadingStore((state:any) => state.loading);
 
     useEffect(() => {
         const backAction = () => {
@@ -81,7 +81,8 @@ export default function ProtectedLayout() {
                 <Stack.Screen
                     name="pengembalianManual"
                     options={{
-                        presentation: 'modal',
+                        // presentation: 'modal',
+                         headerShown: false,
                         title: "Pengembalian Manual",
                         headerTitle: () => (
                             <Text className='font-bold text-white text-xl'>Pengembalian Manual</Text>

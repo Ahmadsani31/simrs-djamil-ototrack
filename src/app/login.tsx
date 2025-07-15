@@ -52,12 +52,24 @@ export default function LoginScreen() {
 
   const [showPassword, setShowPassword] = useState(true);
 
+  const user = useAuthStore((state) => state.user);
+
   const { login, isLoading, errorLogin } = useAuthStore();
+
 
   const handleLogin = async (value: LoginData) => {
 
-    await login(value);
-    router.replace('/(protected)');
+    const log = await login(value);
+    console.log('====================================');
+    console.log(log.role);
+    console.log('====================================');
+    if (log.role == 'admin') {
+      router.replace('/(protected)/(admin)/');
+    } else if (log.role == 'driver') {
+      router.replace('/(protected)/(driver)/');
+    } else {
+      Alert.alert('Error roles', 'Roles tidak terdaftar pada aplikasi ini.');
+    }
 
   };
 

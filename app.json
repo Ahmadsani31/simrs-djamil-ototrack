@@ -12,7 +12,18 @@
       "tsconfigPaths": true
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "sitemap": false
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.642345658543-8btf8rkhocbvo6c058581cgr8r831j21"
+        }
+      ],
       "expo-asset",
       "expo-font",
       [

@@ -1,5 +1,5 @@
 import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLoadingStore } from '@/stores/loadingStore';
 import ScreenPartialPemakaian from '@/components/ScreenPartialPemakaian';
 import { dataAktif } from '@/types/types';

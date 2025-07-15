@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router';
+import { router, Slot, Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
@@ -177,7 +177,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar style="auto" />
-          <Stack screenOptions={{ headerShown: false }} />
+          <Slot />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>

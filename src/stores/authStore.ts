@@ -5,6 +5,13 @@ import { restApi } from '@/services/auth';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
 
+type propLogin = {
+  email:string;
+  id:string;
+  name:string;
+  role:string;
+}
+
 interface AuthState {
   token: string | null;
   user: User | null;
@@ -14,7 +21,7 @@ interface AuthState {
   errorRegister: string | null;
   setToken: (token: string) => Promise<void>;
   setUser: (user: User) => void;
-  login: (data: LoginData) => Promise<boolean>;
+  login: (data: LoginData) => Promise<propLogin>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -44,11 +51,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login successful:', token, user);
+      console.log('Login successful :', user);
+      console.log('Token :', token);
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
-      return true;
+      return user;
     } catch (error: any) {
       // Alert.alert('Warning!', error.message as string);
       console.log('Login error:', error.message as string);

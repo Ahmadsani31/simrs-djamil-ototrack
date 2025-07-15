@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
 
-export default function HomeScreen() {
+export default function IndexScreen() {
 
   const [reservasiID, setReservasiID] = useState(undefined);
 
@@ -115,14 +115,14 @@ export default function HomeScreen() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
-          {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
               uuid: 'ce87741a-f197-4dc4-ac42-0a368ced8a0a',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>

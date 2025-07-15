@@ -42,7 +42,7 @@ const fetchData = async ({ pageParam = 0, queryKey }: { pageParam?: number; quer
 };
 
 
-export default function AdminScreen() {
+export default function IndexScreen() {
 
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');

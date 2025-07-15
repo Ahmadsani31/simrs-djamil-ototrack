@@ -144,7 +144,7 @@ export default function PengembalianManualScreen() {
 
   return (
 
-    <SafeAreaView className="flex-1 bg-slate-300" noTop>
+    <SafeAreaView className="flex-1 bg-slate-300">
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
       <ScrollView className="flex-1">
         <View className="m-4 p-4 bg-white rounded-lg">

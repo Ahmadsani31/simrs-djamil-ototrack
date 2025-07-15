@@ -97,6 +97,7 @@
       }
     },
     "android": {
+      "edgeToEdgeEnabled":true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/adaptive-icon.png",
         "monochromeImage": "./assets/icon/adaptive-icon.png",

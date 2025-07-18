@@ -1,4 +1,4 @@
-import { Alert, BackHandler, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, BackHandler, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import Input from "@/components/Input";
@@ -6,6 +6,7 @@ import InputArea from "@/components/InputArea";
 import ButtonCostum from "@/components/ButtonCostum";
 import { AntDesign } from '@expo/vector-icons';
 import ModalCamera from "@/components/ModalCamera";
+import SafeAreaView from "@/components/SafeAreaView";
 import secureApi from "@/services/service";
 import { Formik, FormikValues } from "formik";
 import * as yup from 'yup';
@@ -20,8 +21,9 @@ import { startTracking } from '@/utils/locationUtils'
 import { dataDetail } from "@/types/types";
 
 const validationSchema = yup.object().shape({
-  kegiatan: yup.string().required('Kegiatan harus diisi'),
-  spidometer: yup.number().required('Spidometer harus diisi'),
+  keterangan: yup.string().required('Keterangan harus diisi'),
+  lokasi: yup.string().required('lokasi / alamat pemiliharaan harus diisi'),
+  jenis_kerusakan: yup.string().required('Jenis Kerusakan harus diisi'),
 });
 
 const fetchData = async (uuid: string) => {
@@ -30,7 +32,7 @@ const fetchData = async (uuid: string) => {
 };
 
 
-export default function DetailScreen() {
+export default function ServiceScreen() {
   const { uuid } = useLocalSearchParams();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -50,18 +52,33 @@ export default function DetailScreen() {
     ]);
   }
 
-  const [modalVisible, setModalVisible] = useState(false);
 
-  const [uri, setUri] = useState<string | null>(null);
+  const backAction = () => {
+    Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      { text: 'YES', onPress: () => router.back() },
+    ]);
+    return true;
+  };
+
+  useEffect(() => {
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
 
   const handleSubmitDetail = async (values: FormikValues) => {
     setLoading(true)
-    if (!uri && values.spidometer == '') {
-      Alert.alert('Peringatan!', 'Foto spidometer belum di ambil', [
-        { text: 'Tutup', onPress: () => null },
-      ]);
-      return
-    }
+
     const coordinate = await reLocation.getCoordinate()
 
     if (!coordinate?.lat && coordinate?.long) {
@@ -74,21 +91,14 @@ export default function DetailScreen() {
     const formData = new FormData();
     formData.append('latitude', coordinate?.lat?.toString() || '');
     formData.append('longitude', coordinate?.long.toString() || '');
-    formData.append('kegiatan', values.kegiatan);
-    formData.append('spidometer', values.spidometer);
+    formData.append('keterangan', values.keterangan);
+    formData.append('jenis_kerusakan', values.jenis_kerusakan);
+    formData.append('lokasi', values.lokasi);
     formData.append('kendaraan_id', data?.id || '');
-    formData.append('fileImage', {
-      uri: uri,
-      name: 'spidometer-capture.jpg',
-      type: 'image/jpeg',
-    } as any);
 
     try {
-
       // console.log('formData', formData);
-
-      const response = await secureApi.postForm('/reservasi/save_detail', formData)
-      await startTracking();
+      const response = await secureApi.postForm('/kendaraan/service', formData)
 
       console.log('response ', JSON.stringify(response));
 
@@ -112,12 +122,7 @@ export default function DetailScreen() {
 
   }
 
-  // const textInputRef = useRef<TextInput>(null);
 
-  const setUriImageModal = (e: any) => {
-    setUri(e)
-    // textInputRef.current?.focus();
-  }
 
   return (
 
@@ -125,60 +130,55 @@ export default function DetailScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="m-4 p-4 bg-white rounded-lg">
           {isLoading || isError ? <SkeletonList loop={5} /> : (
             <>
               <View className="items-center mb-3 py-2 gap-4">
-                <View className='flex-row items-center text-gray-500 text-sm'>
+                <View className='flex-row items-center text-gray-500'>
                   <View className='flex-grow border-t border-gray-300' />
-                  <Text className='text-[#205781] text-lg mx-2'>Jenis Kegiatan</Text>
+                  <Text className='text-[#205781] text-lg mx-2'>Pemiliharaan Kendaaraan</Text>
                   <View className='flex-grow border-t border-gray-300' />
                 </View>
                 <View>
                   <Text className="text-3xl text-center font-bold">{data?.name}</Text>
-                  <Text className="font-medium text-center mt-3">{data?.no_polisi}</Text>
+                  <Text className="font-medium text-center">{data?.no_polisi}</Text>
                 </View>
               </View>
               <View className="border border-b-2 w-full mb-4" />
               <Formik
-                initialValues={{ kegiatan: '', spidometer: '' }}
+                initialValues={{ jenis_kerusakan: '', keterangan: '', lokasi: '' }}
                 validationSchema={validationSchema}
                 onSubmit={async (values) => await handleSubmitDetail(values)}
               >
                 {({ handleChange, handleSubmit, values, errors, touched }) => (
                   <>
-                    {touched.spidometer && errors.spidometer && <View className="p-4 my-4 bg-red-400 rounded-lg"><Text className="text-white">Kegiatan, Foto spidometer dan Spidometer wajib di ambil dan isi</Text></View>}
-                    <InputArea className="bg-gray-200" label="Kegiatan" placeholder="Jenis Kegiatan" value={values.kegiatan} error={errors.kegiatan} onChangeText={handleChange('kegiatan')} />
-                    {!uri ? (
-                      <TouchableOpacity className="py-1 px-3 my-3 rounded-lg items-center justify-center flex-row bg-indigo-500" onPress={() => setModalVisible(true)}>
-                        <AntDesign name="camera" size={32} />
-                        <Text className="font-bold text-white ms-2">Foto Spidometer Awal</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <>
-                        <View className="w-full rounded-lg bg-black my-4">
-                          <Image
-                            source={{ uri: uri || undefined }}
-                            className='w-full aspect-[3/4] rounded-lg'
-                          />
-                          <TouchableOpacity className="absolute right-1 bg-white rounded-full p-1 top-1" onPress={() => {
-                            setUri(null)
-                            values.spidometer = '';
-                          }}>
-                            <AntDesign name="closecircleo" size={32} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer"
-                          inputMode={'numeric'}
-                          value={values.spidometer}
-                          error={touched.spidometer ? errors.spidometer : undefined}
-                          onChangeText={handleChange('spidometer')} />
-                      </>
-                    )}
-                    {uri &&
-                      <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
-                    }
+                    <Input
+                      label="Jenis Kerusakan"
+                      placeholder="jenis kerusakan"
+                      value={values.jenis_kerusakan}
+                      onChangeText={handleChange('jenis_kerusakan')}
+                      error={touched.jenis_kerusakan ? errors.jenis_kerusakan : undefined}
+                      className='bg-gray-50'
+                    />
+                    <Input
+                      label="Lokasi"
+                      placeholder="lokasi / alamat pemiliharaan"
+                      value={values.lokasi}
+                      onChangeText={handleChange('lokasi')}
+                      error={touched.lokasi ? errors.lokasi : undefined}
+                      className='bg-gray-50'
+                    />
+                    <InputArea
+                      className="bg-gray-50"
+                      label="Keterangan"
+                      placeholder="keteragan..."
+                      value={values.keterangan}
+                      error={touched.keterangan ? errors.keterangan : undefined}
+                      onChangeText={handleChange('keterangan')}
+                    />
+
+                    <ButtonCostum classname={colors.primary} title="Simpan" onPress={handleSubmit} />
                   </>
                 )}
               </Formik>
@@ -187,7 +187,6 @@ export default function DetailScreen() {
 
         </View>
       </ScrollView>
-      <ModalCamera visible={modalVisible} onClose={() => setModalVisible(false)} setUriImage={(e) => setUriImageModal(e)} />
     </KeyboardAvoidingView>
 
   );

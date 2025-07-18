@@ -1,4 +1,4 @@
-import { View, Alert, TouchableOpacity, Text } from 'react-native';
+import { View, Alert, TouchableOpacity, Text, Button, Modal, Pressable } from 'react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
@@ -9,7 +9,6 @@ import ScreenListPemakaian from '@/components/ScreenListPemakaian';
 import ScreenPemakaianAktif from '@/components/ScreenPemakaianAktif';
 import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
 import { useAuthStore } from '@/stores/authStore';
-
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -17,6 +16,7 @@ import { useAuthStore } from '@/stores/authStore';
 export default function IndexScreen() {
 
   const [reservasiID, setReservasiID] = useState(undefined);
+  const [uuid, setUuid] = useState("");
 
   const [camera, setCamera] = useState(false);
 
@@ -72,21 +72,29 @@ export default function IndexScreen() {
       });
       if (res.status === true) {
         setCamera(false);
-        Alert.alert('Scan Successfully', 'Tekan OK untuk menlanjutkan proses..', [
-          {
-            text: 'Cancel',
-            onPress: () => null,
-            style: 'cancel',
-          },
-          {
-            text: 'OK', onPress: () => {
-              router.push({
-                pathname: '/(protected)/detail',
-                params: { uuid: data },
-              });
-            }
-          },
-        ]);
+        setUuid(data)
+        setModalVisible(true)
+        // Alert.alert('Scan Barcode Berhasil', 'Silahkan Pilih salah satu pemakaian kendaraan yang diiginkan.', [
+        //   {
+        //     text: 'Batal',
+        //     onPress: () => null,
+        //     style: 'cancel',
+        //   }, {
+        //     text: 'Service Kendaraan', onPress: () => {
+        //       router.push({
+        //         pathname: '/(protected)/detail',
+        //         params: { uuid: data },
+        //       });
+        //     }
+        //   }, {
+        //     text: 'Pemakaian Harian', onPress: () => {
+        //       router.push({
+        //         pathname: '/(protected)/detail',
+        //         params: { uuid: data },
+        //       });
+        //     }
+        //   },
+        // ]);
       }
     } catch (error: any) {
       // console.log('Error fetching data:', error);
@@ -106,6 +114,18 @@ export default function IndexScreen() {
     }
 
   };
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const handleRouterAfterScan = (route: string) => {
+    router.push({
+      pathname: route,
+      params: {
+        uuid: uuid,
+      }
+    })
+
+    setModalVisible(false)
+  }
 
   return (
     <SafeAreaView noTop>
@@ -115,17 +135,39 @@ export default function IndexScreen() {
           <View className='mb-5'>
             <ScreenPemakaianAktif onPress={() => handleSnapPress()} />
           </View>
-          <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
+          {/* <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-black`} onPress={() => router.push({
             pathname: 'detail',
             params: {
               uuid: 'ce87741a-f197-4dc4-ac42-0a368ced8a0a',
             }
           })}>
             <Text className='text-white font-bold'>Bypass Qrcode</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} />
         </View>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 bg-[#205781]/75 justify-center items-center">
+          <View className="bg-white p-6 rounded-2xl w-11/12 max-w-md">
+            <Text className="text-2xl font-bold text-center">Scan Barcode Berhasil</Text>
+            <Text className="text-lg  text-center">Silahkan Pilih salah satu pemakaian kendaraan yang diiginkan.</Text>
+            <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-teal-500`} onPress={() => handleRouterAfterScan('/(protected)/detail')}>
+              <Text className='text-white font-bold'>Aktifitas Harian</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-amber-500`} onPress={() => handleRouterAfterScan('/(protected)/service')}>
+              <Text className='text-white font-bold'>Service Kendaraan</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)} className={`flex-row gap-2 p-3 my-2 rounded-lg justify-center items-center bg-gray-500`} >
+              <Text className="text-white font-bold'">Batal / Tutup</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={['100%']}

@@ -15,6 +15,10 @@ export interface LoginData {
   password: string;
 }
 
+export interface LoginSSOData {
+  email: string;
+}
+
 export interface RegisterData {
   name: string;
   email: string;

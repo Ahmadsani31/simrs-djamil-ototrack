@@ -1,14 +1,12 @@
 import { useAuthStore } from '@/stores/authStore';
+import { API_URL } from '@/utils/constants';
 import axios from 'axios';
-import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Alert } from 'react-native';
 // Ganti dengan base URL API kamu
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Inisialisasi instance axios
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_URL,
   timeout: 10000,
 });
 

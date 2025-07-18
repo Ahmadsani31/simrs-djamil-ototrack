@@ -22,5 +22,5 @@ export const PrivateRoute = ({ children }: PrivateRouteProps) => {
     return <Redirect href="/login" />;
   }
   
-  return <SafeAreaView className='flex-1' noTop={true} >{children}</SafeAreaView>;
+  return <SafeAreaView className='flex-1' noBottom={true} noTop={true} >{children}</SafeAreaView>;
 };

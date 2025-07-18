@@ -17,8 +17,10 @@ import * as Updates from 'expo-updates';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location'
 import * as Notifications from 'expo-notifications';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import '@/utils/backgroundLocationTask';
+import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,6 +41,12 @@ const queryClient = new QueryClient({
 
 
 export default function RootLayout() {
+
+  GoogleSignin.configure({
+    webClientId: GOOGLE_CLIENT_ID,
+    iosClientId: APPEL_CLIENT_ID,
+    profileImageSize: 120,
+  });
 
   const { isLoading } = useAutoLogin();
 

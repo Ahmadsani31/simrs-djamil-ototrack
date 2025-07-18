@@ -1,4 +1,4 @@
-import { Alert, BackHandler, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, BackHandler, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import Input from "@/components/Input";
@@ -39,7 +39,6 @@ export default function PengembalianScreen() {
 
   const { clearCoordinates } = useLocationStore();
 
-
   const { reservasi_id } = useLocalSearchParams();
 
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
@@ -58,27 +57,6 @@ export default function PengembalianScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const [uri, setUri] = useState<string | null>(null);
-
-  const backAction = () => {
-    Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses pemakaian kendaraan?', [
-      {
-        text: 'Cancel',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      { text: 'YES', onPress: () => router.back() },
-    ]);
-    return true;
-  };
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => backHandler.remove();
-  }, [router]);
 
   const handleSubmitExit = async (values: FormikValues) => {
     setLoading(true)
@@ -148,17 +126,24 @@ export default function PengembalianScreen() {
   }
 
   return (
-
-    <SafeAreaView className="flex-1 bg-slate-300">
+    <KeyboardAvoidingView className="bg-slate-300" style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
       <View className='absolute w-full bg-[#205781] h-80 rounded-br-[50]  rounded-bl-[50]' />
-      <CustomHeader title="Pengembalian Kendaraan" onPress={backAction} />
-      <ScrollView className="flex-1">
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="m-4 p-4 bg-white rounded-lg">
           {isLoading || isError ? <SkeletonList loop={5} /> : (
             <>
               <View className="items-center mb-3 py-2">
-                <Text className="text-5xl text-center font-bold">{data?.name}</Text>
-                <Text className="font-medium text-center mt-3">{data?.no_polisi}</Text>
+                <View className='flex-row items-center text-gray-500 text-sm'>
+                  <View className='flex-grow border-t border-gray-300' />
+                  <Text className='text-[#205781] text-lg mx-2'>Proses Pengembalian Kendaraan</Text>
+                  <View className='flex-grow border-t border-gray-300' />
+                </View>
+                <View>
+                  <Text className="text-5xl text-center font-bold">{data?.name}</Text>
+                  <Text className="font-medium text-center mt-3">{data?.no_polisi}</Text>
+                </View>
               </View>
               <View className="border border-b-2 w-full mb-4" />
               <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
@@ -189,7 +174,7 @@ export default function PengembalianScreen() {
                             <AntDesign name="closecircleo" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
-                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={ touched.spidometer ? errors.spidometer : undefined} onChangeText={handleChange('spidometer')} />
+                        <Input className="bg-gray-200" label="Spidometer" placeholder="Angka spidometer" inputMode={'numeric'} value={values.spidometer} error={touched.spidometer ? errors.spidometer : undefined} onChangeText={handleChange('spidometer')} />
                       </>
                     )}
                     {uri && (
@@ -208,7 +193,7 @@ export default function PengembalianScreen() {
         </View>
       </ScrollView>
       <ModalCamera visible={modalVisible} onClose={() => setModalVisible(false)} setUriImage={(e) => setUri(e)} />
-    </SafeAreaView>
+    </KeyboardAvoidingView>
 
   );
 }

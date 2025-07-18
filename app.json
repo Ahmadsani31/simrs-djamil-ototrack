@@ -2,10 +2,11 @@
   "expo": {
     "name": "Oto RS-Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "scheme": "ototrack-djamil",
     "web": {
-      "favicon": "./assets/icon.png",
+      "favicon": "./assets/icon/adaptive-icon.png",
+      "output": "server",
       "bundler": "metro"
     },
     "experiments": {
@@ -21,7 +22,7 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.642345658543-8btf8rkhocbvo6c058581cgr8r831j21"
+          "iosUrlScheme": "com.googleusercontent.apps.642345658543-iju0ncqirablltugnqrtjj3jmek8e05n"
         }
       ],
       "expo-asset",
@@ -76,11 +77,14 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -97,7 +101,7 @@
       }
     },
     "android": {
-      "edgeToEdgeEnabled":true,
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/adaptive-icon.png",
         "monochromeImage": "./assets/icon/adaptive-icon.png",

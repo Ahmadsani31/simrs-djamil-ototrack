@@ -1,6 +1,6 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
-import { Image, Text, View } from 'react-native';
+import { Alert, BackHandler, Image, Text, View } from 'react-native';
 import CustomNavBar from '@/components/CustomNavBar';
 import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
@@ -14,6 +14,7 @@ const LOCATION_TASK_NAME = 'background-location-task';
 export default function TabsLayout() {
 
   const trackingStatus = statusTrackingStore((state) => state.trackingStatus);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -24,9 +25,40 @@ export default function TabsLayout() {
     requestLocationPermission();
   }, []);
 
-  const user = useAuthStore((state) => state.user);
 
-  console.log('role', user?.role);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+    return () => backHandler.remove();
+  }, []);
+
+  const backAction = () => {
+    if (router.canGoBack()) {
+      // Kalau masih bisa mundur (ada history), cukup back saja
+      router.back();
+    } else {
+      // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
+      Alert.alert(
+        'Konfirmasi Keluar',
+        'Apakah Anda yakin ingin keluar dari aplikasi home?',
+        [
+          {
+            text: 'Batal',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Keluar',
+            onPress: () => BackHandler.exitApp(),
+          },
+        ]
+      );
+    }
+
+    return true; // <- Wajib! Supaya sistem back tidak langsung nutup
+  };
 
 
   return (
@@ -90,6 +122,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="pemakaian"
           options={{
+            href: user?.role == 'admin' ? null : 'pemakaian',
             title: "Pemakaian",
             tabBarIcon: ({ color }) => <Ionicons name='speedometer-sharp' size={28} color={color} />,
             headerTitle: () => (

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { LoginData } from '@/types/types';
+import { LoginData, LoginSSOData } from '@/types/types';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { API_URL } from '@/utils/constants';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -21,7 +21,7 @@ export const restApi = {
     let jenisDevice;
     if (Device.isDevice) {
       jenisDevice = 'Phone';
-    }else{
+    } else {
       jenisDevice = 'Emulator';
     }
 
@@ -36,13 +36,48 @@ export const restApi = {
       platformApiLevel,
       rooted,
       ipAddress,
-      jenisDevice:jenisDevice,
+      jenisDevice: jenisDevice,
     };
 
     // console.log('data post',post);
-    
 
     const response = await api.post(`/auth/login`, post, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  loginSSO: async (data: LoginSSOData) => {
+    const manufacturer = Device.manufacturer;
+    const modelName = Device.modelName;
+    const osVersion = Device.osVersion;
+    const platformApiLevel = Device.platformApiLevel;
+    const rooted = await Device.isRootedExperimentalAsync();
+    const ipAddress = await Network.getIpAddressAsync();
+    let jenisDevice;
+    if (Device.isDevice) {
+      jenisDevice = 'Phone';
+    } else {
+      jenisDevice = 'Emulator';
+    }
+
+    // console.log('Login function called with data:', JSON.stringify(data));
+
+    const post = {
+      email: data.email,
+      manufacturer,
+      modelName,
+      osVersion,
+      platformApiLevel,
+      rooted,
+      ipAddress,
+      jenisDevice: jenisDevice,
+    };
+
+    // console.log('data post',post);
+
+    const response = await api.post(`/auth/login_email`, post, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -60,14 +95,12 @@ export const restApi = {
   },
   logout: async (isToken: string) => {
     // console.log('isToken ', isToken);
-    const response = await api.delete(
-      `/auth/logout`,
-      {
-        headers: {
-          Authorization: `Bearer ${isToken}`,
-        },
-      }
-    );
+    const response = await api.delete(`/auth/logout`, {
+      headers: {
+        Authorization: `Bearer ${isToken}`,
+      },
+    });
+    await GoogleSignin.signOut();
     return response.data;
   },
 };

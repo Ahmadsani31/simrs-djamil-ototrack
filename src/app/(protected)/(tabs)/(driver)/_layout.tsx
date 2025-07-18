@@ -7,7 +7,7 @@ export default function DriverLayout() {
     if (user?.role != 'driver') {
         return <Redirect href={'/(admin)'} />;
     }
-    console.log('role', user?.role);
+    // console.log('role', user?.role);
     return (
         <Slot />
     )

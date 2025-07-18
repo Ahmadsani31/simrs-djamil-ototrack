@@ -24,3 +24,6 @@ trash
 .metro-health-check*
 
 .env
+.env.development
+.env.preview
+.env.production

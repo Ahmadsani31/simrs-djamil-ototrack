@@ -80,7 +80,7 @@ export default function LoginScreen() {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
-        console.log(response);
+        // console.log(response);
         const email = response.data.user.email;
         const sso = await loginSSO({ email: email });
         if (sso) {

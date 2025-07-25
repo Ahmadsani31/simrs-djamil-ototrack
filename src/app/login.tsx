@@ -8,6 +8,8 @@ import {
   Image,
   Dimensions,
   Button,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
@@ -36,6 +38,7 @@ import {
   isErrorWithCode,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function LoginScreen() {
   const [submitLogin, setSubmitLogin] = useState(false);
@@ -124,101 +127,109 @@ export default function LoginScreen() {
     }
   };
   return (
-    <SafeAreaView className="flex-1 justify-center bg-slate-300">
-      <Animated.View
-        style={{ width: WiconTL, height: HiconTL }}
-        className="absolute left-[-80] top-[-80] rounded-full bg-[#4F959D]"
-      />
-      <Animated.View
-        style={{ width: WiconTR, height: HiconTR }}
-        className="absolute right-[-100] top-16 rounded-full bg-[#205781]"
-      />
-      <View className="mb-5 items-center">
-        <View className="rounded-2xl bg-white/85 p-2">
-          <Image
-            className="h-[80] w-[250] object-cover"
-            source={require('@asset/images/logo/logo-djamil.png')}
+    <KeyboardAvoidingView
+      className=" bg-slate-300"
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : -80}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <SafeAreaView className="flex-1 justify-center bg-slate-300">
+          <Animated.View
+            style={{ width: WiconTL, height: HiconTL }}
+            className="absolute left-[-80] top-[-80] rounded-full bg-[#4F959D]"
           />
-        </View>
-      </View>
-      <View className=" z-10 mx-4 mb-24 rounded-lg bg-white p-6">
-        <View className="mb-5 mt-2">
-          <Text className="text-center text-xl font-medium">Pencatatan</Text>
-          <Text className="text-center text-2xl font-bold">Kendaraan Operasional</Text>
-        </View>
-        {errorLogin && <ViewError plaintext={errorLogin} />}
-        <Formik
-          initialValues={{ username: '', password: '' }}
-          validationSchema={validationSchema}
-          onSubmit={async (values) => handleLogin(values)}>
-          {({ handleChange, handleSubmit, values, errors, touched }) => (
-            <>
-              <Input
-                label="Username"
-                placeholder="Enter your username"
-                value={values.username}
-                onChangeText={handleChange('username')}
-                error={touched.username ? errors.username : undefined}
-                className="bg-gray-50"
+          <Animated.View
+            style={{ width: WiconTR, height: HiconTR }}
+            className="absolute right-[-100] top-16 rounded-full bg-[#205781]"
+          />
+          <View className="mb-5 items-center">
+            <View className="rounded-2xl bg-white/85 p-2">
+              <Image
+                className="h-[80] w-[250] object-cover"
+                source={require('@asset/images/logo/logo-djamil.png')}
               />
-
-              <View className="relative">
-                <Input
-                  label="Password"
-                  placeholder="Enter your password"
-                  value={values.password}
-                  onChangeText={handleChange('password')}
-                  secureTextEntry={showPassword}
-                  error={touched.password ? errors.password : undefined}
-                  className="bg-gray-50"
-                />
-                <TouchableOpacity
-                  className="absolute right-3 top-9"
-                  onPress={() => setShowPassword(!showPassword)}>
-                  {showPassword ? (
-                    <Feather name="eye-off" size={24} />
-                  ) : (
-                    <Feather name="eye" size={24} />
-                  )}
-                </TouchableOpacity>
-              </View>
-
-              <ButtonCostum
-                classname="bg-[#06202B]"
-                title="Login"
-                onPress={handleSubmit}
-                loading={isLoading}
-                variant="primary"
-              />
-            </>
-          )}
-        </Formik>
-        <View className="items-center">
-          <View className="flex-row items-center text-sm text-gray-500">
-            <View className="flex-grow border-t border-gray-300" />
-            <Text className="mx-2 py-4 text-gray-500">or Login via google</Text>
-            <View className="flex-grow border-t border-gray-300" />
+            </View>
           </View>
-          <GoogleSigninButton
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={() => signIn()}
-            disabled={submitLogin}
+          <View className=" z-10 mx-4 mb-24 rounded-lg bg-white p-6">
+            <View className="mb-5 mt-2">
+              <Text className="text-center text-xl font-medium">Pencatatan</Text>
+              <Text className="text-center text-2xl font-bold">Kendaraan Operasional</Text>
+            </View>
+            {errorLogin && <ViewError plaintext={errorLogin} />}
+            <Formik
+              initialValues={{ username: '', password: '' }}
+              validationSchema={validationSchema}
+              onSubmit={async (values) => handleLogin(values)}>
+              {({ handleChange, handleSubmit, values, errors, touched }) => (
+                <>
+                  <Input
+                    label="Username"
+                    placeholder="Enter your username"
+                    value={values.username}
+                    onChangeText={handleChange('username')}
+                    error={touched.username ? errors.username : undefined}
+                    className="bg-gray-50"
+                  />
+
+                  <View className="relative">
+                    <Input
+                      label="Password"
+                      placeholder="Enter your password"
+                      value={values.password}
+                      onChangeText={handleChange('password')}
+                      secureTextEntry={showPassword}
+                      error={touched.password ? errors.password : undefined}
+                      className="bg-gray-50"
+                    />
+                    <TouchableOpacity
+                      className="absolute right-3 top-9"
+                      onPress={() => setShowPassword(!showPassword)}>
+                      {showPassword ? (
+                        <Feather name="eye-off" size={24} />
+                      ) : (
+                        <Feather name="eye" size={24} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+
+                  <ButtonCostum
+                    classname="bg-[#06202B]"
+                    title="Login"
+                    onPress={handleSubmit}
+                    loading={isLoading}
+                    variant="primary"
+                  />
+                </>
+              )}
+            </Formik>
+            <View className="items-center">
+              <View className="flex-row items-center text-sm text-gray-500">
+                <View className="flex-grow border-t border-gray-300" />
+                <Text className="mx-2 py-4 text-gray-500">or Login via google</Text>
+                <View className="flex-grow border-t border-gray-300" />
+              </View>
+              <GoogleSigninButton
+                size={GoogleSigninButton.Size.Wide}
+                color={GoogleSigninButton.Color.Dark}
+                onPress={() => signIn()}
+                disabled={submitLogin}
+              />
+            </View>
+          </View>
+          <View className="absolute bottom-2 w-full items-center">
+            <Text className="text-sm font-medium">Pencatatan Kendaraan</Text>
+            <Text className="text-xs font-bold">Version. {Constants.expoConfig?.version}</Text>
+          </View>
+          <Animated.View
+            style={{ width: WiconBL, height: HiconBL }}
+            className="absolute bottom-24 left-[-60] rounded-full bg-[#497D74]"
           />
-        </View>
-      </View>
-      <View className="absolute bottom-2 w-full items-center">
-        <Text className="text-sm font-medium">Pencatatan Kendaraan</Text>
-        <Text className="text-xs font-bold">Version. {Constants.expoConfig?.version}</Text>
-      </View>
-      <Animated.View
-        style={{ width: WiconBL, height: HiconBL }}
-        className="absolute bottom-24 left-[-60] rounded-full bg-[#497D74]"
-      />
-      <Animated.View
-        style={{ width: WiconBR, height: HiconBR }}
-        className="absolute bottom-0 right-0 rounded-full  bg-[#03A791]"
-      />
-    </SafeAreaView>
+          <Animated.View
+            style={{ width: WiconBR, height: HiconBR }}
+            className="absolute bottom-0 right-0 rounded-full  bg-[#03A791]"
+          />
+        </SafeAreaView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

@@ -9,6 +9,8 @@ import { Image } from 'expo-image';
 import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
 import PageService from '@/components/PageService';
+import { BarChart } from 'react-native-gifted-charts';
+import PageHome from '@/components/PageHome';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -152,44 +154,7 @@ export default function IndexScreen() {
               <PageService item={rawData} />
             )
           ) : (
-            <>
-              <View className="my-10 ">
-                <Text className="text-center text-2xl font-bold text-white">
-                  Pilih Jenis Penggunaan
-                </Text>
-                <Text className="text-center text-sm text-white">
-                  Silahkan pilih jenis penggunaan dan scan qrcode yang ada pada masing-masing
-                  kendaraan
-                </Text>
-              </View>
-              <View className="mt-10">
-                <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
-                  <TouchableOpacity
-                    className="size-48 items-center justify-center gap-2 rounded-lg bg-green-300 p-2"
-                    onPress={() => handleSnapPress('daily')}>
-                    <Image
-                      style={{ flex: 1, width: '100%' }}
-                      source={require('@asset/images/daily-use.png')}
-                      contentFit="contain"
-                      transition={500}
-                    />
-                    <Text className="font-bold">Aktifitas Harian</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    className="size-48 items-center justify-center gap-2 rounded-lg bg-amber-300 p-2 shadow"
-                    onPress={() => handleSnapPress('service')}>
-                    <Image
-                      style={{ flex: 1, width: '100%' }}
-                      source={require('@asset/images/maintenance.png')}
-                      contentFit="contain"
-                      transition={500}
-                    />
-                    <Text className="font-bold">Service Kendaraan</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </>
+            <PageHome onPress={(e) => handleSnapPress(e)} />
           )}
         </View>
       </View>

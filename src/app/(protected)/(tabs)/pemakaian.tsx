@@ -122,7 +122,6 @@ export default function PemakaianScreen() {
     <View className="flex-1 bg-slate-300">
       <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
       <View className="px-4">
-        {/* <ScreenListPemakaian onPress={(id) => handleSnapPressDetail(id)} /> */}
         <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
           <Fontisto className="absolute left-6 top-5 z-10" name="date" size={24} color={'black'} />
           <TextInput
@@ -148,7 +147,7 @@ export default function PemakaianScreen() {
           renderItem={({ item }) => (
             <>
               <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
-                <Text className={` text-black`}>
+                <Text className="p-2 text-black">
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                 </Text>
                 {item.bbm ? (
@@ -171,7 +170,7 @@ export default function PemakaianScreen() {
                   </View>
                 </View>
 
-                <View className="mt-2 rounded-lg bg-slate-100 p-2">
+                <View className="mt-2 rounded-lg bg-gray-200 p-2">
                   <View className="flex-row items-center justify-between">
                     <Text>Total Perjalanan</Text>
                     <Text className="font-bold">{item.total_spidometer} Km</Text>

@@ -118,9 +118,7 @@ export default function PemiliharaanScreen() {
   };
 
   const flatData = data?.pages.flatMap((page: any) => page.data) || [];
-  console.log('====================================');
-  console.log('flatData', JSON.stringify(data));
-  console.log('====================================');
+
   return (
     <View className="flex-1 bg-slate-300">
       <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />

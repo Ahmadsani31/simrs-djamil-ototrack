@@ -11,48 +11,11 @@ import { useAuthStore } from '@/stores/authStore';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
-export default function TabsLayout() {
-  const trackingStatus = statusTrackingStore((state) => state.trackingStatus);
+export default function TabsAdminLayout() {
   const user = useAuthStore((state) => state.user);
-  if (user?.role != 'driver') {
-    return <Redirect href={'(protected)/(tabs-admin)'} />;
+  if (user?.role != 'admin') {
+    return <Redirect href={'(protected)/(tabs)'} />;
   }
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-      statusTrackingStore.getState().setTrackingStatus(hasStarted);
-      console.log('Location background started:', hasStarted);
-    };
-    requestLocationPermission();
-  }, []);
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () => backHandler.remove();
-  }, []);
-
-  const backAction = () => {
-    if (router.canGoBack()) {
-      // Kalau masih bisa mundur (ada history), cukup back saja
-      router.back();
-    } else {
-      // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
-      Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari aplikasi home?', [
-        {
-          text: 'Batal',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {
-          text: 'Keluar',
-          onPress: () => BackHandler.exitApp(),
-        },
-      ]);
-    }
-
-    return true; // <- Wajib! Supaya sistem back tidak langsung nutup
-  };
-
   return (
     <PrivateRoute>
       <Tabs
@@ -85,48 +48,15 @@ export default function TabsLayout() {
               />
             </View>
           ),
-          headerRight: () => (
-            <View
-              className={`mx-4 p-1  ${trackingStatus ? 'bg-white' : 'bg-gray-500'} flex-row items-center rounded-lg`}>
-              <MaterialIcons
-                name={`${trackingStatus ? 'gps-fixed' : 'gps-off'}`}
-                size={14}
-                color={`${trackingStatus ? 'green' : 'black'}`}
-              />
-            </View>
-          ),
         }}>
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color }) => <Ionicons name="home-sharp" size={28} color={color} />,
-            headerTitle: () => <Text className="text-xl font-bold text-white">Home</Text>,
-          }}
-        />
-
-        <Tabs.Screen
-          name="pemakaian"
-          options={{
-            title: 'Pemakaian',
             tabBarIcon: ({ color }) => (
               <Ionicons name="speedometer-sharp" size={28} color={color} />
             ),
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pemakaian Kendaraan</Text>
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="pemiliharaan"
-          options={{
-            title: 'Pemiliharaan',
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="car-cog" size={28} color={color} />
-            ),
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pemiliharaan Kendaraan</Text>
-            ),
+            headerTitle: () => <Text className="text-xl font-bold text-white">Home</Text>,
           }}
         />
         <Tabs.Screen
@@ -139,7 +69,6 @@ export default function TabsLayout() {
             headerTitle: () => <Text className="text-xl font-bold text-white">Kendaraan</Text>,
           }}
         />
-
         <Tabs.Screen
           name="profile"
           options={{

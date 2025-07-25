@@ -12,6 +12,7 @@ import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { colors } from '@/constants/colors';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 
 const LIMIT = 5;
 
@@ -26,7 +27,7 @@ const fetchData = async ({
   const [_key, params] = queryKey;
   const date = (params as { date?: String }).date;
   try {
-    const response = await secureApi.get(`reservasi/list`, {
+    const response = await secureApi.get(`service/list`, {
       params: {
         limit: LIMIT,
         offset: pageParam,
@@ -44,7 +45,7 @@ const fetchData = async ({
     };
   }
 };
-export default function PemakaianScreen() {
+export default function PemiliharaanScreen() {
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -58,9 +59,9 @@ export default function PemakaianScreen() {
   // ref
   const bottomSheetDetailRef = useRef<BottomSheet>(null);
 
-  const [reservasiID, setReservasiID] = useState(undefined);
-  const handleSnapPressDetail = useCallback((id: any) => {
-    setReservasiID(id);
+  const [rawService, setRawService] = useState([]);
+  const handleSnapPressDetail = useCallback((item: []) => {
+    setRawService(item);
     bottomSheetDetailRef.current?.expand();
   }, []);
 
@@ -73,7 +74,7 @@ export default function PemakaianScreen() {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({
-      queryKey: ['listPemakaian', { date: dateInput }],
+      queryKey: ['list-service', { date: dateInput }],
       queryFn: fetchData,
       getNextPageParam: (lastPage) => lastPage.nextOffset,
       initialPageParam: 0,
@@ -117,7 +118,9 @@ export default function PemakaianScreen() {
   };
 
   const flatData = data?.pages.flatMap((page: any) => page.data) || [];
-
+  console.log('====================================');
+  console.log('flatData', JSON.stringify(data));
+  console.log('====================================');
   return (
     <View className="flex-1 bg-slate-300">
       <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
@@ -151,66 +154,23 @@ export default function PemakaianScreen() {
                 <Text className={` text-black`}>
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                 </Text>
-                {item.bbm ? (
-                  <TouchableOpacity
-                    className={`my-2 flex-row gap-2 rounded-lg p-2 ${colors.secondary}`}
-                    onPress={() => handleSnapPressDetail(item.id)}>
-                    <MaterialCommunityIcons name="gas-station" size={18} color="white" />
-                    <Text className="text-white">BBM</Text>
-                  </TouchableOpacity>
-                ) : null}
+                <TouchableOpacity
+                  className={`my-2 flex-row gap-2 rounded-lg p-2 ${colors.secondary}`}
+                  onPress={() => handleSnapPressDetail(item.images)}>
+                  <Text className="text-white">Detail</Text>
+                  <MaterialCommunityIcons name="arrow-top-right-bold-box" size={18} color="white" />
+                </TouchableOpacity>
               </View>
               <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
-                <View className="flex flex-row items-center gap-3">
-                  <View className="p-2">
-                    <Text className={`text-xl font-bold text-black`}>{item.model}</Text>
-                    <Text className="text-secondary text-sm">{item.no_polisi}</Text>
-                  </View>
-                  <View className="h-full flex-1 rounded-lg bg-slate-100 p-2">
-                    <Text className="font-medium">{item.kegiatan}</Text>
-                  </View>
+                <View className="items-center">
+                  <Text className={`text-xl font-bold text-black`}>{item.kendaraan}</Text>
+                  <Text className="text-secondary text-sm">{item.no_polisi}</Text>
                 </View>
-
-                <View className="mt-2 rounded-lg bg-slate-100 p-2">
-                  <View className="flex-row items-center justify-between">
-                    <Text>Total Perjalanan</Text>
-                    <Text className="font-bold">{item.total_spidometer} Km</Text>
-                  </View>
-                  <View className="flex-row items-center justify-between">
-                    <Text>Lama Perjalanan</Text>
-                    <Text className="font-bold">{item.selisih_waktu} Menit</Text>
-                  </View>
+                <View className="mt-2 rounded-lg bg-slate-200 p-1">
+                  <Text className="text-center font-medium">{item.jenis_kerusakan}</Text>
                 </View>
-                <View className="mt-2 flex justify-center gap-2">
-                  <TouchableOpacity onPress={() => handleModalImageShow(item.spidometer_file_in)}>
-                    <View className="flex-row items-center gap-10 rounded-lg bg-blue-300 p-2">
-                      <Text className=" text-2xl font-bold">Pergi</Text>
-                      <View className="flex-1 gap-2">
-                        <Text className=" text-black">
-                          {dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')}
-                        </Text>
-                        <View className="flex-row items-center justify-between">
-                          <Text className="text-black ">Spidometer</Text>
-                          <Text className="font-bold text-black">{item.spidometer_in} Km</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleModalImageShow(item.spidometer_file_out)}>
-                    <View className="flex-row items-center gap-5 rounded-lg bg-amber-300 p-2">
-                      <Text className="text-2xl font-bold">Pulang</Text>
-
-                      <View className="flex-1 gap-2">
-                        <Text className=" text-black">
-                          {dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')}
-                        </Text>
-                        <View className="flex-row items-center justify-between">
-                          <Text className="text-black ">Spidometer</Text>
-                          <Text className="font-bold text-black">{item.spidometer_out} Km</Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                <View className="mt-2 rounded-lg bg-slate-200 p-1">
+                  <Text className="text-center font-medium">Biaya : Rp. {item.nominal}</Text>
                 </View>
               </View>
             </>
@@ -226,7 +186,7 @@ export default function PemakaianScreen() {
               <SkeletonList loop={8} />
             ) : (
               <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                <Text>Tidak ada pemakaian kendaraan yang dilakukan</Text>
+                <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
               </View>
             )
           }
@@ -244,7 +204,7 @@ export default function PemakaianScreen() {
         index={-1}
         enablePanDownToClose
         animationConfigs={animationConfigs}>
-        <ListDetailSectionSheet reservasiID={reservasiID ?? ''} />
+        <ListDetailServiceSheet items={rawService} />
       </BottomSheet>
     </View>
   );

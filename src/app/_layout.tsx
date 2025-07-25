@@ -3,10 +3,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAutoLogin } from '../hooks/useAutoLogin';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
@@ -15,12 +12,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Updates from 'expo-updates';
 
 import { Camera } from 'expo-camera';
-import * as Location from 'expo-location'
+import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
+import ToastManager from 'toastify-react-native';
 import '@/utils/backgroundLocationTask';
 import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
+import { colorKeys } from 'moti';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,9 +37,7 @@ const queryClient = new QueryClient({
   },
 });
 
-
 export default function RootLayout() {
-
   GoogleSignin.configure({
     webClientId: GOOGLE_CLIENT_ID,
     iosClientId: APPEL_CLIENT_ID,
@@ -115,30 +111,23 @@ export default function RootLayout() {
         router.back();
       } else {
         // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
-        Alert.alert(
-          'Konfirmasi Keluar',
-          'Apakah Anda yakin ingin keluar dari aplikasi?',
-          [
-            {
-              text: 'Tidak',
-              onPress: () => null,
-              style: 'cancel',
-            },
-            {
-              text: 'Ya',
-              onPress: () => BackHandler.exitApp(),
-            },
-          ]
-        );
+        Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari aplikasi?', [
+          {
+            text: 'Tidak',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Ya',
+            onPress: () => BackHandler.exitApp(),
+          },
+        ]);
       }
 
       return true; // <- Wajib! Supaya sistem back tidak langsung nutup
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction
-    );
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => backHandler.remove();
   }, [router]);
@@ -179,17 +168,15 @@ export default function RootLayout() {
   //   return <RequiredPermission />
   // }
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="auto" />
+          <StatusBar style="inverted" animated={true} />
           <Slot />
+          <ToastManager useModal={false} />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>
   );
 }
-
-

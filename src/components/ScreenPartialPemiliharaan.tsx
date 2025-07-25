@@ -29,7 +29,7 @@ const fetchDataLog = async (reservasi_id: string) => {
   }
 };
 
-export default function ScreenPartialPemiliharaan({ items }: any) {
+export default function ScreenPartialPemakaian({ items }: any) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [checkpointAktif, setCheckpointAktif] = useState(false);
@@ -166,7 +166,7 @@ export default function ScreenPartialPemiliharaan({ items }: any) {
   return (
     <>
       <View className="rounded-lg bg-white p-4">
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.primary}`}
           onPress={() => setDialogExit(!dialogExit)}>
           <MaterialCommunityIcons name="gas-station" size={22} color="white" />
@@ -182,10 +182,47 @@ export default function ScreenPartialPemiliharaan({ items }: any) {
               },
             })
           }>
-          <Text className="font-bold text-white">Proses Pengembalian Kendaraan</Text>
+          <Text className="font-bold text-white">Pemiliharaan Selesai</Text>
 
           <MaterialCommunityIcons name="car" size={22} color="white" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View className="flex items-center justify-center gap-4 rounded-lg bg-white">
+          <TouchableOpacity
+            className="rounded-lg bg-slate-500 p-4"
+            onPress={() =>
+              router.push({
+                pathname: 'pengembalian',
+                params: {
+                  reservasi_id: items?.id,
+                },
+              })
+            }>
+            <View className="w-full flex-row items-center gap-5">
+              <Image
+                style={{ width: 60, height: 60 }}
+                source={require('@asset/images/return-car.png')}
+              />
+              <View className="w-72 text-wrap">
+                <Text className="text-xl font-bold text-white">Pengembalian Kendaraan</Text>
+                <Text className="text-sm">Klik disini untuk mengembalikan kendaraan</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="rounded-lg bg-red-400 p-4"
+            onPress={() => setDialogExit(!dialogExit)}>
+            <View className="w-full flex-row items-center gap-5">
+              <Image
+                style={{ width: 60, height: 60 }}
+                source={require('@asset/images/gas-station1.png')}
+              />
+              <View className="w-72 text-wrap">
+                <Text className="text-xl font-bold text-white">Pengisian BBM Kendaraan</Text>
+                <Text className="text-sm">Klik disini untuk proses pengisian BBM ke SPBU</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
       <Text className="my-3 font-bold">Log pengisian BBM</Text>
       {dataAllBbm ? (
@@ -248,7 +285,7 @@ export default function ScreenPartialPemiliharaan({ items }: any) {
         <ModalRN.Header>
           <Text className="text-center font-bold">Proses Pengisian BBM Kendaraan</Text>
           <Text className="text-center text-sm">
-            Silahkan foto lokasi sekitar atau foto tempat SPBU pengisian BBM Kendaraan
+            Silahkan foto kondisi terkini saat melakukan proses pengisian BBM Kendaraan
           </Text>
         </ModalRN.Header>
         <ModalRN.Content>

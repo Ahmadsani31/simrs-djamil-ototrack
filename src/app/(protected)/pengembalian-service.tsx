@@ -28,35 +28,50 @@ import { stopTracking } from '@/utils/locationUtils';
 import { useLocationStore } from '@/stores/locationStore';
 import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
-import { dataDetail } from '@/types/types';
 import * as SecureStore from 'expo-secure-store';
 import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
+import CustomNumberInput from '@/components/CustomNumberInput';
+import InputArea from '@/components/InputArea';
+
+type propsService = {
+  id: string;
+  name: string;
+  no_polisi: string;
+  keterangan: string;
+  jenis_kerusakan: string;
+  lokasi: string;
+};
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
 });
 
-const fetchData = async (reservasi_id: string) => {
-  const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
+const fetchData = async (service_id: string) => {
+  const response = await secureApi.get(`/service/data_aktif`, {
     params: {
-      reservasi_id: reservasi_id,
+      service_id: service_id,
     },
   });
+  console.log(`fetchData response`, response.data);
+
   return response.data;
 };
 
-export default function PengembalianScreen() {
-  const { reservasi_id } = useLocalSearchParams();
+export default function PengembalianServiceScreen() {
+  const { service_id } = useLocalSearchParams();
+
+  console.log('service_id', service_id);
+
   const { clearCoordinates } = useLocationStore();
 
-  const { data, isLoading, error, isError } = useQuery<dataDetail>({
-    queryKey: ['pengembalian', reservasi_id],
-    queryFn: () => fetchData(reservasi_id.toString()),
+  const { data, isLoading, error, isError } = useQuery<propsService>({
+    queryKey: ['pengembalian', service_id],
+    queryFn: () => fetchData(service_id.toString()),
   });
 
   if (isError) {
-    Alert.alert('Peringatan!', 'Data tidak valid atau kendaraan tidak aktif!', [
+    Alert.alert('Peringatan!', 'Tidak ada pemiliharaan kendaraan yang aktif!', [
       { text: 'Kembali', onPress: () => router.back() },
     ]);
   }
@@ -65,12 +80,27 @@ export default function PengembalianScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [nominal, setNominal] = useState<string>('');
+  const [keterangan, setKeterangan] = useState<string>('');
+
   const [uri, setUri] = useState<string | null>(null);
 
-  const handleSubmitExit = async (values: FormikValues) => {
+  const handleSubmit = async () => {
     setLoading(true);
-    if (!uri && values.spidometer == '') {
-      Toast.error('Foto spidometer belum di ambil');
+    if (!nominal || nominal === '') {
+      Toast.error('Nominal wajib di isi');
+      setLoading(false);
+      return;
+    }
+    if (!uri) {
+      Toast.error('Foto struk / bon belum di ambil');
+      setLoading(false);
+      return;
+    }
+
+    if (!keterangan || keterangan === '') {
+      Toast.error('Foto struk / bon belum di ambil');
+      setLoading(false);
       return;
     }
 
@@ -86,30 +116,29 @@ export default function PengembalianScreen() {
       const formData = new FormData();
       formData.append('latitude', coordinate?.lat?.toString() || '');
       formData.append('longitude', coordinate?.long.toString() || '');
-      formData.append('spidometer', values.spidometer);
-      formData.append('reservasi_id', reservasi_id.toString());
-      formData.append('coordinates', JSON.stringify(asyncCoords));
+      formData.append('service_id', service_id.toString());
+      formData.append('nominal', nominal);
+      formData.append('keterangan', keterangan);
       formData.append('fileImage', {
         uri: uri,
-        name: 'spidometer-capture.jpg',
+        name: 'bon-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
+      console.log('formData', formData);
+      // return;
 
-      await secureApi.postForm('/reservasi/return_kendaraan', formData);
-      clearCoordinates();
-      await stopTracking();
+      await secureApi.postForm('/service/update', formData);
       // console.log('response ', JSON.stringify(response.data));
 
-      await SecureStore.deleteItemAsync('DataAktif');
+      // await SecureStore.deleteItemAsync('DataAktif');
       // console.log(response.message);
       router.replace('(tabs)');
     } catch (error: any) {
-      // alert(error.response.data.message)
+      console.log(error.response);
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
+        Toast.error(msg);
       } else if (error.request) {
         Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
       } else {
@@ -146,62 +175,55 @@ export default function PengembalianScreen() {
               </View>
               <View className="mb-4 w-full border border-b-2" />
               <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
-              <Formik
-                initialValues={{ spidometer: '' }}
-                validationSchema={validationSchema}
-                onSubmit={async (values) => await handleSubmitExit(values)}>
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
-                  <>
-                    {touched.spidometer && errors.spidometer && (
-                      <View className="my-4 rounded-lg bg-red-400 p-4">
-                        <Text className="text-white">
-                          Foto dan Spidometer wajib di ambil dan isi
-                        </Text>
-                      </View>
-                    )}
-                    {!uri ? (
-                      <TouchableOpacity
-                        className="my-3 flex-row items-center justify-center rounded-lg bg-indigo-500 px-3 py-1"
-                        onPress={() => setModalVisible(true)}>
-                        <AntDesign name="camera" size={32} />
-                        <Text className="ms-2 font-bold text-white">Open Camera</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <>
-                        <View className="my-4 w-full rounded-lg bg-black">
-                          <Image
-                            source={{ uri: uri || undefined }}
-                            className="aspect-[3/4] w-full rounded-lg"
-                          />
-                          <TouchableOpacity
-                            className="absolute right-1 top-1 rounded-full bg-white p-1"
-                            onPress={() => {
-                              setUri(null);
-                              values.spidometer = '';
-                            }}>
-                            <AntDesign name="closecircleo" size={32} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                        <Input
-                          className="bg-gray-200"
-                          label="Spidometer"
-                          placeholder="Angka spidometer"
-                          inputMode={'numeric'}
-                          value={values.spidometer}
-                          error={touched.spidometer ? errors.spidometer : undefined}
-                          onChangeText={handleChange('spidometer')}
-                        />
-                      </>
-                    )}
-                    <TouchableOpacity
-                      className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
-                      onPress={() => handleSubmit()}>
-                      <Text className="font-bold text-white">Kembaliankan Kendaraan</Text>
-                      <MaterialCommunityIcons name="car" size={22} color="white" />
-                    </TouchableOpacity>
-                  </>
-                )}
-              </Formik>
+
+              <CustomNumberInput
+                className="bg-gray-50"
+                placeholder="Masukan nominal"
+                label="Uang"
+                onFormattedValue={(raw, formatted) => {
+                  setNominal(raw);
+                  // console.log('Raw:', raw);
+                  // console.log('Formatted:', formatted);
+                }}
+              />
+              <Text className="text-center text-sm text-gray-500">
+                Ambil foto struk / bon pengisian BBM
+              </Text>
+              {!uri ? (
+                <TouchableOpacity
+                  className="my-3 flex-row items-center rounded-lg bg-indigo-500 px-3 py-1"
+                  onPress={() => setModalVisible(true)}>
+                  <AntDesign name="camera" size={32} color={'white'} />
+                  <Text className="ms-2 font-bold text-white">Open Camera</Text>
+                </TouchableOpacity>
+              ) : (
+                <View className="my-4 w-full rounded-lg bg-black">
+                  <Image
+                    source={{ uri: uri || undefined }}
+                    className="aspect-[3/4] w-full rounded-lg"
+                  />
+                  <TouchableOpacity
+                    className="absolute right-1 top-1 rounded-full bg-white p-1"
+                    onPress={() => {
+                      setUri(null);
+                    }}>
+                    <AntDesign name="closecircleo" size={32} color="red" />
+                  </TouchableOpacity>
+                </View>
+              )}
+              <InputArea
+                className="bg-gray-50"
+                label="Keterangan"
+                placeholder="Keterangan pengembalian manual"
+                value={keterangan}
+                onChangeText={(e) => setKeterangan(e)}
+              />
+              <TouchableOpacity
+                className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
+                onPress={() => handleSubmit()}>
+                <Text className="font-bold text-white">Pemiliharaan Selesai</Text>
+                <MaterialCommunityIcons name="car" size={22} color="white" />
+              </TouchableOpacity>
             </>
           )}
         </View>

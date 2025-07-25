@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Platform, Linking, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  Platform,
+  Linking,
+  Pressable,
+} from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
@@ -8,9 +18,7 @@ const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
 
-export default function BarcodeScanner({ onScan }: {
-  onScan: (data: string) => void;
-}) {
+export default function BarcodeScanner({ onScan }: { onScan: (data: string) => void }) {
   const [scanned, setScanned] = useState(false);
   const scanLinePos = useRef(new Animated.Value(0)).current;
 
@@ -48,16 +56,24 @@ export default function BarcodeScanner({ onScan }: {
   // Permission kamera
   if (!permission) {
     // Camera permissions are still loading.
-    return <View className='flex-1 w-full items-center justify-center bg-white'>
-      <Text className='font-medium text-xl'>Requesting camera permission...</Text>
-    </View>;
+    return (
+      <View className="w-full flex-1 items-center justify-center bg-white">
+        <Text className="text-xl font-medium">Requesting camera permission...</Text>
+      </View>
+    );
   }
 
   if (permission.status === 'denied') {
     return (
-      <View className='flex-1 w-full items-center justify-center bg-white'>
-        <Text className='text-xl text-center font-bold text-red-500'>Permission denied!, Please allow your permission camera</Text>
-        <ButtonCostum classname={colors.secondary} onPress={() => openAppSettings()} title="Grant permission" />
+      <View className="w-full flex-1 items-center justify-center bg-white">
+        <Text className="text-center text-xl font-bold text-red-500">
+          Permission denied!, Please allow your permission camera
+        </Text>
+        <ButtonCostum
+          classname={colors.secondary}
+          onPress={() => openAppSettings()}
+          title="Grant permission"
+        />
       </View>
     );
   }
@@ -65,66 +81,85 @@ export default function BarcodeScanner({ onScan }: {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View className='flex-1 w-full items-center justify-center bg-white'>
-        <Text className='font-medium text-xl'>We need your permission to show the camera</Text>
-        <ButtonCostum classname={colors.secondary} onPress={() => requestPermission()} title="Grant permission" />
+      <View className="w-full flex-1 items-center justify-center bg-white">
+        <Text className="text-xl font-medium">We need your permission to show the camera</Text>
+        <ButtonCostum
+          classname={colors.secondary}
+          onPress={() => requestPermission()}
+          title="Grant permission"
+        />
       </View>
     );
   }
 
   return (
-    <View className='flex-1 bg-black'>
+    <View className="flex-1 bg-black">
       <CameraView
-        className='flex-1'
-        facing='back'
+        className="flex-1"
+        facing="back"
+        ratio="1:1"
         barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
+          barcodeTypes: ['qr'],
         }}
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}>
         {/* Overlay Hitam Transparan */}
-        <View className='flex-1'>
-          {/* Area Transparan di Atas Frame Scan */}
-          <View style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 3 - SCAN_PADDING }]} />
+        <>
+          <View className="flex-1">
+            {/* Area Transparan di Atas Frame Scan */}
+            <View
+              style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 3 - SCAN_PADDING }]}
+            />
 
-          {/* Baris Tengah (Frame Scan) */}
-          <View style={styles.middleRow}>
-            {/* Area Transparan di Kiri Frame */}
-            <View style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]} />
+            {/* Baris Tengah (Frame Scan) */}
+            <View style={styles.middleRow}>
+              {/* Area Transparan di Kiri Frame */}
+              <View
+                style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]}
+              />
 
-            {/* Frame Scanner */}
-            <View style={styles.scanFrame}>
-              {/* Corner Borders */}
-              <View style={[styles.corner, styles.cornerTopLeft]} />
-              <View style={[styles.corner, styles.cornerTopRight]} />
-              <View style={[styles.corner, styles.cornerBottomLeft]} />
-              <View style={[styles.corner, styles.cornerBottomRight]} />
+              {/* Frame Scanner */}
+              <View style={styles.scanFrame}>
+                {/* Corner Borders */}
+                <View style={[styles.corner, styles.cornerTopLeft]} />
+                <View style={[styles.corner, styles.cornerTopRight]} />
+                <View style={[styles.corner, styles.cornerBottomLeft]} />
+                <View style={[styles.corner, styles.cornerBottomRight]} />
 
-              {/* Animated Scan Line */}
-              <Animated.View
-                style={[
-                  styles.scanLine,
-                  {
-                    transform: [{
-                      translateY: scanLinePos.interpolate({
-                        inputRange: [0, SCAN_SIZE],
-                        outputRange: [0, SCAN_SIZE]
-                      })
-                    }]
-                  }
-                ]}
+                {/* Animated Scan Line */}
+                <Animated.View
+                  style={[
+                    styles.scanLine,
+                    {
+                      transform: [
+                        {
+                          translateY: scanLinePos.interpolate({
+                            inputRange: [0, SCAN_SIZE],
+                            outputRange: [0, SCAN_SIZE],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                />
+              </View>
+
+              {/* Area Transparan di Kanan Frame */}
+              <View
+                style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]}
               />
             </View>
 
-            {/* Area Transparan di Kanan Frame */}
-            <View style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]} />
+            {/* Area Transparan di Bawah Frame Scan */}
+            <View
+              style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 2 - SCAN_PADDING }]}
+            />
           </View>
 
-          {/* Area Transparan di Bawah Frame Scan */}
-          <View style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 2 - SCAN_PADDING }]} />
-        </View>
-
-        {/* Text Instruksi */}
-        <Text className='absolute top-24 font-bold text-2xl text-center text-white self-center'>Arahkan kamera ke barcode/QR code Kedaraan</Text>
+          {/* Text Instruksi */}
+          <Text className="absolute top-24 self-center text-center text-2xl font-bold text-white">
+            Arahkan kamera ke barcode/QR code Kedaraan
+          </Text>
+        </>
       </CameraView>
     </View>
   );
@@ -158,7 +193,6 @@ const styles = StyleSheet.create({
     left: 0,
     borderTopWidth: 10,
     borderLeftWidth: 10,
-
   },
   cornerTopRight: {
     top: 0,

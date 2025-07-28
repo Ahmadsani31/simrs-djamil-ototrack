@@ -1,23 +1,10 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image as ImageLocal,
-  Pressable,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image as ImageLocal, ScrollView, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { Image } from 'expo-image';
 import { Link, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import secureApi from '@/services/service';
-import { Checkpoint } from '@/types/types';
 import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import dayjs from 'dayjs';
 import { ModalRN } from './ModalRN';
 import ButtonCostum from './ButtonCostum';
 import { colors } from '@/constants/colors';
@@ -43,11 +30,17 @@ type rawData = {
   };
 };
 
-const fetchDataLog = async (reservasi_id: number) => {
+type propsUseQuery = {
+  id: number;
+  keterangan: string;
+  file_image: string;
+};
+
+const fetchDataLog = async (service_id: number) => {
   try {
-    const response = await secureApi.get(`/checkpoint/pemakaian`, {
+    const response = await secureApi.get(`/service/list_images`, {
       params: {
-        reservasi_id: reservasi_id,
+        service_id: service_id,
       },
     });
     return response.data;
@@ -67,18 +60,6 @@ const PageService = ({ item }: rawData) => {
 
   const [previewImage, setPreviewImage] = useState(false);
   const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
-
-  const {
-    data: fetch_checkpoint,
-    isLoading: isIsLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery<Checkpoint[]>({
-    queryKey: ['fetch_checkpoint', item.id],
-    queryFn: async () => await fetchDataLog(item.id),
-    enabled: !!item.id,
-  });
 
   const handleDialogBBM = () => {
     setModalVisible(false);
@@ -134,11 +115,11 @@ const PageService = ({ item }: rawData) => {
     // console.log('formData', formData);
 
     try {
-      const response = await secureApi.postForm('/service/image_store', formData);
-      console.log('response save ', JSON.stringify(response));
+      await secureApi.postForm('/service/image_store', formData);
+      // console.log('response save ', JSON.stringify(response));
 
       handleDialogBBM();
-      // refetch();
+      refetch();
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -148,7 +129,7 @@ const PageService = ({ item }: rawData) => {
         closeIconColor: '#ff0000',
       });
 
-      console.log('response checkpoint', JSON.stringify(error.response.data));
+      // console.log('response checkpoint', JSON.stringify(error.response.data));
       // Alert.alert('Warning!', error.response.data.message, [
       //   { text: 'Tutup', onPress: () => null },
       // ]);
@@ -167,6 +148,17 @@ const PageService = ({ item }: rawData) => {
     setImgPreviewUrl('');
   };
 
+  const {
+    data: fetch_service,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<propsUseQuery[]>({
+    queryKey: ['fetch_service', item.id],
+    queryFn: async () => await fetchDataLog(item.id),
+  });
+
   return (
     <>
       <View className="my-2 rounded-lg bg-amber-500 p-4">
@@ -175,7 +167,7 @@ const PageService = ({ item }: rawData) => {
         <Text className="text-center text-4xl font-bold">{item?.kendaraan}</Text>
         <Text className="mb-2 text-center text-xl font-medium">{item?.no_polisi}</Text>
         <View className=" rounded-lg bg-white p-1 px-3">
-          <Text className="text-center font-medium">{item?.jenis_kerusakan}</Text>
+          <Text className="text-center text-xl font-bold">{item?.jenis_kerusakan}</Text>
           <Text className="text-center font-medium">{item?.keterangan}</Text>
           <Text className="text-center font-medium">{item?.lokasi}</Text>
         </View>
@@ -189,6 +181,7 @@ const PageService = ({ item }: rawData) => {
                 pathname: 'pengembalian-service',
                 params: {
                   service_id: item?.id,
+                  kendaraan_id: item?.kendaraan_id,
                 },
               })
             }>
@@ -223,7 +216,11 @@ const PageService = ({ item }: rawData) => {
           </TouchableOpacity>
         </View>
       </View>
-      <PageServiceListImage id={item.id} onPress={(e) => handleOpenPreviewImage(e)} />
+      <PageServiceListImage
+        items={fetch_service ?? []}
+        isLoading={isLoading}
+        onPress={(e) => handleOpenPreviewImage(e)}
+      />
       <ModalRN visible={isModalVisible} onClose={handleDialogBBM}>
         <ModalRN.Header>
           <Text className="text-center text-xl font-bold">

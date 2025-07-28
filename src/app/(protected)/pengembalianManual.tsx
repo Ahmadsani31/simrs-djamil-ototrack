@@ -93,9 +93,9 @@ export default function PengembalianManualScreen() {
   const handlePengembalian = async (values: FormikValues) => {
     setLoading(true);
 
-    console.log('error');
+    // console.log('error');
 
-    console.log(validateForm());
+    // console.log(validateForm());
 
     if (!validateForm()) {
       // Submit form
@@ -118,8 +118,9 @@ export default function PengembalianManualScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
-
+      // console.log('formData', formData);
+      // console.log(formData);
+      // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
       // console.log('response ', JSON.stringify(response.data));
 
@@ -158,7 +159,12 @@ export default function PengembalianManualScreen() {
             <SkeletonList loop={5} />
           ) : (
             <>
-              <View className="mb-3 items-center py-2">
+              <View className="mb-3 items-center gap-4 py-2">
+                <View className="flex-row items-center text-sm text-gray-500">
+                  <View className="flex-grow border-t border-gray-300" />
+                  <Text className="mx-2 text-lg text-[#205781]">Proses Pengembalian Kendaraan</Text>
+                  <View className="flex-grow border-t border-gray-300" />
+                </View>
                 <Text className="text-center text-5xl font-bold">{data?.name}</Text>
                 <Text className="mt-3 text-center font-medium">{data?.no_polisi}</Text>
               </View>
@@ -170,7 +176,7 @@ export default function PengembalianManualScreen() {
                 {({ handleChange, handleSubmit, values, errors, touched }) => (
                   <>
                     <Input
-                      className="bg-gray-200"
+                      className="bg-gray-100"
                       label="Spidometer"
                       placeholder="Angka spidometer"
                       inputMode={'numeric'}

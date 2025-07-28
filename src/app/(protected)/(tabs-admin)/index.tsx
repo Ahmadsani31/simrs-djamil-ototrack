@@ -16,7 +16,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/SkeletonList';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 
 const LIMIT = 5;
 
@@ -102,10 +102,7 @@ export default function IndexScreen() {
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="px-4">
           <View className="mb-4 ">
-            <Text className="text-center text-2xl font-bold text-white">
-              List Pemakaian Kendaraan
-            </Text>
-            <Text className="text-center text-sm text-white">
+            <Text className="text-center text-white">
               Berikut list semua pemakaian kendaraan Operasional RS Djamil
             </Text>
           </View>
@@ -146,26 +143,24 @@ export default function IndexScreen() {
                     {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                   </Text>
                   {item.status == 'Dipakai' ? (
-                    <Link
-                      asChild
-                      push
-                      href={{
-                        pathname: '/pengembalianManual',
-                        params: {
-                          reservasi_id: item?.id,
-                          user_id: item?.user_id,
-                        },
-                      }}>
-                      <View
-                        className={`my-2 flex-row items-center justify-center rounded-md p-1 ${colors.primary}`}>
-                        <Text className="font-bold text-white">Pengembalian</Text>
-                        <MaterialCommunityIcons
-                          name="arrow-top-right-bold-box"
-                          size={24}
-                          color="black"
-                        />
-                      </View>
-                    </Link>
+                    <TouchableOpacity
+                      onPress={() =>
+                        router.push({
+                          pathname: '/pengembalianManual',
+                          params: {
+                            reservasi_id: item?.id,
+                            user_id: item?.user_id,
+                          },
+                        })
+                      }
+                      className={`my-2 flex-row items-center justify-center rounded-md p-1 ${colors.primary}`}>
+                      <Text className="font-bold text-white">Pengembalian</Text>
+                      <MaterialCommunityIcons
+                        name="arrow-top-right-bold-box"
+                        size={24}
+                        color="black"
+                      />
+                    </TouchableOpacity>
                   ) : null}
                 </View>
                 <View className="mb-2 gap-2 rounded-b-lg bg-white p-4 shadow">
@@ -196,18 +191,16 @@ export default function IndexScreen() {
                     </Text>
                   </View> */}
                   <View className="flex-row items-center justify-between">
-                    <View className="w-48 items-center rounded-md bg-blue-500 p-2">
-                      <Text className={`text-lg font-bold text-white`}>Dipakai</Text>
-                      <Text className="text-secondary font-medium">
+                    <View className="w-48 items-center rounded-md bg-blue-200 p-2">
+                      <Text className={`text-lg font-bold`}>Dipakai</Text>
+                      <Text className="text-secondary font-medium ">
                         {item.reservasi_in
                           ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY')
                           : ''}
                       </Text>
-                      <Text className="text-secondary text-sm text-white">
-                        {item.spidometer_in} Km
-                      </Text>
+                      <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
                     </View>
-                    <View className="w-48 items-center rounded-md bg-amber-500 p-2">
+                    <View className="w-48 items-center rounded-md bg-amber-200 p-2">
                       <Text className={`text-lg font-bold `}>Dikembalikan</Text>
                       <Text className="text-secondary font-medium">
                         {item.reservasi_out

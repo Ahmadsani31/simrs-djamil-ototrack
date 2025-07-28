@@ -27,7 +27,7 @@ const fetchData = async ({
   const [_key, params] = queryKey;
   const date = (params as { date?: String }).date;
   try {
-    const response = await secureApi.get(`service/list`, {
+    const response = await secureApi.get(`service/list_admin`, {
       params: {
         limit: LIMIT,
         offset: pageParam,
@@ -118,7 +118,6 @@ export default function PemiliharaanScreen() {
   };
 
   const flatData = data?.pages.flatMap((page: any) => page.data) || [];
-  // console.log('flatData pemakaiana', fetchData);
 
   return (
     <View className="flex-1 bg-slate-300">
@@ -145,7 +144,7 @@ export default function PemiliharaanScreen() {
         </Pressable>
         <FlatList
           data={flatData}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item.id.toString()}
           refreshControl={
             <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
           }
@@ -153,7 +152,7 @@ export default function PemiliharaanScreen() {
           contentContainerStyle={{ paddingBottom: 80 }}
           renderItem={({ item }) => (
             <>
-              <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
+              <View className="flex-row items-center justify-between rounded-t-lg bg-[#f8d260] px-4">
                 <Text className={` text-black`}>
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                 </Text>

@@ -43,27 +43,19 @@ type propsService = {
   lokasi: string;
 };
 
-const validationSchema = yup.object().shape({
-  spidometer: yup.number().required('Spidometer harus diisi'),
-});
-
 const fetchData = async (service_id: string) => {
   const response = await secureApi.get(`/service/data_aktif`, {
     params: {
       service_id: service_id,
     },
   });
-  console.log(`fetchData response`, response.data);
+  // console.log(`fetchData response`, response.data);
 
   return response.data;
 };
 
 export default function PengembalianServiceScreen() {
-  const { service_id } = useLocalSearchParams();
-
-  console.log('service_id', service_id);
-
-  const { clearCoordinates } = useLocationStore();
+  const { service_id, kendaraan_id } = useLocalSearchParams();
 
   const { data, isLoading, error, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
@@ -98,25 +90,19 @@ export default function PengembalianServiceScreen() {
       return;
     }
 
-    if (!keterangan || keterangan === '') {
-      Toast.error('Foto struk / bon belum di ambil');
-      setLoading(false);
-      return;
-    }
-
     const coordinate = await reLocation.getCoordinate();
 
     if (!coordinate?.lat && coordinate?.long) {
       Alert.alert('Peringatan!', 'Error device location', [{ text: 'Tutup', onPress: () => null }]);
       return;
     }
-    const asyncCoords = await getStoredCoords();
 
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate?.lat?.toString() || '');
       formData.append('longitude', coordinate?.long.toString() || '');
       formData.append('service_id', service_id.toString());
+      formData.append('kendaraan_id', kendaraan_id.toString());
       formData.append('nominal', nominal);
       formData.append('keterangan', keterangan);
       formData.append('fileImage', {
@@ -125,7 +111,7 @@ export default function PengembalianServiceScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       // return;
 
       await secureApi.postForm('/service/update', formData);
@@ -135,7 +121,7 @@ export default function PengembalianServiceScreen() {
       // console.log(response.message);
       router.replace('(tabs)');
     } catch (error: any) {
-      console.log(error.response);
+      // console.log(error.response);
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Terjadi kesalahan.';
         Toast.error(msg);
@@ -174,10 +160,13 @@ export default function PengembalianServiceScreen() {
                 </View>
               </View>
               <View className="mb-4 w-full border border-b-2" />
-              <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
+              <Text className="mb-3 text-center">
+                {' '}
+                Silahkan foto spidometer kendaraan yang terbaru
+              </Text>
 
               <CustomNumberInput
-                className="bg-gray-50"
+                className="bg-gray-100"
                 placeholder="Masukan nominal"
                 label="Uang"
                 onFormattedValue={(raw, formatted) => {
@@ -214,7 +203,7 @@ export default function PengembalianServiceScreen() {
               <InputArea
                 className="bg-gray-50"
                 label="Keterangan"
-                placeholder="Keterangan pengembalian manual"
+                placeholder="Keterangan pengembalian (opsional)"
                 value={keterangan}
                 onChangeText={(e) => setKeterangan(e)}
               />

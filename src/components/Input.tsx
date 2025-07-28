@@ -24,12 +24,11 @@ export default function Input({
   error,
   className,
   inputMode = 'text',
-  autoFocus
+  autoFocus,
 }: InputProps) {
-
   return (
     <View className="mb-4">
-      {label && <Text className="text-gray-700 mb-1 font-bold">{label}</Text>}
+      {label && <Text className="mb-1 font-bold text-gray-700">{label}</Text>}
       <TextInput
         className={`border ${error ? 'border-red-500' : 'border-gray-500'} rounded-lg p-3 ${className}`}
         placeholder={placeholder}
@@ -39,7 +38,7 @@ export default function Input({
         inputMode={inputMode}
         autoFocus={autoFocus}
       />
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      {error && <Text className="mt-1 text-xs text-red-500">{error}</Text>}
     </View>
   );
 }

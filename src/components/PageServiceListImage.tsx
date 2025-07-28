@@ -1,34 +1,6 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image as ImageLocal,
-  Pressable,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
-  TouchableHighlight,
-} from 'react-native';
-import React, { useState } from 'react';
-import { Image } from 'expo-image';
-import { Link, router } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import secureApi from '@/services/service';
-import { Checkpoint } from '@/types/types';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import dayjs from 'dayjs';
-import PageDailyListCheckpoint from './PageDailyListCheckpoint';
-import { ModalRN } from './ModalRN';
-import ButtonCostum from './ButtonCostum';
-import { colors } from '@/constants/colors';
-import ModalCamera from './ModalCamera';
-import InputArea from './InputArea';
-import { reLocation } from '@/hooks/locationRequired';
-import { Toast } from 'toastify-react-native';
+import { View, Text, TouchableOpacity, Image as ImageLocal } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import ModalPreviewImage from './ModalPreviewImage';
+import SkeletonList from './SkeletonList';
 
 type propsUseQuery = {
   id: number;
@@ -36,45 +8,15 @@ type propsUseQuery = {
   file_image: string;
 };
 
-const fetchDataLog = async (service_id: number) => {
-  try {
-    const response = await secureApi.get(`/service/list_images`, {
-      params: {
-        service_id: service_id,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    return [];
-  }
-};
-
-const [previewImage, setPreviewImage] = useState(false);
-const [imgUrl, setImgUrl] = useState<string | null>(null);
-
-const PageServiceListImage = ({ id, onPress }: { id: number; onPress: (e: string) => void }) => {
-  const {
-    data: fetch_service,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery<propsUseQuery[]>({
-    queryKey: ['fetch_service', id],
-    queryFn: async () => await fetchDataLog(id),
-    enabled: !!id,
-  });
-
-  const handleOpenPreviewImage = (e: string) => {
-    setPreviewImage(true);
-    setImgUrl(e);
-  };
-
-  const handleCloseImage = () => {
-    setPreviewImage(false);
-    setImgUrl('');
-  };
-
+export default function PageServiceListImage({
+  items,
+  isLoading,
+  onPress,
+}: {
+  items: propsUseQuery[];
+  isLoading: boolean;
+  onPress: (e: string) => void;
+}) {
   const renderItem = ({ item }: { item: propsUseQuery }) => {
     return (
       <View className="flex-row items-center justify-between rounded-lg bg-white">
@@ -97,16 +39,23 @@ const PageServiceListImage = ({ id, onPress }: { id: number; onPress: (e: string
     );
   };
 
-  return (
+  return items.length > 0 ? (
     <View className="rounded-lg bg-white p-4">
       <FlatList
-        data={fetch_service}
+        data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 920, gap: 10 }}
+        ListEmptyComponent={
+          isLoading ? (
+            <SkeletonList loop={8} />
+          ) : (
+            <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+              <Text>Tidak ada laporan pemiliharaan</Text>
+            </View>
+          )
+        }
       />
     </View>
-  );
-};
-
-export default PageServiceListImage;
+  ) : null;
+}

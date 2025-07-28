@@ -10,7 +10,8 @@
       "bundler": "metro"
     },
     "experiments": {
-      "tsconfigPaths": true
+      "tsconfigPaths": true,
+      "newArchitecture": true
     },
     "plugins": [
       [
@@ -82,9 +83,7 @@
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

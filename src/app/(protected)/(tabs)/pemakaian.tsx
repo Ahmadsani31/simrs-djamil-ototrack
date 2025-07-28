@@ -117,6 +117,7 @@ export default function PemakaianScreen() {
   };
 
   const flatData = data?.pages.flatMap((page: any) => page.data) || [];
+  // console.log('flatData pemakaiana', fetchData);
 
   return (
     <View className="flex-1 bg-slate-300">

@@ -22,7 +22,7 @@ export default function InputArea({
     <View className="mb-4">
       {label && <Text className="mb-1 font-bold text-gray-700">{label}</Text>}
       <TextInput
-        className={`border ${error ? 'border-red-500' : 'border-gray-300'} min-h-24 rounded-lg p-3 ${className}`}
+        className={`border ${error ? 'border-red-500' : 'border-gray-500'} min-h-24 rounded-lg p-3 ${className}`}
         multiline
         numberOfLines={5}
         placeholder={placeholder}

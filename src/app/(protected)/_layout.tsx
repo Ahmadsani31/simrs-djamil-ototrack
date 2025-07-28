@@ -113,11 +113,21 @@ export default function ProtectedLayout() {
         <Stack.Screen
           name="pengembalianManual"
           options={{
-            // presentation: 'modal',
-            headerShown: false,
-            title: 'Pengembalian Manual',
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pengembalian Manual</Text>
+            headerShown: true,
+            headerTitle: '',
+            headerRight: () => (
+              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
+                <Ionicons name="arrow-back-circle" size={24} color="red" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
+                <Image
+                  style={{ width: 53, height: 30 }}
+                  source={require('@asset/images/logo/logo-kemenkes.png')}
+                />
+                <Text className="font-bold">Oto RS-Djamil</Text>
+              </View>
             ),
           }}
         />

@@ -56,7 +56,17 @@ export default function TabsAdminLayout() {
             tabBarIcon: ({ color }) => (
               <Ionicons name="speedometer-sharp" size={28} color={color} />
             ),
-            headerTitle: () => <Text className="text-xl font-bold text-white">Home</Text>,
+            headerTitle: () => <Text className="text-xl font-bold text-white">Daily Use</Text>,
+          }}
+        />
+        <Tabs.Screen
+          name="pemiliharaan"
+          options={{
+            title: 'Pemiliharaan',
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="car-cog" size={28} color={color} />
+            ),
+            headerTitle: () => <Text className="text-xl font-bold text-white">Maintenance</Text>,
           }}
         />
         <Tabs.Screen

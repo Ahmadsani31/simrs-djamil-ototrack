@@ -128,7 +128,6 @@ export default function LoginScreen() {
   };
   return (
     <KeyboardAvoidingView
-      className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : -80}>

@@ -5,11 +5,9 @@ import BarcodeScanner from '@/components/BarcodeScanner';
 import { router } from 'expo-router';
 import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
-import { Image } from 'expo-image';
 import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
 import PageService from '@/components/PageService';
-import { BarChart } from 'react-native-gifted-charts';
 import PageHome from '@/components/PageHome';
 // import * as Location from 'expo-location';
 
@@ -119,11 +117,11 @@ export default function IndexScreen() {
     setLoading(true);
     try {
       const response = await secureApi.get(`reservasi/aktif`);
-      console.log('response', response);
+      // console.log('response', response);
 
       setRawData(response.data);
     } catch (error: any) {
-      console.log('response', error.response.data);
+      // console.log('response', error.response.data);
       setRawData(undefined);
     } finally {
       setLoading(false);
@@ -134,17 +132,6 @@ export default function IndexScreen() {
     <SafeAreaView noTop>
       <View className="flex-1 bg-slate-300">
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-        {/* <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={false}
-              onRefresh={fetchData}
-              colors={['#205781']}
-              progressBackgroundColor="#fff"
-            />
-          }></ScrollView> */}
 
         <View className="px-4">
           {rawData ? (

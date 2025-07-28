@@ -30,6 +30,7 @@ import CustomHeader from '@/components/CustomHeader';
 
 import { startTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
+import { Picker } from '@react-native-picker/picker';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -102,13 +103,13 @@ export default function ServiceScreen() {
       // console.log('formData', formData);
       const response = await secureApi.postForm('/service/store', formData);
 
-      console.log('response ', JSON.stringify(response));
+      // console.log('response ', JSON.stringify(response));
 
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       // console.log(response.message);
       router.replace('(tabs)');
     } catch (error: any) {
-      console.log(error.response.data);
+      // console.log(error.response.data);
 
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Terjadi kesalahan.';
@@ -154,14 +155,28 @@ export default function ServiceScreen() {
                 onSubmit={async (values) => await handleSubmitDetail(values)}>
                 {({ handleChange, handleSubmit, values, errors, touched }) => (
                   <>
-                    <Input
-                      label="Jenis Kerusakan"
-                      placeholder="jenis kerusakan"
-                      value={values.jenis_kerusakan}
-                      onChangeText={handleChange('jenis_kerusakan')}
-                      error={touched.jenis_kerusakan ? errors.jenis_kerusakan : undefined}
-                      className="bg-gray-50"
-                    />
+                    <View className="mb-3">
+                      <Text className="mb-1 font-bold text-gray-700">Jenis Kerusakan</Text>
+                      <View
+                        className={`border ${errors.jenis_kerusakan ? 'border-red-500' : 'border-gray-500'} rounded-lg `}>
+                        <Picker
+                          style={{ padding: 0, margin: 0 }}
+                          onValueChange={handleChange('jenis_kerusakan')}>
+                          <Picker.Item label="-Pilih jenis kerusakan-" value="" />
+                          <Picker.Item label="Service Rutin" value="Service Rutin" />
+                          <Picker.Item label="Ganti Sparepart" value="Ganti Sparepart" />
+                          <Picker.Item label="Ganti Oli" value="Ganti Oli" />
+                          <Picker.Item label="Ganti Aki" value="Ganti Aki" />
+                          <Picker.Item label="Ganti Ban" value="Ganti Ban" />
+                          <Picker.Item label="Tune Up Mesin" value="Tune Up Mesin" />
+                          <Picker.Item label="Dan Lain-lainnya..." value="Dan Lain-lainnya..." />
+                        </Picker>
+                      </View>
+                      {touched.jenis_kerusakan ? (
+                        <Text className="mt-1 text-xs text-red-500">{errors.jenis_kerusakan}</Text>
+                      ) : undefined}
+                    </View>
+
                     <Input
                       label="Lokasi"
                       placeholder="lokasi / alamat pemiliharaan"

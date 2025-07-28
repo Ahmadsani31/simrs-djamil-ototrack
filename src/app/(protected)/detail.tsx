@@ -95,7 +95,7 @@ export default function DetailScreen() {
       const response = await secureApi.postForm('/reservasi/save_detail', formData);
       // await startTracking();
 
-      console.log('response ', JSON.stringify(response));
+      // console.log('response ', JSON.stringify(response));
 
       await SecureStore.setItemAsync('DataAktif', JSON.stringify(response.data));
       // console.log(response.message);

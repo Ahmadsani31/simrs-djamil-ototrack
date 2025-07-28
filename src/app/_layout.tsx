@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
-import { Alert, BackHandler, Text } from 'react-native';
+import { Alert, BackHandler, Platform, Text, UIManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Updates from 'expo-updates';
 
@@ -137,9 +137,9 @@ export default function RootLayout() {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         const metadata = Updates.manifest;
-        console.log('====================================');
-        console.log('Update Tersedia:', metadata);
-        console.log('====================================');
+        // console.log('====================================');
+        // console.log('Update Tersedia:', metadata);
+        // console.log('====================================');
         Alert.alert(
           'Update Tersedia',
           `Versi baru aplikasi tersedia. Silahkan Update dan Aplikasi akan diperbarui.`,
@@ -174,7 +174,7 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar style="inverted" animated={true} />
           <Slot />
-          <ToastManager useModal={false} />
+          <ToastManager useModal={true} />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>

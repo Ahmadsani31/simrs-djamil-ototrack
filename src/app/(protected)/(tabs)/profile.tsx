@@ -73,7 +73,7 @@ export default function Profile() {
         // console.log('formData', formData);
 
         const response = await secureApi.postForm('/user/password_update', formData);
-        console.log('response ', JSON.stringify(response));
+        // console.log('response ', JSON.stringify(response));
         handleCloseModal();
         Alert.alert(
           'Successfully!',

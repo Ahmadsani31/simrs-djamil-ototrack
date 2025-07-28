@@ -4,7 +4,7 @@ import { View, Text, TouchableHighlight, FlatList, ScrollView, RefreshControl } 
 import { Checkpoint } from '@/types/types';
 import { Entypo } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ModalPreviewImage from './ModalPreviewImage';
 
 const fetchDataLog = async (reservasi_id: number) => {
@@ -20,6 +20,10 @@ const fetchDataLog = async (reservasi_id: number) => {
   }
 };
 export default function PageDailyCheckpoint({ id }: { id: number }) {
+  useEffect(() => {
+    refetch();
+  }, []);
+
   const {
     data: fetch_checkpoint,
     isLoading,

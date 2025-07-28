@@ -2,9 +2,9 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { BarChart } from 'react-native-gifted-charts';
 import { Image } from 'expo-image';
-import { useLoadingStore } from '@/stores/loadingStore';
 import secureApi from '@/services/service';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import SkeletonList from './SkeletonList';
 
 type propsBar = {
   value: number;
@@ -45,7 +45,7 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
 
   return (
     <View>
-      <View className="my-10 ">
+      <View className="my-5">
         <Text className="text-center text-2xl font-bold text-white">Pilih Jenis Penggunaan</Text>
         <Text className="text-center text-sm text-white">
           Silahkan pilih jenis penggunaan dan scan qrcode yang ada pada masing-masing kendaraan
@@ -54,27 +54,27 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
       <View className="mt-10">
         <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
           <TouchableOpacity
-            className="size-48 items-center justify-center gap-2 rounded-lg bg-green-300 p-2"
+            className="flex-auto items-center justify-center gap-4 rounded-lg bg-blue-300 p-5 shadow"
             onPress={() => onPress('daily')}>
             <Image
-              style={{ flex: 1, width: '100%' }}
+              style={{ width: 100, height: 100 }}
               source={require('@asset/images/daily-use.png')}
               contentFit="contain"
               transition={500}
             />
-            <Text className="font-bold">Aktifitas Harian</Text>
+            <Text className="font-bold shadow-black">Aktifitas Harian</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="size-48 items-center justify-center gap-2 rounded-lg bg-amber-300 p-2 shadow"
+            className="flex-auto items-center justify-center gap-4 rounded-lg bg-amber-300 p-5 shadow"
             onPress={() => onPress('service')}>
             <Image
-              style={{ flex: 1, width: '100%' }}
+              style={{ width: 100, height: 100 }}
               source={require('@asset/images/maintenance.png')}
               contentFit="contain"
               transition={500}
             />
-            <Text className="font-bold">Service Kendaraan</Text>
+            <Text className="font-bold shadow-black">Service Kendaraan</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -85,22 +85,22 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
         </View>
 
         <View className="border-1 my-1 h-px bg-black dark:bg-gray-700"></View>
-        <BarChart
-          showYAxisIndices
-          // hideRules
-          noOfSections={4}
-          maxValue={100}
-          data={barData}
-          barWidth={40}
-          sideWidth={15}
-          // yAxisThickness={0}
-          barBorderRadius={4}
-          xAxisThickness={0}
-          spacing={40}
-          initialSpacing={10}
-          // isThreeD
-          // side="right"
-        />
+        {loading ? (
+          <SkeletonList loop={2} />
+        ) : (
+          <BarChart
+            showYAxisIndices
+            noOfSections={5}
+            maxValue={100}
+            data={barData}
+            barWidth={40}
+            sideWidth={15}
+            barBorderRadius={4}
+            xAxisThickness={0}
+            spacing={40}
+            initialSpacing={10}
+          />
+        )}
       </View>
     </View>
   );

@@ -1,12 +1,7 @@
-import { View, Text, TouchableOpacity, TouchableHighlight, Pressable, Modal } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import { useState } from 'react';
 import { Image } from 'expo-image';
-import { Link, router } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import secureApi from '@/services/service';
-import { Checkpoint } from '@/types/types';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import dayjs from 'dayjs';
+import { router } from 'expo-router';
 import PageDailyListCheckpoint from './PageDailyListCheckpoint';
 
 type rawData = {
@@ -21,40 +16,8 @@ type rawData = {
   };
 };
 
-const fetchDataLog = async (reservasi_id: number) => {
-  try {
-    const response = await secureApi.get(`/checkpoint/pemakaian`, {
-      params: {
-        reservasi_id: reservasi_id,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    return [];
-  }
-};
-
 const PageDaily = ({ item }: rawData) => {
-  const [dialogExit, setDialogExit] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const {
-    data: fetch_checkpoint,
-    isLoading: isIsLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery<Checkpoint[]>({
-    queryKey: ['fetch_checkpoint', item.id],
-    queryFn: async () => await fetchDataLog(item.id),
-    enabled: !!item.id,
-  });
-
-  const handleShowImage = (url: string, title: string) => {
-    // setTitleModalImage(title);
-    // setImgUrl(url);
-    // setModalVisible(true);
-  };
 
   return (
     <>

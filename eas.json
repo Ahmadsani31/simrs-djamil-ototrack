@@ -13,9 +13,7 @@
     "development-simulator": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": {
-        "APP_ENV": "development"
-      },
+      "environment": "development",
       "channel": "development",
       "ios": {
         "simulator": true
@@ -23,16 +21,12 @@
     },
     "preview": {
       "distribution": "internal",
-      "env": {
-        "APP_ENV": "preview"
-      },
+      "environment": "preview",
       "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
-      "env": {
-        "APP_ENV": "production"
-      },
+      "environment": "production",
       "channel": "production"
     }
   },

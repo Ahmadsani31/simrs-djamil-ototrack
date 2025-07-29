@@ -31,6 +31,7 @@ import CustomHeader from '@/components/CustomHeader';
 import { startTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
 import { Picker } from '@react-native-picker/picker';
+import CustomNumberInput from '@/components/CustomNumberInput';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -97,6 +98,7 @@ export default function ServiceScreen() {
     formData.append('keterangan', values.keterangan);
     formData.append('jenis_kerusakan', values.jenis_kerusakan);
     formData.append('lokasi', values.lokasi);
+    formData.append('spidometer', values.spidometer);
     formData.append('kendaraan_id', data?.id || '');
 
     try {
@@ -150,7 +152,7 @@ export default function ServiceScreen() {
               </View>
               <View className="mb-4 w-full border border-b-2" />
               <Formik
-                initialValues={{ jenis_kerusakan: '', keterangan: '', lokasi: '' }}
+                initialValues={{ jenis_kerusakan: '', keterangan: '', lokasi: '', spidometer: '' }}
                 validationSchema={validationSchema}
                 onSubmit={async (values) => await handleSubmitDetail(values)}>
                 {({ handleChange, handleSubmit, values, errors, touched }) => (
@@ -184,6 +186,14 @@ export default function ServiceScreen() {
                       onChangeText={handleChange('lokasi')}
                       error={touched.lokasi ? errors.lokasi : undefined}
                       className="bg-gray-50"
+                    />
+                    <CustomNumberInput
+                      className="bg-gray-100"
+                      placeholder="Angka spidometer kendaraan"
+                      value={values.spidometer}
+                      label="Spidometer"
+                      error={touched.spidometer ? errors.spidometer : undefined}
+                      onFormattedValue={handleChange('spidometer')}
                     />
                     <InputArea
                       className="bg-gray-50"

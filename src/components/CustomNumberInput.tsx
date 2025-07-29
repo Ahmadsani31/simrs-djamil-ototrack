@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextInput, View, StyleSheet, TextInputProps, Text } from 'react-native';
 
 type Props = TextInputProps & {
-  onFormattedValue?: (rawValue: string, formatted: string) => void;
+  onFormattedValue?: (rawValue: string) => void;
   label: string;
   placeholder: string;
   error?: string;
@@ -27,7 +27,7 @@ const CustomNumberInput = ({
     const formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
     setValue(formatted);
-    if (onFormattedValue) onFormattedValue(raw, formatted);
+    if (onFormattedValue) onFormattedValue(raw);
   };
 
   return (
@@ -41,21 +41,9 @@ const CustomNumberInput = ({
         className={`border ${error ? 'border-red-500' : 'border-gray-500'} rounded-lg p-3 ${className}`}
         placeholder={placeholder}
       />
+      {error && <Text className="mt-1 text-xs text-red-500">{error}</Text>}
     </View>
   );
 };
 
 export default CustomNumberInput;
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 10,
-    fontSize: 16,
-  },
-});

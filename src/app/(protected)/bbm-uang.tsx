@@ -199,7 +199,7 @@ export default function BbmUangScreen() {
               className="bg-gray-50"
               placeholder="Masukan nominal"
               label="Uang"
-              onFormattedValue={(raw, formatted) => {
+              onFormattedValue={(raw) => {
                 setUang(raw);
                 // console.log('Raw:', raw);
                 // console.log('Formatted:', formatted);

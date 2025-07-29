@@ -7,7 +7,7 @@ export default ({ config }) => {
     ...config,
     name: isDev ? 'Oto RS-Djamil Dev' : 'Oto RS-Djamil',
     slug: isDev ? 'simrs-djamil-ototrack-dev' : 'simrs-djamil-ototrack',
-    version: '1.1.0',
+    version: '1.1.1',
     scheme: isDev ? 'ototrack-djamil-dev' : 'ototrack-djamil',
     orientation: 'portrait',
     icon: './assets/icon.png',

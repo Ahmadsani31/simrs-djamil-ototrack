@@ -14,24 +14,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 import ButtonCostum from '@/components/ButtonCostum';
 import { colors } from '@/constants/colors';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import { cn } from '@/utils/constants';
 import { Image as ImageExpo } from 'expo-image';
 import { Toast } from 'toastify-react-native';
-import { useQuery } from '@tanstack/react-query';
-
-const fetchData = async (kendaraan_id: string) => {
-  const response = await secureApi.get(`/bbm`, {
-    params: {
-      kendaraan_id: kendaraan_id,
-    },
-  });
-  return response.data;
-};
 
 type propsBBMVoucher = {
   checkpoint_id: string;
@@ -46,16 +35,33 @@ export default function BbmVoucherScreen() {
   const [dialogCamera, setDialogCamera] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [typeImage, setTypeImage] = useState('');
+  const [data, setData] = useState<propsBBMVoucher>();
   const [uriLokasi, setUriLokasi] = useState<string | null>(null);
   const [uriStruck, setUriStruck] = useState<string | null>(null);
 
-  const { data, isLoading, error, isError } = useQuery<propsBBMVoucher>({
-    queryKey: ['bbm-voucher', kendaraan_id],
-    queryFn: () => fetchData(kendaraan_id.toString()),
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await secureApi.get(`/bbm`, {
+          params: {
+            kendaraan_id: kendaraan_id,
+          },
+        });
+        setData(response.data);
+      } catch (error) {
+        setIsError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [kendaraan_id]);
 
-  console.log(error);
+  // console.log(error);
   console.log(data);
 
   if (isError) {
@@ -84,7 +90,7 @@ export default function BbmVoucherScreen() {
   }
 
   const handleSubmitProsesBBM = async () => {
-    setLoading(true);
+    setLoadingSubmit(true);
     const coordinate = await reLocation.getCoordinate();
 
     if (!coordinate?.lat && coordinate?.long) {
@@ -100,7 +106,7 @@ export default function BbmVoucherScreen() {
         closeIconSize: 18,
         closeIconColor: '#ff0000',
       });
-      setLoading(false);
+      setLoadingSubmit(false);
       return;
     }
 
@@ -126,11 +132,9 @@ export default function BbmVoucherScreen() {
       } as any);
 
       console.log('formData', formData);
-      const response = await secureApi.postForm('/bbm/checkpoint_voucher', formData);
-      console.log('response save ', JSON.stringify(response));
+      await secureApi.postForm('/bbm/checkpoint_voucher', formData);
       router.replace('/(protected)/(tabs)');
-
-      setLoading(false);
+      setLoadingSubmit(false);
     } catch (error: any) {
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Terjadi kesalahan.';
@@ -140,7 +144,7 @@ export default function BbmVoucherScreen() {
       } else {
         Alert.alert('Error', error.message);
       }
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
 
@@ -158,7 +162,7 @@ export default function BbmVoucherScreen() {
       <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="m-4 rounded-lg bg-white p-4">
-          {isLoading || isError ? (
+          {loading || isError ? (
             <SkeletonList loop={5} />
           ) : (
             <>
@@ -210,14 +214,17 @@ export default function BbmVoucherScreen() {
                         source={{ uri: uriStruck }}
                         className="aspect-[3/4] w-full rounded-lg"
                       />
-                      <ButtonCloseImage onPress={() => setUriStruck(null)} loading={loading} />
+                      <ButtonCloseImage
+                        onPress={() => setUriStruck(null)}
+                        loading={loadingSubmit}
+                      />
                     </View>
                   )}
                 </View>
                 <ButtonCostum
                   classname={colors.secondary}
                   title="Simpan Pengisian BBM"
-                  loading={loading}
+                  loading={loadingSubmit}
                   onPress={handleSubmitProsesBBM}
                 />
               </View>

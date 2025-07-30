@@ -21,7 +21,7 @@ import { colors } from '@/constants/colors';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-const LIMIT = 5;
+const LIMIT = 10;
 
 const fetchData = async ({
   pageParam = 0,
@@ -124,7 +124,7 @@ export default function PemakaianScreen() {
     refetch();
   };
 
-  const flatData = data?.pages.flatMap((page: any) => page.data) || [];
+  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
   // console.log('flatData pemakaiana', fetchData);
 
   return (
@@ -132,6 +132,11 @@ export default function PemakaianScreen() {
       <View className="flex-1 bg-slate-300">
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="px-4">
+          <View className="mb-4 ">
+            <Text className="text-center text-white">
+              Semua list pemakaian kendaraan Operasional RS Djamil
+            </Text>
+          </View>
           <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
             <Fontisto
               className="absolute left-6 top-5 z-10"
@@ -176,8 +181,8 @@ export default function PemakaianScreen() {
                 </View>
                 <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
                   <View className="flex flex-row items-center gap-3">
-                    <View className="p-2">
-                      <Text className={`text-xl font-bold text-black`}>{item.model}</Text>
+                    <View className="flex-1">
+                      <Text className="text-wrap text-xl font-bold text-black">{item.model}</Text>
                       <Text className="text-secondary text-sm">{item.no_polisi}</Text>
                     </View>
                     <View className="h-full flex-1 rounded-lg bg-slate-100 p-2">
@@ -237,14 +242,11 @@ export default function PemakaianScreen() {
             }}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={
-              isLoading || isFetchingNextPage ? (
-                <SkeletonList loop={8} />
-              ) : (
-                <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                  <Text>Tidak ada pemakaian kendaraan yang dilakukan</Text>
-                </View>
-              )
+              <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+                <Text>Tidak ada pemakaian kendaraan yang dilakukan</Text>
+              </View>
             }
+            ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
           />
         </View>
         <ModalPreviewImage

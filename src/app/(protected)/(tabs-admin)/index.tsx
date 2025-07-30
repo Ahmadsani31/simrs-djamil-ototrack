@@ -106,7 +106,7 @@ export default function IndexScreen() {
       <View className="px-4">
         <View className="mb-4 ">
           <Text className="text-center text-white">
-            Berikut list semua pemakaian kendaraan Operasional RS Djamil
+            Berikut semua list pemakaian kendaraan Operasional RS Djamil
           </Text>
         </View>
         <FlatList
@@ -225,14 +225,11 @@ export default function IndexScreen() {
           }}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={
-            isLoading || isFetchingNextPage ? (
-              <SkeletonList loop={8} />
-            ) : (
-              <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                <Text>Belum ada pemakaian kendaraan</Text>
-              </View>
-            )
+            <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+              <Text>Belum ada pemakaian kendaraan</Text>
+            </View>
           }
+          ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
         />
       </View>
     </SafeAreaView>

@@ -21,6 +21,11 @@ export default function ListDetailServiceSheet({ items }: { items: itemsProps[] 
       <BottomSheetFlatList
         data={items}
         keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+            <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
+          </View>
+        }
         renderItem={({ item, index }) => (
           <View className="w-full flex-1 px-4 " key={index}>
             <Text className="text-sm text-gray-500">

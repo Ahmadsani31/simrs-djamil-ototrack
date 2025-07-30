@@ -148,7 +148,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <SafeAreaView className="flex-1 justify-center bg-slate-300">
+        <SafeAreaView noBottom className="flex-1 justify-center bg-slate-300">
           <Animated.View
             style={{ width: WiconTL, height: HiconTL }}
             className="absolute left-[-80] top-[-80] rounded-full bg-[#4F959D]"
@@ -221,7 +221,7 @@ export default function LoginScreen() {
               <View className="flex-row items-center text-sm text-gray-500">
                 <View className="flex-grow border-t border-gray-300" />
                 <Text className="mx-2 py-4 text-gray-500">or Login via google</Text>
-                {/* <View className="flex-grow border-t border-gray-300" /> */}
+                <View className="flex-grow border-t border-gray-300" />
               </View>
               <GoogleSigninButton
                 size={GoogleSigninButton.Size.Wide}
@@ -234,7 +234,7 @@ export default function LoginScreen() {
           <View className="absolute bottom-2 w-full items-center">
             <Text className="text-sm font-medium">Pencatatan Kendaraan</Text>
             <Text className="text-xs font-bold">Version. {Constants.expoConfig?.version}</Text>
-            <Text className="text-sm">URL : {API_URL}</Text>
+            {/* <Text className="text-sm">URL : {API_URL}</Text> */}
           </View>
           <Animated.View
             style={{ width: WiconBL, height: HiconBL }}

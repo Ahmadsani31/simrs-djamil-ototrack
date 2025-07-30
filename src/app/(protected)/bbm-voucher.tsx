@@ -132,7 +132,7 @@ export default function BbmVoucherScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       await secureApi.postForm('/bbm/checkpoint_voucher', formData);
       router.replace('/(protected)/(tabs)');
       setLoadingSubmit(false);

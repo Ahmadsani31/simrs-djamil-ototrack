@@ -21,7 +21,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 
-const LIMIT = 5;
+const LIMIT = 10;
 
 const fetchData = async ({
   pageParam = 0,
@@ -87,15 +87,6 @@ export default function PemiliharaanScreen() {
       initialPageParam: 0,
     });
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imgBase64, setImgBase64] = useState<Base64URLString>();
-
-  const handleModalImageShow = async (uri: any) => {
-    // console.log('show image modal');
-    setImgBase64(uri);
-    setModalVisible(true);
-  };
-
   const showMode = (currentMode: any) => {
     DateTimePickerAndroid.open({
       value: date ?? new Date(),
@@ -124,7 +115,7 @@ export default function PemiliharaanScreen() {
     refetch();
   };
 
-  const flatData = data?.pages.flatMap((page: any) => page.data) || [];
+  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
   // console.log('flatData pemakaiana', fetchData);
 
   return (
@@ -134,7 +125,7 @@ export default function PemiliharaanScreen() {
         <View className="px-4">
           <View className="mb-4 ">
             <Text className="text-center text-white">
-              Berikut semua list pemiliharaan kendaraan Operasional RS Djamil
+              Semua list pemiliharaan kendaraan Operasional RS Djamil
             </Text>
           </View>
           <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
@@ -163,7 +154,7 @@ export default function PemiliharaanScreen() {
               <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
             }
             // stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
             renderItem={({ item }) => (
               <>
                 <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
@@ -182,7 +173,7 @@ export default function PemiliharaanScreen() {
                   </TouchableOpacity>
                 </View>
                 <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
-                  <View className="flex-1 flex-row">
+                  <View style={{ flex: 1 }} className="flex flex-row">
                     <View className="flex-1">
                       <Text className="text-wrap text-xl font-bold text-black">
                         {item.kendaraan}
@@ -197,6 +188,9 @@ export default function PemiliharaanScreen() {
                   <View className="mt-2 rounded-lg bg-slate-200 p-1">
                     <Text className="text-center text-lg font-bold">{item.jenis_kerusakan}</Text>
                     <Text className="text-center font-medium">{item.keterangan}</Text>
+                    <Text className="mt-2 text-center font-bold">
+                      Spidometer {item.spidometer} Km
+                    </Text>
                   </View>
                 </View>
               </>
@@ -208,22 +202,14 @@ export default function PemiliharaanScreen() {
             }}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={
-              isLoading || isFetchingNextPage ? (
-                <SkeletonList loop={8} />
-              ) : (
-                <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                  <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
-                </View>
-              )
+              <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+                <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
+              </View>
             }
+            ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
           />
         </View>
-        <ModalPreviewImage
-          title="Gambar Spidometer"
-          visible={modalVisible}
-          imgUrl={imgBase64 || ''}
-          onPress={() => setModalVisible(false)}
-        />
+
         <BottomSheet
           ref={bottomSheetDetailRef}
           snapPoints={snapPoints}

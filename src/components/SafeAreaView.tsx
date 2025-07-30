@@ -7,12 +7,12 @@ interface SafeAreaViewProps extends ViewProps {
   noBottom?: boolean;
 }
 
-export default function SafeAreaView({ 
-  children, 
-  noTop = false, 
+export default function SafeAreaView({
+  children,
+  noTop = false,
   noBottom = false,
   style,
-  ...props 
+  ...props
 }: SafeAreaViewProps) {
   const insets = useSafeAreaInsets();
 
@@ -26,8 +26,7 @@ export default function SafeAreaView({
         },
         style,
       ]}
-      {...props}
-    >
+      {...props}>
       {children}
     </View>
   );

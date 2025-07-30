@@ -81,8 +81,7 @@ const PageService = ({ item }: rawData) => {
         type: 'error',
         text1: 'Warning!',
         text2: 'Foto lokasi dan foto struck harus diisi',
-        closeIconSize: 18,
-        closeIconColor: '#ff0000',
+        useModal: true,
       });
       setLoading(false);
       return;
@@ -93,8 +92,7 @@ const PageService = ({ item }: rawData) => {
         type: 'error',
         text1: 'Warning!',
         text2: 'Keterangan harus diisi',
-        closeIconSize: 18,
-        closeIconColor: '#ff0000',
+        useModal: true,
       });
       setLoading(false);
       return;
@@ -125,8 +123,7 @@ const PageService = ({ item }: rawData) => {
         type: 'error',
         text1: 'Warning!',
         text2: JSON.stringify(error.response.data.message) || 'Terjadi kesalahan.',
-        closeIconSize: 18,
-        closeIconColor: '#ff0000',
+        useModal: true,
       });
 
       // console.log('response checkpoint', JSON.stringify(error.response.data));

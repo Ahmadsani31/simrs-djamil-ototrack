@@ -22,7 +22,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 
-const LIMIT = 5;
+const LIMIT = 10;
 
 const fetchData = async ({
   pageParam = 0,
@@ -157,7 +157,7 @@ export default function PemiliharaanScreen() {
             <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
           }
           // stickyHeaderIndices={[0]}
-          contentContainerStyle={{ paddingBottom: 80 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
           renderItem={({ item }) => (
             <>
               <View className="flex-row items-center justify-between rounded-t-lg bg-[#f8d260] px-4">
@@ -172,7 +172,7 @@ export default function PemiliharaanScreen() {
                 </TouchableOpacity>
               </View>
               <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
-                <View className="flex-1 flex-row">
+                <View style={{ flex: 1 }} className="flex-1 flex-row">
                   <View className="flex-1">
                     <Text className="text-wrap text-xl font-bold text-black">{item.kendaraan}</Text>
                     <Text className="text-secondary text-sm">{item.no_polisi}</Text>
@@ -196,14 +196,11 @@ export default function PemiliharaanScreen() {
           }}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={
-            isLoading || isFetchingNextPage ? (
-              <SkeletonList loop={8} />
-            ) : (
-              <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
-              </View>
-            )
+            <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+              <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
+            </View>
           }
+          ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
         />
       </View>
       <ModalPreviewImage

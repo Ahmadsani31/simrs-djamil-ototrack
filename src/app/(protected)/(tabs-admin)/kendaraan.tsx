@@ -3,6 +3,8 @@ import secureApi from '@/services/service';
 import SkeletonList from '@/components/SkeletonList';
 import { useQuery } from '@tanstack/react-query';
 import { Kendaraan, KendaraanItemProps } from '@/types/types';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useEffect } from 'react';
 
 const fetchData = async () => {
   try {
@@ -14,12 +16,9 @@ const fetchData = async () => {
 };
 
 export default function KendaraanScreen() {
-  // const queryClient = useQueryClient()
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     refetch();
-  //   }, [])
-  // );
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const { data, isLoading, isError, error, refetch } = useQuery<Kendaraan[]>({
     queryKey: ['dataKendaraan'],
@@ -31,17 +30,16 @@ export default function KendaraanScreen() {
       <View className="flex-1 bg-slate-300">
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="px-4">
-          <View>
-            <Text className="rounded-lg bg-[#F2E5BF] p-2 text-lg font-medium">
-              Data kendaraan terdaftar
-            </Text>
+          <View className="flex flex-row items-center gap-2 rounded-lg bg-white p-2 ">
+            <FontAwesome6 name="circle-dot" size={16} color="black" />
+            <Text className="text-lg font-medium">Data kendaraan terdaftar</Text>
           </View>
           <FlatList
             data={data}
             bounces
             style={{ flexGrow: 0 }}
             keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={{ paddingBottom: 120 }}
+            contentContainerStyle={{ paddingBottom: 50 }}
             renderItem={KendaraanItem}
             ListEmptyComponent={
               isLoading ? (

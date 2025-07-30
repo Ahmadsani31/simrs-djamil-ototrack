@@ -1,6 +1,5 @@
 import {
   Alert,
-  BackHandler,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -10,18 +9,16 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Input from '@/components/Input';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from '@/components/ModalCamera';
-import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
 import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
 import { useLoadingStore } from '@/stores/loadingStore';
-import CustomHeader from '@/components/CustomHeader';
 
 import { stopTracking } from '@/utils/locationUtils';
 
@@ -32,6 +29,7 @@ import { dataDetail } from '@/types/types';
 import * as SecureStore from 'expo-secure-store';
 import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
+import HandleError from '@/utils/handleError';
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -71,6 +69,7 @@ export default function PengembalianScreen() {
     setLoading(true);
     if (!uri && values.spidometer == '') {
       Toast.error('Foto spidometer belum di ambil');
+      setLoading(false);
       return;
     }
 
@@ -78,6 +77,7 @@ export default function PengembalianScreen() {
 
     if (!coordinate?.lat && coordinate?.long) {
       Alert.alert('Peringatan!', 'Error device location', [{ text: 'Tutup', onPress: () => null }]);
+      setLoading(false);
       return;
     }
     const asyncCoords = await getStoredCoords();
@@ -106,15 +106,7 @@ export default function PengembalianScreen() {
       // console.log(response.message);
       router.replace('(tabs)');
     } catch (error: any) {
-      // alert(error.response.data.message)
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
     } finally {
       setLoading(false);
     }

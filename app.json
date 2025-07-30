@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "Oto RS-Djamil Dev",
-    "slug": "simrs-djamil-ototrack-dev",
-    "version": "1.0.8",
-    "scheme": "ototrack-djamil-dev",
+    "name": "Oto RS-Djamil",
+    "slug": "simrs-djamil-ototrack",
+    "version": "1.0.6",
+    "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon/adaptive-icon.png",
       "output": "server",
@@ -91,7 +91,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.darma31.simrsdjamilototrackdev",
+      "bundleIdentifier": "com.darma31.simrsdjamilototrack",
       "buildNumber": "1",
       "icon": {
         "dark": "./assets/icon/ios-dark.png",
@@ -107,7 +107,7 @@
         "backgroundColor": "#ffffff"
       },
       "versionCode": 1,
-      "package": "com.darma31.simrsdjamilototrackdev",
+      "package": "com.darma31.simrsdjamilototrack",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -127,7 +127,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "f4387b14-ec17-49fb-ac2f-f5428154fc24"
+        "projectId": "39b7a571-7afd-4fae-ab4a-73ba8c38030d"
       }
     },
     "runtimeVersion": {

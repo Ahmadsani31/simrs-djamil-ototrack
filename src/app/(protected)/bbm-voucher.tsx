@@ -21,6 +21,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { cn } from '@/utils/constants';
 import { Image as ImageExpo } from 'expo-image';
 import { Toast } from 'toastify-react-native';
+import HandleError from '@/utils/handleError';
 
 type propsBBMVoucher = {
   checkpoint_id: string;
@@ -136,14 +137,7 @@ export default function BbmVoucherScreen() {
       router.replace('/(protected)/(tabs)');
       setLoadingSubmit(false);
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
       setLoadingSubmit(false);
     }
   };

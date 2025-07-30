@@ -1,21 +1,13 @@
 import {
   Alert,
-  BackHandler,
-  Image,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import Input from '@/components/Input';
-import ModalCamera from '@/components/ModalCamera';
-import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
 import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
@@ -26,16 +18,20 @@ import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import { dataDetail } from '@/types/types';
 
-import { Entypo, Fontisto, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import InputArea from '@/components/InputArea';
 import InputDate from '@/components/InputDate';
 import InputFile from '@/components/InputFile';
 import dayjs from 'dayjs';
+import CustomNumberInput from '@/components/CustomNumberInput';
+import HandleError from '@/utils/handleError';
 
 const validationSchema = yup.object().shape({
-  spidometer: yup.number().required('Spidometer harus diisi (required)'),
-  keterangan: yup.string().required('Keterangan harus diisi (required)'),
+  spidometer: yup.number().required('Spidometer wajib diisi (required)'),
+  keterangan: yup.string().required('Keterangan wajib diisi (required)'),
+  tanggal: yup.string().required('Tanggal wajib diisi (required)'),
+  fileUpload: yup.string().required('File image wajib diisi (required)'),
 });
 
 const fetchData = async (reservasi_id: string, user_id: string) => {
@@ -51,10 +47,6 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
 
-  const [dateInput, setDateInput] = useState('');
-
-  const [errorInput, setErrorInput] = useState({ tanggal: '', fileUpload: '' });
-
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
     queryFn: () => fetchData(reservasi_id.toString(), user_id.toString()),
@@ -68,58 +60,23 @@ export default function PengembalianManualScreen() {
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [uri, setUri] = useState<string | null>(null);
-
-  const validateForm = () => {
-    const errors: { tanggal: string; fileUpload: string } = { tanggal: '', fileUpload: '' };
-    if (!dateInput) {
-      errors.tanggal = 'Tanggal harus diisi (required)';
-    } else {
-      errors.tanggal = '';
-    }
-
-    if (!uri) {
-      errors.fileUpload = 'Imgae harus diisi (required)';
-    } else {
-      errors.fileUpload = '';
-    }
-
-    setErrorInput(errors);
-
-    // Mengembalikan true jika tidak ada error
-    return errors.tanggal === '' && errors.fileUpload === '';
-  };
-
   const handlePengembalian = async (values: FormikValues) => {
     setLoading(true);
-
-    // console.log('error');
-
-    // console.log(validateForm());
-
-    if (!validateForm()) {
-      // Submit form
-
-      setLoading(false);
-      return false;
-    }
-
     try {
       const formData = new FormData();
 
       formData.append('id', reservasi_id.toString());
       formData.append('spidometer_out', values.spidometer);
-      formData.append('reservasi_out', dayjs(dateInput).format('YYYY-MM-DD HH:mm:ss'));
+      formData.append('reservasi_out', dayjs(values.tanggal).format('YYYY-MM-DD HH:mm:ss'));
       formData.append('keterangan_pengembalian', values.keterangan);
       formData.append('check_pegembalian_manual', '1');
       formData.append('spidometer_file_out', {
-        uri: uri,
+        uri: values.fileUpload,
         name: 'spidometer-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
       // console.log('formData', formData);
-      // console.log(formData);
       // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
       // console.log('response ', JSON.stringify(response.data));
@@ -129,21 +86,10 @@ export default function PengembalianManualScreen() {
       router.replace('(tabs)');
     } catch (error: any) {
       // console.log(JSON.stringify(error));
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleResetTanggal = () => {
-    setDateInput('');
   };
 
   return (
@@ -151,9 +97,9 @@ export default function PengembalianManualScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView className="flex-1">
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />
@@ -170,52 +116,33 @@ export default function PengembalianManualScreen() {
               </View>
               <View className="mb-4 w-full border border-b-2" />
               <Formik
-                initialValues={{ spidometer: '', keterangan: '' }}
+                initialValues={{ spidometer: '', keterangan: '', tanggal: '', fileUpload: '' }}
                 validationSchema={validationSchema}
-                onSubmit={async (values) => await handlePengembalian(values)}>
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                onSubmit={async (values) => handlePengembalian(values)}>
+                {({ handleChange, handleSubmit, setFieldValue, values, errors, touched }) => (
                   <>
-                    <Input
+                    <CustomNumberInput
                       className="bg-gray-100"
-                      label="Spidometer"
-                      placeholder="Angka spidometer"
-                      inputMode={'numeric'}
+                      placeholder="Angka spidometer kendaraan"
                       value={values.spidometer}
-                      error={errors.spidometer}
-                      onChangeText={handleChange('spidometer')}
+                      label="Spidometer"
+                      error={touched.spidometer ? errors.spidometer : undefined}
+                      onFormattedValue={handleChange('spidometer')}
                     />
                     <InputDate
                       label="Waktu Pengembalian"
-                      onChangeDate={(e) => setDateInput(e)}
-                      onResetDate={handleResetTanggal}
-                      value={dateInput}
-                      error={errorInput.tanggal}
+                      onChangeDate={(e) => setFieldValue('tanggal', e)}
+                      onResetDate={() => setFieldValue('tanggal', '')}
+                      value={values.tanggal}
+                      error={touched.tanggal ? errors.tanggal : undefined}
                     />
 
-                    {!uri ? (
-                      <InputFile
-                        label="Upload file"
-                        onChangeFile={(e) => setUri(e)}
-                        placeholder={'Chose file'}
-                        error={errorInput.fileUpload}
-                      />
-                    ) : (
-                      <>
-                        <View className="my-4 w-full rounded-lg bg-black">
-                          <Image
-                            source={{ uri: uri || undefined }}
-                            className="aspect-[3/4] w-full rounded-lg"
-                          />
-                          <TouchableOpacity
-                            className="absolute right-1 top-1 rounded-full bg-white p-1"
-                            onPress={() => {
-                              setUri(null);
-                            }}>
-                            <AntDesign name="closecircleo" size={32} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                      </>
-                    )}
+                    <InputFile
+                      label="Upload file"
+                      onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                      placeholder={'Chose file'}
+                      error={touched.fileUpload ? errors.fileUpload : undefined}
+                    />
 
                     <InputArea
                       className="bg-gray-200"

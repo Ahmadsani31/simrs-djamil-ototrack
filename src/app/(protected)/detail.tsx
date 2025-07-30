@@ -27,6 +27,7 @@ import * as SecureStore from 'expo-secure-store';
 
 import { startTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
+import HandleError from '@/utils/handleError';
 
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),
@@ -93,7 +94,7 @@ export default function DetailScreen() {
       // console.log('formData', formData);
 
       const response = await secureApi.postForm('/reservasi/save_detail', formData);
-      // await startTracking();
+      await startTracking();
 
       // console.log('response ', JSON.stringify(response));
 
@@ -102,15 +103,7 @@ export default function DetailScreen() {
       router.replace('/(protected)/(tabs)');
     } catch (error: any) {
       console.log(error.response.data);
-
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
     } finally {
       setLoading(false);
     }

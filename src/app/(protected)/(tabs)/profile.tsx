@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useAuthStore } from '@/stores/authStore';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
-import SafeAreaView from '@/components/SafeAreaView';
 import {
   AntDesign,
   Feather,
@@ -23,8 +22,9 @@ import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import { useFocusEffect } from 'expo-router';
 import { dataDashboard } from '@/types/types';
+import HandleError from '@/utils/handleError';
 
-// const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const fetchData = async () => {
   try {
@@ -85,14 +85,7 @@ export default function Profile() {
         );
       } catch (error: any) {
         // alert(error.response.data.message)
-        if (error.response && error.response.data) {
-          const msg = error.response.data.message || 'Terjadi kesalahan.';
-          Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-        } else if (error.request) {
-          Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-        } else {
-          Alert.alert('Error', error.message);
-        }
+        HandleError(error);
       } finally {
         setLoading(false);
       }
@@ -105,7 +98,7 @@ export default function Profile() {
   };
 
   return (
-    <SafeAreaView noTop>
+    <SafeAreaView style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
         <View className="rounded-bl-[50] rounded-br-[50]  bg-[#205781] shadow">
           <View className="px-4">
@@ -184,7 +177,7 @@ export default function Profile() {
           <Text className="text-lg font-bold">RSUP DR. M. DJAMIL PADANG</Text>
           <Text className="mt-4">Vesion</Text>
           <Text className="text-sm">{Constants.expoConfig?.version}</Text>
-          {/* <Text className='text-xs'>{API_URL}</Text> */}
+          <Text className="text-xs">{API_URL}</Text>
         </View>
       </View>
       <ModalRN visible={isModal} onClose={() => setIsModal(false)}>

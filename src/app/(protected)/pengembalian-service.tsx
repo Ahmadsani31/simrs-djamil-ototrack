@@ -1,6 +1,5 @@
 import {
   Alert,
-  BackHandler,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -10,29 +9,21 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import Input from '@/components/Input';
+import { useState } from 'react';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from '@/components/ModalCamera';
-import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
 import { useLoadingStore } from '@/stores/loadingStore';
-import CustomHeader from '@/components/CustomHeader';
-
-import { stopTracking } from '@/utils/locationUtils';
-
-import { useLocationStore } from '@/stores/locationStore';
 import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
-import * as SecureStore from 'expo-secure-store';
-import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
 import CustomNumberInput from '@/components/CustomNumberInput';
 import InputArea from '@/components/InputArea';
+import HandleError from '@/utils/handleError';
 
 type propsService = {
   id: string;
@@ -126,14 +117,7 @@ export default function PengembalianServiceScreen() {
       router.replace('(tabs)');
     } catch (error: any) {
       // console.log(error.response);
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Toast.error(msg);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
     } finally {
       setLoading(false);
     }

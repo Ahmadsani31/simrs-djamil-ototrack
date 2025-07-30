@@ -1,4 +1,12 @@
-import { View, Text, FlatList, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl } from 'react-native-gesture-handler';
 import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
@@ -120,7 +128,7 @@ export default function PemiliharaanScreen() {
   const flatData = data?.pages.flatMap((page: any) => page.data) || [];
 
   return (
-    <View className="flex-1 bg-slate-300">
+    <SafeAreaView className="bg-slate-300" style={{ flex: 1 }}>
       <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
       <View className="px-4">
         <View className="mb-4 ">
@@ -212,6 +220,6 @@ export default function PemiliharaanScreen() {
         animationConfigs={animationConfigs}>
         <ListDetailServiceSheet items={rawService} />
       </BottomSheet>
-    </View>
+    </SafeAreaView>
   );
 }

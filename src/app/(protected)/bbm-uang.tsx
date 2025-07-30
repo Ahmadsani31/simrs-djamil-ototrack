@@ -1,11 +1,8 @@
 import ButtonCloseImage from '@/components/ButtonCloseImage';
-import InputArea from '@/components/InputArea';
 import ModalCamera from '@/components/ModalCamera';
-import SkeletonList from '@/components/SkeletonList';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
-import { Formik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   Image,
@@ -16,17 +13,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import ButtonCostum from '@/components/ButtonCostum';
 import { colors } from '@/constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { dataDetail } from '@/types/types';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
-import { cn } from '@/utils/constants';
-import { Image as ImageExpo } from 'expo-image';
 import CustomNumberInput from '@/components/CustomNumberInput';
 import { Toast } from 'toastify-react-native';
+import HandleError from '@/utils/handleError';
 
 const fetchData = async (reservasi_id: string) => {
   const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
@@ -122,14 +117,7 @@ export default function BbmUangScreen() {
       // handleReload();
       setLoading(false);
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Toast.error(msg);
-      } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
       setLoading(false);
     }
   };

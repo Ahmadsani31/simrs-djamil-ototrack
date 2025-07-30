@@ -12,10 +12,6 @@ type propLogin = {
   role: string;
 };
 
-type propLoginSSO = {
-  email: string;
-};
-
 interface AuthState {
   token: string | null;
   user: User | null;
@@ -105,7 +101,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Alert.alert('Warning!', error.message as string);
       console.log('Login error:', error.message as string);
       if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Username atau password salah';
+        const msg = error.response.data.message || 'Email tidak terdaftar';
         set({
           errorLogin: msg,
           isLoading: false,

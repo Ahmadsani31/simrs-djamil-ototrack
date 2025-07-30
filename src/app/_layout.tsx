@@ -18,7 +18,6 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ToastManager from 'toastify-react-native';
 import '@/utils/backgroundLocationTask';
 import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
-import { colorKeys } from 'moti';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +26,7 @@ SplashScreen.setOptions({
   duration: 1000,
   fade: true,
 });
+
 // Create a QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -174,7 +174,7 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar style="inverted" animated={true} />
           <Slot />
-          <ToastManager useModal={true} />
+          <ToastManager useModal={false} />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>

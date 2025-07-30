@@ -1,9 +1,8 @@
-import { View, Alert, TouchableOpacity, Text, ScrollView, RefreshControl } from 'react-native';
+import { View, Alert, SafeAreaView } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { router } from 'expo-router';
-import SafeAreaView from '@/components/SafeAreaView';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
@@ -106,19 +105,11 @@ export default function IndexScreen() {
 
   const [rawData, setRawData] = useState<rawData>();
 
-  // async function getValueFor() {
-  //   let result = await SecureStore.getItemAsync('DataAktif');
-  //   const resultParsed = result ? JSON.parse(result) : undefined;
-  //   console.log('SecureStore', resultParsed.kendaraan_id);
-  //   setRawData(result ? JSON.parse(result) : undefined);
-  // }
-
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await secureApi.get(`reservasi/aktif`);
       // console.log('response', response);
-
       setRawData(response.data);
     } catch (error: any) {
       // console.log('response', error.response.data);
@@ -129,7 +120,7 @@ export default function IndexScreen() {
   };
 
   return (
-    <SafeAreaView noTop>
+    <SafeAreaView style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
 

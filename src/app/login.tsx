@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   Image,
-  Dimensions,
-  Button,
   Platform,
   KeyboardAvoidingView,
+  Button,
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
@@ -25,7 +23,8 @@ import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
 import Constants from 'expo-constants';
-import { API_URL } from '@/utils/constants';
+import { API_URL, APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
+import * as Updates from 'expo-updates';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),
@@ -40,6 +39,7 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import { ScrollView } from 'react-native-gesture-handler';
+import { Toast } from 'toastify-react-native';
 
 export default function LoginScreen() {
   const [submitLogin, setSubmitLogin] = useState(false);
@@ -81,8 +81,6 @@ export default function LoginScreen() {
       router.replace('/(protected)/(tabs-admin)/');
     } else if (log.role == 'driver') {
       router.replace('/(protected)/(tabs)/');
-    } else {
-      Alert.alert('Error roles', 'Roles tidak terdaftar pada aplikasi ini.');
     }
   };
 
@@ -109,29 +107,46 @@ export default function LoginScreen() {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
-            Alert.alert('Login via gmail', 'On prosess login');
+            Toast.show({
+              type: 'error',
+              text1: 'Login with email',
+              text2: 'On prosess login',
+            });
             break;
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             // Android only, play services not available or outdated
-            Alert.alert('Login via gmail', 'Play services not available');
+            Toast.show({
+              type: 'error',
+              text1: 'Login with email',
+              text2: 'Play services not available',
+            });
             break;
           default:
             // some other error happened
-            Alert.alert('Login via gmail', '');
+            Toast.show({
+              type: 'error',
+              text1: 'Login with email',
+              text2: JSON.stringify(error),
+            });
         }
       } else {
         // an error that's not related to google sign in occurred
-        Alert.alert('Login via gmail', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Login with email',
+          text2: JSON.stringify(error),
+        });
       }
     } finally {
       setSubmitLogin(false);
     }
   };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : -80}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <SafeAreaView className="flex-1 justify-center bg-slate-300">
           <Animated.View
@@ -206,7 +221,7 @@ export default function LoginScreen() {
               <View className="flex-row items-center text-sm text-gray-500">
                 <View className="flex-grow border-t border-gray-300" />
                 <Text className="mx-2 py-4 text-gray-500">or Login via google</Text>
-                <View className="flex-grow border-t border-gray-300" />
+                {/* <View className="flex-grow border-t border-gray-300" /> */}
               </View>
               <GoogleSigninButton
                 size={GoogleSigninButton.Size.Wide}

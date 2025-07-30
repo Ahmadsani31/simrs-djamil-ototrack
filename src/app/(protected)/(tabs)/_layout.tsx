@@ -1,9 +1,8 @@
 import { Redirect, router, Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { Alert, BackHandler, Image, Text, View } from 'react-native';
-import CustomNavBar from '@/components/CustomNavBar';
-import { FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useEffect } from 'react';
 
 import * as Location from 'expo-location';
 import { statusTrackingStore } from '@/stores/statusTrackingStore';

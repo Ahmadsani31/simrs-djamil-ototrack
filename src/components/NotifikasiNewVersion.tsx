@@ -32,10 +32,10 @@ export default function NotifikasiNewVersion() {
       <Modal animationType="slide" transparent={true} visible={visible}>
         <View className="flex-1 items-center justify-end bg-black/50">
           <View className="w-full rounded-t-lg bg-white">
-            <View className="rounded-t-lg bg-teal-500 p-5">
+            <View className="rounded-t-lg bg-[#4F959D] p-5">
               <View className="flex-row gap-2">
                 <Foundation name="alert" size={24} color={'#ff9966'} />
-                <Text className="text-xl font-bold">Wajib Update</Text>
+                <Text className="text-xl font-bold text-white">Wajib Update</Text>
               </View>
             </View>
             <View className="mb-10 gap-4 p-5">
@@ -45,7 +45,7 @@ export default function NotifikasiNewVersion() {
               </Text>
               <View className="my-5">
                 <TouchableHighlight
-                  className="items-center rounded-xl bg-blue-500 p-2"
+                  className="items-center rounded-3xl bg-[#205781] py-3"
                   onPress={() => Linking.openURL(URL_PLAY_STORE)}>
                   <View className="flex-row items-center gap-2">
                     <MaterialIcons name="system-security-update" size={20} color="white" />

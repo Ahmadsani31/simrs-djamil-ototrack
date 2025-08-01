@@ -4,7 +4,7 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Updates from 'expo-updates';
 
 export default function NotifikasiNewVersionMinor() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const cekNewVersion = async () => {
@@ -42,9 +42,9 @@ export default function NotifikasiNewVersionMinor() {
                 Kami baru saja merilis pembaruan kecil untuk meningkatkan stabilitas dan kenyamanan
                 penggunaan. Silakan update!
               </Text>
-              <View className="my-5">
+              <View className="my-7">
                 <TouchableHighlight
-                  className="items-center rounded-xl bg-blue-500 p-2"
+                  className="items-center rounded-xl bg-[#205781] py-3"
                   onPress={() => handleUpdate()}>
                   <View className="flex-row items-center gap-2">
                     <MaterialIcons name="system-security-update" size={20} color="white" />

@@ -188,7 +188,7 @@ export default function IndexScreen() {
                     <Text className={`text-lg font-bold`}>Dipakai</Text>
                     <Text className="text-secondary font-medium ">
                       {item.reservasi_in
-                        ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY')
+                        ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')
                         : ''}
                     </Text>
                     <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
@@ -197,7 +197,7 @@ export default function IndexScreen() {
                     <Text className={`text-lg font-bold `}>Dikembalikan</Text>
                     <Text className="text-secondary font-medium">
                       {item.reservasi_out
-                        ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY')
+                        ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')
                         : '-'}
                     </Text>
                     <Text className="text-secondary text-sm">

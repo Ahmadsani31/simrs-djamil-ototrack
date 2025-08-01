@@ -144,7 +144,14 @@ export default function IndexScreen() {
         enablePanDownToClose={true}
         animationConfigs={animationConfigs}
         onChange={handleSheetChanges}>
-        <BottomSheetView className="flex-1 items-center justify-center bg-slate-300">
+        <BottomSheetView
+          style={{
+            flex: 1,
+            padding: 36,
+            height: '100%',
+            alignItems: 'center',
+            backgroundColor: '#4f4f4f',
+          }}>
           {camera && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
       </BottomSheet>

@@ -20,6 +20,7 @@ const SCAN_PADDING = 20;
 
 export default function BarcodeScanner({ onScan }: { onScan: (data: string) => void }) {
   const [scanned, setScanned] = useState(false);
+  const [flashlight, setFlashlight] = useState(false);
   const scanLinePos = useRef(new Animated.Value(0)).current;
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -93,74 +94,63 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
   }
 
   return (
-    <View className="flex-1 bg-black">
-      <CameraView
-        className="flex-1"
-        facing="back"
-        ratio="1:1"
-        barcodeScannerSettings={{
-          barcodeTypes: ['qr'],
-        }}
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}>
-        {/* Overlay Hitam Transparan */}
-        <>
-          <View className="flex-1">
-            {/* Area Transparan di Atas Frame Scan */}
-            <View
-              style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 3 - SCAN_PADDING }]}
-            />
+    <View className="flex-1 items-center">
+      <Text className="self-center text-center text-xl font-bold text-white">
+        Arahkan kamera ke barcode kedaraan yang akan digunakan.
+      </Text>
+      <View className="mt-10">
+        <CameraView
+          style={{
+            width: 260,
+            height: 260,
+            borderRadius: 10,
+          }}
+          facing="back"
+          ratio="1:1"
+          autofocus="on"
+          flash="on"
+          enableTorch={flashlight}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr'],
+          }}
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        />
+      </View>
 
-            {/* Baris Tengah (Frame Scan) */}
-            <View style={styles.middleRow}>
-              {/* Area Transparan di Kiri Frame */}
-              <View
-                style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]}
-              />
+      {/* Frame Scanner */}
+      <View style={styles.scanFrame}>
+        {/* Corner Borders */}
+        <View style={[styles.corner, styles.cornerTopLeft]} />
+        <View style={[styles.corner, styles.cornerTopRight]} />
+        <View style={[styles.corner, styles.cornerBottomLeft]} />
+        <View style={[styles.corner, styles.cornerBottomRight]} />
 
-              {/* Frame Scanner */}
-              <View style={styles.scanFrame}>
-                {/* Corner Borders */}
-                <View style={[styles.corner, styles.cornerTopLeft]} />
-                <View style={[styles.corner, styles.cornerTopRight]} />
-                <View style={[styles.corner, styles.cornerBottomLeft]} />
-                <View style={[styles.corner, styles.cornerBottomRight]} />
-
-                {/* Animated Scan Line */}
-                <Animated.View
-                  style={[
-                    styles.scanLine,
-                    {
-                      transform: [
-                        {
-                          translateY: scanLinePos.interpolate({
-                            inputRange: [0, SCAN_SIZE],
-                            outputRange: [0, SCAN_SIZE],
-                          }),
-                        },
-                      ],
-                    },
-                  ]}
-                />
-              </View>
-
-              {/* Area Transparan di Kanan Frame */}
-              <View
-                style={[styles.overlaySection, { width: (width - SCAN_SIZE) / 2 - SCAN_PADDING }]}
-              />
-            </View>
-
-            {/* Area Transparan di Bawah Frame Scan */}
-            <View
-              style={[styles.overlaySection, { height: (height - SCAN_SIZE) / 2 - SCAN_PADDING }]}
-            />
-          </View>
-
-          {/* Text Instruksi */}
-          <Text className="absolute top-24 self-center text-center text-2xl font-bold text-white">
-            Arahkan kamera ke barcode/QR code Kedaraan
-          </Text>
-        </>
-      </CameraView>
+        {/* Animated Scan Line */}
+        <Animated.View
+          style={[
+            styles.scanLine,
+            {
+              transform: [
+                {
+                  translateY: scanLinePos.interpolate({
+                    inputRange: [0, SCAN_SIZE],
+                    outputRange: [0, SCAN_SIZE],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />
+      </View>
+      <TouchableOpacity
+        className="mt-20 rounded-full bg-black p-5"
+        onPress={() => setFlashlight(!flashlight)}>
+        <MaterialIcons
+          name={flashlight ? 'flashlight-on' : 'flashlight-off'}
+          size={24}
+          color="white"
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -178,8 +168,8 @@ const styles = StyleSheet.create({
     height: SCAN_SIZE,
     borderColor: 'rgba(255, 255, 255, 0.3)',
     backgroundColor: 'transparent',
-    position: 'relative',
-    margin: SCAN_PADDING,
+    position: 'absolute',
+    margin: 77,
   },
   corner: {
     position: 'absolute',

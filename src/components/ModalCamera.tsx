@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
 import LoadingIndikator from './LoadingIndikator';
 // import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
@@ -29,6 +29,7 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
   const [permission, requestPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
+  const [flashlight, setFlashlight] = useState(false);
 
   const takePicture = async () => {
     setLoading(true);
@@ -51,29 +52,42 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
                 mirror={true}
                 ratio={'4:3'}
                 facing="back"
+                flash="on"
+                autofocus="on"
+                enableTorch={flashlight}
                 ref={cameraRef}
               />
-              <View className="absolute right-5 top-5">
-                <TouchableOpacity
-                  onPress={onClose}
-                  className="flex-row items-center justify-center gap-2 rounded-lg bg-white p-1">
-                  <AntDesign name="closecircleo" size={28} color="red" />
-                  <Text>Tutup</Text>
-                </TouchableOpacity>
-              </View>
-              <View className="absolute bottom-0 w-full items-center bg-black/50 p-14">
-                <TouchableOpacity onPress={takePicture}>
-                  <View style={[styles.shutterBtn]}>
-                    <View
-                      style={[
-                        styles.shutterBtnInner,
-                        {
-                          backgroundColor: 'white',
-                        },
-                      ]}
+
+              {/* Bottom controls */}
+              <View className="absolute bottom-0 w-full items-center bg-black/50 p-24">
+                <View style={styles.bottomOverlay}>
+                  <TouchableOpacity
+                    style={styles.flipButton}
+                    onPress={() => setFlashlight(!flashlight)}>
+                    <MaterialIcons
+                      name={flashlight ? 'flashlight-on' : 'flashlight-off'}
+                      size={24}
+                      color="white"
                     />
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={takePicture}>
+                    <View style={[styles.shutterBtn]}>
+                      <View
+                        style={[
+                          styles.shutterBtnInner,
+                          {
+                            backgroundColor: 'white',
+                          },
+                        ]}
+                      />
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.flipButton} onPress={onClose}>
+                    <AntDesign name="closecircleo" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </>
           ) : (
@@ -108,6 +122,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  captureButtonInner: {
+    width: 60,
+    height: 60,
+    borderRadius: 28,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
   shutterBtnInner: {
     width: 70,
     height: 70,
@@ -120,5 +140,36 @@ const styles = StyleSheet.create({
     aspectRatio: CAMERA_RATIO,
     // justifyContent: 'space-between',
     // marginBottom: 100
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  flipButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  captureButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  captureButtonDisabled: {
+    opacity: 0.6,
   },
 });

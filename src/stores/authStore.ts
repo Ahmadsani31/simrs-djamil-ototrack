@@ -126,7 +126,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const token = await SecureStore.getItemAsync('token');
     if (token) {
-      const response = await restApi.logout(token);
+      await restApi.logout(token);
       // console.log('response logout ', response);
     }
     await SecureStore.deleteItemAsync('token');

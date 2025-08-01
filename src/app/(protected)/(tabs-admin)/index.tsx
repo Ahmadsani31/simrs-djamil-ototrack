@@ -143,7 +143,7 @@ export default function IndexScreen() {
               <View
                 className={`flex-row items-center ${item.status == 'Dipakai' ? ' bg-[#F2E5BF]' : 'bg-teal-300'} justify-between rounded-t-lg px-4`}>
                 <Text className={`p-2 text-black`}>
-                  {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
+                  {dayjs(item.created_at).format('dddd ,DD MMMM YYYY')}
                 </Text>
                 {item.status == 'Dipakai' ? (
                   <TouchableOpacity
@@ -156,13 +156,15 @@ export default function IndexScreen() {
                         },
                       })
                     }
-                    className={`my-2 flex-row items-center justify-center rounded-md p-1 ${colors.primary}`}>
-                    <Text className="font-bold text-white">Pengembalian</Text>
-                    <MaterialCommunityIcons
-                      name="arrow-top-right-bold-box"
-                      size={24}
-                      color="black"
-                    />
+                    className={`my-2 rounded-md ${colors.primary}`}>
+                    <View className=" flex-row items-center justify-center px-2 py-1">
+                      <Text className="font-bold text-white">Pengembalian</Text>
+                      <MaterialCommunityIcons
+                        name="arrow-top-right-bold-box"
+                        size={24}
+                        color="black"
+                      />
+                    </View>
                   </TouchableOpacity>
                 ) : null}
               </View>
@@ -186,7 +188,7 @@ export default function IndexScreen() {
                 <View className="flex-row items-center justify-between">
                   <View className="w-48 items-center rounded-md bg-blue-200 p-2">
                     <Text className={`text-lg font-bold`}>Dipakai</Text>
-                    <Text className="text-secondary font-medium ">
+                    <Text className="text-secondary text-center font-medium">
                       {item.reservasi_in
                         ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')
                         : ''}
@@ -195,7 +197,7 @@ export default function IndexScreen() {
                   </View>
                   <View className="w-48 items-center rounded-md bg-amber-200 p-2">
                     <Text className={`text-lg font-bold `}>Dikembalikan</Text>
-                    <Text className="text-secondary font-medium">
+                    <Text className="text-secondary text-center font-medium">
                       {item.reservasi_out
                         ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')
                         : '-'}

@@ -4,7 +4,7 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Updates from 'expo-updates';
 
 export default function NotifikasiNewVersionMinor() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const cekNewVersion = async () => {

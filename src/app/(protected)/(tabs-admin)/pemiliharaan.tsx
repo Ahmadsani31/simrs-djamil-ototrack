@@ -166,7 +166,7 @@ export default function PemiliharaanScreen() {
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                 </Text>
                 <TouchableOpacity
-                  className={`my-2 flex-row gap-2 rounded-lg p-2 ${colors.secondary}`}
+                  className={`my-2 flex-row items-center justify-center gap-2 rounded-lg px-2 py-1 ${colors.secondary}`}
                   onPress={() => handleSnapPressDetail(item.images)}>
                   <Text className="text-white">Detail</Text>
                   <MaterialCommunityIcons name="arrow-top-right-bold-box" size={18} color="white" />
@@ -178,7 +178,7 @@ export default function PemiliharaanScreen() {
                     <Text className="text-wrap text-xl font-bold text-black">{item.kendaraan}</Text>
                     <Text className="text-secondary text-sm">{item.no_polisi}</Text>
                   </View>
-                  <View className="mt-2 justify-center rounded-lg bg-blue-200 p-2">
+                  <View className="mt-2 justify-center rounded-lg bg-blue-200 px-4">
                     <Text className="text-center font-medium">Biaya : Rp. {item.nominal}</Text>
                   </View>
                 </View>
@@ -187,7 +187,8 @@ export default function PemiliharaanScreen() {
                     <Pressable onPress={() => handleModalImageShow(item.image)}>
                       <Image
                         source={{ uri: item.image }}
-                        style={{ width: 120, height: 150, borderRadius: 8, objectFit: 'contain' }}
+                        style={{ width: 120, height: 120, borderRadius: 8 }}
+                        contentFit="cover"
                       />
                     </Pressable>
                     <View className="flex-1 gap-2">

@@ -148,8 +148,8 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
-          <NotifikasiNewVersion />
-          <NotifikasiNewVersionMinor />
+          {/* <NotifikasiNewVersion />
+          <NotifikasiNewVersionMinor /> */}
           <ToastManager useModal={false} />
         </GestureHandlerRootView>
       </SafeAreaProvider>

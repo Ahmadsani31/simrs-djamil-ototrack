@@ -2,11 +2,11 @@ import { Checkpoint } from '@/types/types';
 import { BottomSheetSectionList } from '@gorhom/bottom-sheet';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
-import { TextInput, Text, View, Image, Pressable } from 'react-native';
-import ModalPreviewImage from './ModalPreviewImage';
+import { TextInput, Text, View, Pressable } from 'react-native';
 import SkeletonList from './SkeletonList';
 import { useQuery } from '@tanstack/react-query';
 import secureApi from '@/services/service';
+import { Image } from 'expo-image';
 
 interface itemsProps {
   reservasiID: string;
@@ -55,24 +55,26 @@ export default function ListDetailSectionSheet({ reservasiID, onPressImage }: it
               </View>
             </View>
             <View className="p-4">
-              <Image className="aspect-[3/4] w-full rounded-lg" source={{ uri: item.image }} />
+              <Image style={{ height: 350 }} contentFit="fill" source={{ uri: item.image }} />
             </View>
           </View>
         </View>
       )}
       renderSectionHeader={({ section: { checkpoint_in, image } }) => (
         <View className="mx-4 my-3 flex-row items-center justify-between rounded-lg bg-[#F2E5BF] p-4">
-          <View>
+          <View className="flex-1">
             <Text className="font-bold">Proses Pengisian BBM,</Text>
             <Text>{dayjs(checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
             <Text>Waktu : {dayjs(checkpoint_in).format('HH:ss')}</Text>
           </View>
-          <View className="p-4">
-            <Pressable onPress={() => onPressImage(image)}>
-              <Image className="size-32 rounded-lg" source={{ uri: image }} />
-              <Text className="absolute left-4 top-1/3 rounded-md bg-white/75 p-1">
-                Clik to show
-              </Text>
+          <View className="flex-1">
+            <Pressable onPress={() => onPressImage(image)} className="items-center">
+              <Image
+                style={{ height: 80, width: 100 }}
+                contentFit="contain"
+                source={{ uri: image }}
+              />
+              <Text className="absolute top-1/3 rounded-md bg-white/75 p-1">Clik to show</Text>
             </Pressable>
           </View>
         </View>

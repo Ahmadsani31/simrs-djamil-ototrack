@@ -28,32 +28,36 @@ export default function NotifikasiNewVersion() {
   }, []);
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
-      <View className="flex-1 items-center justify-end bg-black/50">
-        <View className="w-full rounded-t-lg bg-white">
-          <View className="rounded-t-lg bg-amber-200 p-5">
-            <View className="flex-row gap-2">
-              <Foundation name="alert" size={24} color={'#ff9966'} />
-              <Text className="text-xl font-bold">Wajib Update</Text>
+    visible && (
+      <Modal animationType="slide" transparent={true} visible={visible}>
+        <View className="flex-1 items-center justify-end bg-black/50">
+          <View className="w-full rounded-t-lg bg-white">
+            <View className="rounded-t-lg bg-teal-500 p-5">
+              <View className="flex-row gap-2">
+                <Foundation name="alert" size={24} color={'#ff9966'} />
+                <Text className="text-xl font-bold">Wajib Update</Text>
+              </View>
+            </View>
+            <View className="mb-10 gap-4 p-5">
+              <Text>
+                Versi terbaru aplikasi sudah tersedia dan dibutuhkan agar aplikasi tetap berjalan
+                optimal. Silakan update untuk melanjutkan.
+              </Text>
+              <View className="my-5">
+                <TouchableHighlight
+                  className="items-center rounded-xl bg-blue-500 p-2"
+                  onPress={() => Linking.openURL(URL_PLAY_STORE)}>
+                  <View className="flex-row items-center gap-2">
+                    <MaterialIcons name="system-security-update" size={20} color="white" />
+                    <Text className="text-lg font-bold text-white">New Update</Text>
+                  </View>
+                </TouchableHighlight>
+              </View>
             </View>
           </View>
-          <View className="gap-4 p-5">
-            <Text>
-              Versi terbaru aplikasi sudah tersedia dan dibutuhkan agar aplikasi tetap berjalan
-              optimal. Silakan update untuk melanjutkan.
-            </Text>
-            <TouchableHighlight
-              className="items-center rounded-xl bg-blue-500 p-2"
-              onPress={() => Linking.openURL(URL_PLAY_STORE)}>
-              <View className="flex-row items-center gap-2">
-                <MaterialIcons name="system-security-update" size={20} color="white" />
-                <Text className="text-lg font-bold text-white">New Update</Text>
-              </View>
-            </TouchableHighlight>
-          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    )
   );
 }
 

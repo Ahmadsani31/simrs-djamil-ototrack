@@ -52,7 +52,6 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
                 mirror={true}
                 ratio={'4:3'}
                 facing="back"
-                flash="on"
                 autofocus="on"
                 enableTorch={flashlight}
                 ref={cameraRef}

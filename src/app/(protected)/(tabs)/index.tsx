@@ -94,7 +94,7 @@ export default function IndexScreen() {
         const msg = error.response.data.message || 'Terjadi kesalahan.';
         Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
       } else if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
+        Alert.alert('Network Error Scan', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
       } else {
         Alert.alert('Error', error.message);
       }

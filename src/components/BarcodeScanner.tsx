@@ -108,7 +108,6 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
           facing="back"
           ratio="1:1"
           autofocus="on"
-          flash="on"
           enableTorch={flashlight}
           barcodeScannerSettings={{
             barcodeTypes: ['qr'],

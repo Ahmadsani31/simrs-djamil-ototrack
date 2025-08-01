@@ -151,9 +151,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch (error: any) {
       // console.log('Check User error:', JSON.stringify(error.response?.data?.message));
-      if (error.request) {
-        Alert.alert('Network Error', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      }
       await SecureStore.deleteItemAsync('token');
       set({ token: null, user: null, isLoading: false });
     }

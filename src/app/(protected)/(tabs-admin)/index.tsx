@@ -183,16 +183,6 @@ export default function IndexScreen() {
                 </View>
                 <View className="border-1 my-1 h-px bg-gray-200 dark:bg-gray-700"></View>
 
-                {/* <View
-                    className={`${item.status == 'Selesai' ? 'bg-blue-400' : 'bg-amber-400'} items-center rounded-lg p-1`}>
-                    <Text
-                      className={`px-2 text-xl font-bold ${item.status == 'Selesai' ? 'text-white' : 'text-black'}`}>
-                      {item.status}{' '}
-                      {item.status == 'Selesai' ? (
-                        <AntDesign name="checkcircle" size={16} color="white" />
-                      ) : null}
-                    </Text>
-                  </View> */}
                 <View className="flex-row items-center justify-between">
                   <View className="w-48 items-center rounded-md bg-blue-200 p-2">
                     <Text className={`text-lg font-bold`}>Dipakai</Text>

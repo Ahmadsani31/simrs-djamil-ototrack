@@ -163,7 +163,7 @@ export default function PemakaianScreen() {
               <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
             }
             // stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={{ paddingBottom: 120 }}
             renderItem={({ item }) => (
               <>
                 <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
@@ -249,21 +249,27 @@ export default function PemakaianScreen() {
             ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
           />
         </View>
+      </View>
+      {modalVisible && (
         <ModalPreviewImage
           title="Gambar Spidometer"
           visible={modalVisible}
           imgUrl={imgBase64 || ''}
           onPress={() => setModalVisible(false)}
         />
-        <BottomSheet
-          ref={bottomSheetDetailRef}
-          snapPoints={snapPoints}
-          index={-1}
-          enablePanDownToClose
-          animationConfigs={animationConfigs}>
-          <ListDetailSectionSheet reservasiID={reservasiID ?? ''} />
-        </BottomSheet>
-      </View>
+      )}
+
+      <BottomSheet
+        ref={bottomSheetDetailRef}
+        snapPoints={snapPoints}
+        index={-1}
+        enablePanDownToClose
+        animationConfigs={animationConfigs}>
+        <ListDetailSectionSheet
+          reservasiID={reservasiID ?? ''}
+          onPressImage={(e) => handleModalImageShow(e)}
+        />
+      </BottomSheet>
     </SafeAreaView>
   );
 }

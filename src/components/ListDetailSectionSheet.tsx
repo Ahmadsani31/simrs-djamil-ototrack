@@ -10,6 +10,7 @@ import secureApi from '@/services/service';
 
 interface itemsProps {
   reservasiID: string;
+  onPressImage: (e: string) => void;
 }
 
 const fetchData = async (reservasi_id: string) => {
@@ -25,25 +26,12 @@ const fetchData = async (reservasi_id: string) => {
   }
 };
 
-export default function ListDetailSectionSheet({ reservasiID }: itemsProps) {
+export default function ListDetailSectionSheet({ reservasiID, onPressImage }: itemsProps) {
   const { data, isLoading, isError, error, refetch } = useQuery<Checkpoint[]>({
     queryKey: ['dataReservasi', reservasiID],
     queryFn: async () => await fetchData(reservasiID),
     enabled: !!reservasiID,
   });
-
-  const [modalImageVisible, setModalImageVisible] = useState(false);
-  const [urlImageModal, setUrlImageModale] = useState<string>('');
-
-  const handleModalPrevieImage = (uri: any) => {
-    setUrlImageModale(uri);
-    setModalImageVisible(true);
-  };
-
-  const handleCloseModalPrevieImage = () => {
-    setUrlImageModale('');
-    setModalImageVisible(false);
-  };
 
   return (
     <BottomSheetSectionList
@@ -80,19 +68,13 @@ export default function ListDetailSectionSheet({ reservasiID }: itemsProps) {
             <Text>Waktu : {dayjs(checkpoint_in).format('HH:ss')}</Text>
           </View>
           <View className="p-4">
-            <Pressable onPress={() => handleModalPrevieImage(image)}>
+            <Pressable onPress={() => onPressImage(image)}>
               <Image className="size-32 rounded-lg" source={{ uri: image }} />
               <Text className="absolute left-4 top-1/3 rounded-md bg-white/75 p-1">
                 Clik to show
               </Text>
             </Pressable>
           </View>
-          <ModalPreviewImage
-            title="Gambar Proses Pengisian BBM"
-            visible={modalImageVisible}
-            imgUrl={urlImageModal}
-            onPress={() => handleCloseModalPrevieImage()}
-          />
         </View>
       )}
       ListEmptyComponent={

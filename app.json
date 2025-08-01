@@ -10,8 +10,7 @@
       "bundler": "metro"
     },
     "experiments": {
-      "tsconfigPaths": true,
-      "newArchitecture": true
+      "tsconfigPaths": true
     },
     "plugins": [
       [

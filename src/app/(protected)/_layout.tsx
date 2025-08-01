@@ -12,23 +12,32 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 export default function ProtectedLayout() {
   const loading = useLoadingStore((state: any) => state.loading);
 
-  const backAction = () => {
-    Alert.alert('Peringatan!', 'Apakah Kamu yakin ingin membatalkan proses saat ini??', [
-      {
-        text: 'Cancel',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      { text: 'YES', onPress: () => router.back() },
-    ]);
-    return true;
-  };
-
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
     return () => backHandler.remove();
-  }, [router]);
+  }, []);
+
+  const backAction = () => {
+    if (router.canGoBack()) {
+      // Kalau masih bisa mundur (ada history), cukup back saja
+      router.back();
+    } else {
+      // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
+      Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari aplikasi home?', [
+        {
+          text: 'Batal',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: 'Keluar',
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
+    }
+
+    return true; // <- Wajib! Supaya sistem back tidak langsung nutup
+  };
 
   return (
     <PrivateRoute>

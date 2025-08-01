@@ -25,33 +25,6 @@ export default function TabsLayout() {
     requestLocationPermission();
   }, []);
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () => backHandler.remove();
-  }, []);
-
-  const backAction = () => {
-    if (router.canGoBack()) {
-      // Kalau masih bisa mundur (ada history), cukup back saja
-      router.back();
-    } else {
-      // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
-      Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari aplikasi home?', [
-        {
-          text: 'Batal',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {
-          text: 'Keluar',
-          onPress: () => BackHandler.exitApp(),
-        },
-      ]);
-    }
-
-    return true; // <- Wajib! Supaya sistem back tidak langsung nutup
-  };
-
   return (
     <PrivateRoute>
       <Tabs

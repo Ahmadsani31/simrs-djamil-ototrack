@@ -7,17 +7,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
-import { Alert, BackHandler, Platform, Text, UIManager } from 'react-native';
+import { Alert, BackHandler } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import * as Updates from 'expo-updates';
-
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ToastManager from 'toastify-react-native';
 import '@/utils/backgroundLocationTask';
-import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
+import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID, URL_PLAY_STORE, VERSION_NEW } from '@/utils/constants';
+import NotifikasiNewVersion from '@/components/NotifikasiNewVersion';
+import NotifikasiNewVersionMinor from '@/components/NotifikasiNewVersionMinor';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -72,8 +72,6 @@ export default function RootLayout() {
         console.error('Error requesting permissions:', error);
       }
     })();
-
-    checkAppUpdate();
     registerForPushNotificationsAsync();
   }, []);
 
@@ -132,34 +130,6 @@ export default function RootLayout() {
     return () => backHandler.remove();
   }, [router]);
 
-  const checkAppUpdate = async () => {
-    try {
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        const metadata = Updates.manifest;
-        // console.log('====================================');
-        // console.log('Update Tersedia:', metadata);
-        // console.log('====================================');
-        Alert.alert(
-          'Update Tersedia',
-          `Versi baru aplikasi tersedia. Silahkan Update dan Aplikasi akan diperbarui.`,
-          [
-            {
-              text: 'Update Sekarang',
-              onPress: async () => {
-                await Updates.fetchUpdateAsync();
-                await Updates.reloadAsync(); // Restart dengan update
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-    } catch (e) {
-      console.warn('Gagal memeriksa pembaruan:', e);
-    }
-  };
-
   if (isLoading || !isReady) {
     return <Loader />;
   }
@@ -173,7 +143,13 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <StatusBar style="inverted" animated={true} />
-          <Slot />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          />
+          <NotifikasiNewVersion />
+          <NotifikasiNewVersionMinor />
           <ToastManager useModal={false} />
         </GestureHandlerRootView>
       </SafeAreaProvider>

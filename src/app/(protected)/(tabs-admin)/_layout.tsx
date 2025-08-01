@@ -1,15 +1,8 @@
 import { Redirect, router, Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
-import { Alert, BackHandler, Image, Text, View } from 'react-native';
-import CustomNavBar from '@/components/CustomNavBar';
-import { FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
-
-import * as Location from 'expo-location';
-import { statusTrackingStore } from '@/stores/statusTrackingStore';
+import { Image, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
-
-const LOCATION_TASK_NAME = 'background-location-task';
 
 export default function TabsAdminLayout() {
   const user = useAuthStore((state) => state.user);

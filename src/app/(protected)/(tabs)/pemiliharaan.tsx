@@ -20,6 +20,7 @@ import { colors } from '@/constants/colors';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
+import { Image } from 'expo-image';
 
 const LIMIT = 10;
 
@@ -63,6 +64,14 @@ export default function PemiliharaanScreen() {
 
   const snapPoints = useMemo(() => ['100%'], []);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imgBase64, setImgBase64] = useState<Base64URLString>();
+
+  const handleModalImageShow = async (uri: any) => {
+    // console.log('show image modal');
+    setImgBase64(uri);
+    setModalVisible(true);
+  };
   // ref
   const bottomSheetDetailRef = useRef<BottomSheet>(null);
 
@@ -185,12 +194,29 @@ export default function PemiliharaanScreen() {
                     </View>
                   </View>
 
-                  <View className="mt-2 rounded-lg bg-slate-200 p-1">
-                    <Text className="text-center text-lg font-bold">{item.jenis_kerusakan}</Text>
-                    <Text className="text-center font-medium">{item.keterangan}</Text>
-                    <Text className="mt-2 text-center font-bold">
-                      Spidometer {item.spidometer} Km
-                    </Text>
+                  <View className="mb-3 mt-2 rounded-lg">
+                    <View className="w-full flex-1 flex-row items-start gap-5">
+                      <Pressable onPress={() => handleModalImageShow(item.image)}>
+                        <Image
+                          source={{ uri: item.image }}
+                          style={{ width: 120, height: 150, borderRadius: 8, objectFit: 'contain' }}
+                        />
+                      </Pressable>
+                      <View className="flex-1 gap-2">
+                        <View className=" rounded-md bg-slate-200 p-2">
+                          <Text className="text-lg font-bold">{item.jenis_kerusakan}</Text>
+                          <Text className="text-wrap">{item.keterangan}</Text>
+                        </View>
+                        <View className=" rounded-md bg-slate-200 p-2">
+                          <Text className="text-lg font-bold">Spidometer</Text>
+                          <Text className="text-wrap">{item.spidometer} Km</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
+                    <Text className="text-center text-lg font-bold">Keterangan</Text>
+                    <Text className="text-center font-medium">{item.keterangan_out}</Text>
                   </View>
                 </View>
               </>
@@ -203,22 +229,27 @@ export default function PemiliharaanScreen() {
             onEndReachedThreshold={0.5}
             ListEmptyComponent={
               <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
+                <Text>Tidak ada proses pemiliharaan kendaraan</Text>
               </View>
             }
             ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
           />
         </View>
-
-        <BottomSheet
-          ref={bottomSheetDetailRef}
-          snapPoints={snapPoints}
-          index={-1}
-          enablePanDownToClose
-          animationConfigs={animationConfigs}>
-          <ListDetailServiceSheet items={rawService} />
-        </BottomSheet>
       </View>
+      <ModalPreviewImage
+        title="Gambar Pemiliharaan"
+        visible={modalVisible}
+        imgUrl={imgBase64 || ''}
+        onPress={() => setModalVisible(false)}
+      />
+      <BottomSheet
+        ref={bottomSheetDetailRef}
+        snapPoints={snapPoints}
+        index={-1}
+        enablePanDownToClose
+        animationConfigs={animationConfigs}>
+        <ListDetailServiceSheet items={rawService} />
+      </BottomSheet>
     </SafeAreaView>
   );
 }

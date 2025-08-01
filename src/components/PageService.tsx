@@ -190,7 +190,8 @@ const PageService = ({ item }: rawData) => {
               <View className="w-72 text-wrap">
                 <Text className="text-xl font-bold text-white">Selesai Pemiliharaan</Text>
                 <Text className="text-sm">
-                  Klik disini untuk mengembalikan kendaraan / telah selesai pemiliharaan
+                  Klik disini untuk memproses mengembalikan kendaraan / pemiliharaan kendaraan telah
+                  selesai
                 </Text>
               </View>
             </View>
@@ -204,9 +205,10 @@ const PageService = ({ item }: rawData) => {
                 source={require('@asset/images/camera.png')}
               />
               <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold">Foto Service</Text>
+                <Text className="text-xl font-bold">Foto Aktivitas</Text>
                 <Text className="text-sm">
-                  Klik disini untuk pengambilan gambar waktu pemiliharaan / foto struk
+                  Klik disini untuk pengambilan gambar waktu pemiliharaan / foto struk pembelian
+                  barang
                 </Text>
               </View>
             </View>

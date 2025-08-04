@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, Image as ImageLocal } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import SkeletonList from './SkeletonList';
+import { Image } from 'expo-image';
 
 type propsUseQuery = {
   id: number;
@@ -24,9 +25,10 @@ export default function PageServiceListImage({
           <TouchableOpacity onPress={() => onPress(item.file_image)} className="p-4">
             <View className="w-full flex-row items-center gap-3">
               {item.file_image && (
-                <ImageLocal
+                <Image
                   source={{ uri: item.file_image }}
-                  style={{ width: 120, height: 120, borderRadius: 5 }}
+                  style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
+                  contentFit="contain"
                 />
               )}
               <View className="flex-1">

@@ -29,11 +29,11 @@ export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: p
             {/* <Text className="mt-2 rounded-md text-center text-xl font-bold">{title}</Text> */}
             <View style={{ width: width, padding: 15 }}>
               <Image
-                style={{ height: height / 2, borderRadius: 10 }}
+                style={{ aspectRatio: 3 / 4, borderRadius: 10 }}
                 source={{ uri: imgUrl }}
+                contentFit="contain"
                 placeholder={blurhash}
-                contentFit="fill"
-                transition={1000}
+                transition={500}
               />
             </View>
           </View>

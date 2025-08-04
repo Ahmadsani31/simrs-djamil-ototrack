@@ -187,8 +187,8 @@ export default function PemiliharaanScreen() {
                     <Pressable onPress={() => handleModalImageShow(item.image)}>
                       <Image
                         source={{ uri: item.image }}
-                        style={{ width: 120, height: 120, borderRadius: 8 }}
-                        contentFit="cover"
+                        style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 8 }}
+                        contentFit="contain"
                       />
                     </Pressable>
                     <View className="flex-1 gap-2">

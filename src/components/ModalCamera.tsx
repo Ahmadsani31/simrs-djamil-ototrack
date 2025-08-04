@@ -1,17 +1,14 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import React, { useRef, useState } from 'react';
-import {
-  View,
-  Modal,
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
-import { AntDesign, FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
+import * as Location from 'expo-location';
+import { View, Modal, TouchableOpacity, StyleSheet, Text, Dimensions } from 'react-native';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import Marker, { ImageFormat, Position, TextBackgroundType } from 'react-native-image-marker';
 import ButtonCostum from './ButtonCostum';
 import LoadingIndikator from './LoadingIndikator';
+import { Toast } from 'toastify-react-native';
+import dayjs from 'dayjs';
+import { useAuthStore } from '@/stores/authStore';
 // import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 // import { Asset } from 'expo-asset';
 
@@ -25,18 +22,113 @@ interface InputProps {
   setUriImage: (text: string | null) => void;
 }
 
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  address: string;
+}
+
 export default function ModalCamera({ visible, onClose, setUriImage }: InputProps) {
+  const { user } = useAuthStore();
+
   const [permission, requestPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const [flashlight, setFlashlight] = useState(false);
+  // const [location, setLocation] = useState<LocationData | null>(null);
+
+  // useEffect(() => {
+  //   getCurrentLocation();
+  // }, []);
 
   const takePicture = async () => {
     setLoading(true);
     const photo = await cameraRef.current?.takePictureAsync({ base64: true, quality: 0.6 });
-    setUriImage(photo?.uri ?? null);
+    await manipulatorImage(photo?.uri ?? null);
+    // setUriImage(photo?.uri ?? null);
     setLoading(false);
     onClose();
+  };
+
+  // const getCurrentLocation = async () => {
+  //   try {
+  //     const { status } = await Location.getForegroundPermissionsAsync();
+  //     if (status === 'granted') {
+  //       const currentLocation = await Location.getCurrentPositionAsync({
+  //         accuracy: Location.Accuracy.High,
+  //       });
+
+  //       const { latitude, longitude } = currentLocation.coords;
+
+  //       // Reverse geocoding to get address
+  //       const reverseGeocoding = await Location.reverseGeocodeAsync({
+  //         latitude,
+  //         longitude,
+  //       });
+
+  //       const address = reverseGeocoding[0]
+  //         ? `${reverseGeocoding[0].street || ''} ${reverseGeocoding[0].city || ''}, ${reverseGeocoding[0].region || ''}`.trim()
+  //         : `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+  //       setLocation({
+  //         latitude,
+  //         longitude,
+  //         address,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error('Error getting location:', error);
+  //   }
+  // };
+
+  const manipulatorImage = async (urlImage: string | null) => {
+    const datetime = new Date();
+    const text = `📍 ${user?.name} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
+    // const text = `📍 ${location?.address} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
+    console.log('====================================');
+    console.log(text);
+    console.log('====================================');
+    try {
+      const options = {
+        // background image
+        backgroundImage: {
+          src: urlImage,
+          scale: 1,
+        },
+        watermarkTexts: [
+          {
+            text: text,
+            position: {
+              position: Position.bottomLeft,
+            },
+            style: {
+              color: '#fff',
+              fontSize: 80,
+              fontName: 'Arial',
+              textBackgroundStyle: {
+                paddingX: 30,
+                paddingY: 30,
+                type: TextBackgroundType.stretchX,
+                color: '#15192399',
+              },
+            },
+          },
+        ],
+        scale: 1,
+        quality: 100,
+        filename: 'oto-track-djmail',
+        saveFormat: ImageFormat.jpg,
+      };
+      const path = await Marker.markText(options);
+      console.log('path', path);
+      setUriImage('file:' + path);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error capture',
+        text2: JSON.stringify(error),
+      });
+    }
   };
 
   return (

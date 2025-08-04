@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  BackHandler,
 } from 'react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl } from 'react-native-gesture-handler';
@@ -73,12 +74,12 @@ export default function PemiliharaanScreen() {
     setModalVisible(true);
   };
   // ref
-  const bottomSheetDetailRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const [rawService, setRawService] = useState([]);
   const handleSnapPressDetail = useCallback((item: []) => {
     setRawService(item);
-    bottomSheetDetailRef.current?.expand();
+    bottomSheetRef.current?.expand();
   }, []);
 
   const [date, setDate] = useState<Date>();
@@ -199,7 +200,7 @@ export default function PemiliharaanScreen() {
                       <Pressable onPress={() => handleModalImageShow(item.image)}>
                         <Image
                           source={{ uri: item.image }}
-                          style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 8 }}
+                          style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
                           contentFit="contain"
                         />
                       </Pressable>
@@ -244,7 +245,7 @@ export default function PemiliharaanScreen() {
         onPress={() => setModalVisible(false)}
       />
       <BottomSheet
-        ref={bottomSheetDetailRef}
+        ref={bottomSheetRef}
         snapPoints={snapPoints}
         index={-1}
         enablePanDownToClose

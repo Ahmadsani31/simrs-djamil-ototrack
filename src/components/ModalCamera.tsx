@@ -85,9 +85,7 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
     const datetime = new Date();
     const text = `📍 ${user?.name} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
     // const text = `📍 ${location?.address} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
-    console.log('====================================');
-    console.log(text);
-    console.log('====================================');
+
     try {
       const options = {
         // background image

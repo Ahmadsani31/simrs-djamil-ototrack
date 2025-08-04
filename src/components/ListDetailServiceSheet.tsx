@@ -1,12 +1,7 @@
-import { Checkpoint } from '@/types/types';
 import { BottomSheetFlatList, BottomSheetSectionList } from '@gorhom/bottom-sheet';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import { TextInput, Text, View, Image, Pressable } from 'react-native';
-import ModalPreviewImage from './ModalPreviewImage';
-import SkeletonList from './SkeletonList';
-import { useQuery } from '@tanstack/react-query';
-import secureApi from '@/services/service';
+import { Image } from 'expo-image';
+import { Text, View } from 'react-native';
 
 type itemsProps = {
   id: number;
@@ -14,6 +9,9 @@ type itemsProps = {
   keterangan: string;
   created_at: string;
 };
+
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 export default function ListDetailServiceSheet({ items }: { items: itemsProps[] }) {
   return (
@@ -36,8 +34,10 @@ export default function ListDetailServiceSheet({ items }: { items: itemsProps[] 
                 {item.file_image && (
                   <Image
                     source={{ uri: item.file_image }}
-                    className="object-contain"
-                    style={{ width: 200, height: 250, borderRadius: 8 }}
+                    style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 8 }}
+                    contentFit="contain"
+                    placeholder={blurhash}
+                    transition={500}
                   />
                 )}
                 <View className="flex-1">

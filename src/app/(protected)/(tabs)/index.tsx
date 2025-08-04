@@ -1,4 +1,4 @@
-import { View, Alert, SafeAreaView } from 'react-native';
+import { View, Alert, SafeAreaView, BackHandler } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
@@ -8,6 +8,8 @@ import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
 import PageService from '@/components/PageService';
 import PageHome from '@/components/PageHome';
+import { Toast } from 'toastify-react-native';
+import HandleError from '@/utils/handleError';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -29,8 +31,8 @@ export default function IndexScreen() {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [jenisAksi, setJenisAksi] = useState('');
-
-  const [camera, setCamera] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     fetchData();
@@ -46,18 +48,15 @@ export default function IndexScreen() {
   });
 
   // ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
-      // console.log('BottomSheet closed with swipe down.');
-      // Lakukan aksi lain jika ditutup
-      setCamera(false);
+      setIsSheetOpen(false);
     }
   }, []);
 
   const handleSnapPress = useCallback((value: string) => {
-    setCamera(true);
+    setIsSheetOpen(true);
     setJenisAksi(value);
     bottomSheetRef.current?.expand();
   }, []);
@@ -71,7 +70,7 @@ export default function IndexScreen() {
         },
       });
       if (res.status === true) {
-        setCamera(false);
+        setIsSheetOpen(false);
         // setUuid(data);
         if (jenisAksi == 'daily') {
           router.push({
@@ -84,21 +83,19 @@ export default function IndexScreen() {
             params: { uuid: data },
           });
         } else {
-          Alert.alert('Scan Error', 'QRCode salah atau tidak terbaca.');
+          Toast.show({
+            type: 'error',
+            text1: 'Perhatian!!',
+            text2: 'QRCode salah atau tidak terdaftar pada system.',
+          });
         }
       }
     } catch (error: any) {
       // console.log('Error fetching data:', error);
       // toast.info(error.response.data.message);
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Terjadi kesalahan.';
-        Alert.alert('Warning!', msg, [{ text: 'Tutup', style: 'cancel' }]);
-      } else if (error.request) {
-        Alert.alert('Network Error Scan', 'Tidak bisa terhubung ke server. Cek koneksi kamu.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
+      HandleError(error);
     } finally {
+      setIsSheetOpen(false);
       bottomSheetRef.current?.close();
     }
   };
@@ -152,7 +149,7 @@ export default function IndexScreen() {
             alignItems: 'center',
             backgroundColor: '#4f4f4f',
           }}>
-          {camera && <BarcodeScanner onScan={handleScan} />}
+          {isSheetOpen && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
       </BottomSheet>
     </SafeAreaView>

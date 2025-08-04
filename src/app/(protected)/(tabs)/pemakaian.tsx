@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  BackHandler,
 } from 'react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl } from 'react-native-gesture-handler';
@@ -64,12 +65,12 @@ export default function PemakaianScreen() {
   const snapPoints = useMemo(() => ['100%'], []);
 
   // ref
-  const bottomSheetDetailRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const [reservasiID, setReservasiID] = useState(undefined);
   const handleSnapPressDetail = useCallback((id: any) => {
     setReservasiID(id);
-    bottomSheetDetailRef.current?.expand();
+    bottomSheetRef.current?.expand();
   }, []);
 
   const [date, setDate] = useState<Date>();
@@ -260,7 +261,7 @@ export default function PemakaianScreen() {
       )}
 
       <BottomSheet
-        ref={bottomSheetDetailRef}
+        ref={bottomSheetRef}
         snapPoints={snapPoints}
         index={-1}
         enablePanDownToClose

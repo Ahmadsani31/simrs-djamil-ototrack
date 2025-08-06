@@ -28,6 +28,7 @@ import * as SecureStore from 'expo-secure-store';
 import { startTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
+import CustomNumberInput from '@/components/CustomNumberInput';
 
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),
@@ -100,7 +101,7 @@ export default function DetailScreen() {
 
       await SecureStore.setItemAsync('DataAktif', JSON.stringify(response.data));
       // console.log(response.message);
-      router.replace('/(protected)/(tabs)');
+      router.dismissTo('/(protected)/(tabs)');
     } catch (error: any) {
       console.log(error.response.data);
       HandleError(error);
@@ -185,14 +186,13 @@ export default function DetailScreen() {
                             <AntDesign name="closecircleo" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
-                        <Input
+                        <CustomNumberInput
                           className="bg-gray-200"
+                          placeholder="Masukan nilai spidometer"
                           label="Spidometer"
-                          placeholder="Angka spidometer"
-                          inputMode={'numeric'}
                           value={values.spidometer}
                           error={touched.spidometer ? errors.spidometer : undefined}
-                          onChangeText={handleChange('spidometer')}
+                          onFormattedValue={handleChange('spidometer')}
                         />
                       </>
                     )}

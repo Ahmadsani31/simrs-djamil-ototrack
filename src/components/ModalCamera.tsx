@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
 import { View, Modal, TouchableOpacity, StyleSheet, Text, Dimensions } from 'react-native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import Marker, { ImageFormat, Position, TextBackgroundType } from 'react-native-image-marker';
+// import Marker, { ImageFormat, Position, TextBackgroundType } from 'react-native-image-marker';
 import ButtonCostum from './ButtonCostum';
 import LoadingIndikator from './LoadingIndikator';
 import { Toast } from 'toastify-react-native';
@@ -43,9 +43,11 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
 
   const takePicture = async () => {
     setLoading(true);
-    const photo = await cameraRef.current?.takePictureAsync({ base64: true, quality: 0.6 });
-    await manipulatorImage(photo?.uri ?? null);
-    // setUriImage(photo?.uri ?? null);
+    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6 });
+    // await manipulatorImage(photo?.uri ?? null);
+    // console.log(photo);
+
+    setUriImage(photo?.uri ?? null);
     setLoading(false);
     onClose();
   };
@@ -81,53 +83,53 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
   //   }
   // };
 
-  const manipulatorImage = async (urlImage: string | null) => {
-    const datetime = new Date();
-    const text = `📍 ${user?.name} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
-    // const text = `📍 ${location?.address} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
+  // const manipulatorImage = async (urlImage: string | null) => {
+  //   const datetime = new Date();
+  //   const text = `📍 ${user?.name} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
+  //   // const text = `📍 ${location?.address} \n🕒 ${dayjs(datetime).format('dddd ,DD MMMM YYYY | HH:ss')}`;
 
-    try {
-      const options = {
-        // background image
-        backgroundImage: {
-          src: urlImage,
-          scale: 1,
-        },
-        watermarkTexts: [
-          {
-            text: text,
-            position: {
-              position: Position.bottomLeft,
-            },
-            style: {
-              color: '#fff',
-              fontSize: 80,
-              fontName: 'Arial',
-              textBackgroundStyle: {
-                paddingX: 30,
-                paddingY: 30,
-                type: TextBackgroundType.stretchX,
-                color: '#15192399',
-              },
-            },
-          },
-        ],
-        scale: 1,
-        quality: 100,
-        filename: 'oto-track-djmail',
-        saveFormat: ImageFormat.jpg,
-      };
-      const path = await Marker.markText(options);
-      console.log('path', path);
-      setUriImage('file:' + path);
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error capture',
-        text2: JSON.stringify(error),
-      });
-    }
-  };
+  //   try {
+  //     const options = {
+  //       // background image
+  //       backgroundImage: {
+  //         src: urlImage,
+  //         scale: 1,
+  //       },
+  //       watermarkTexts: [
+  //         {
+  //           text: text,
+  //           position: {
+  //             position: Position.bottomLeft,
+  //           },
+  //           style: {
+  //             color: '#fff',
+  //             fontSize: 80,
+  //             fontName: 'Arial',
+  //             textBackgroundStyle: {
+  //               paddingX: 30,
+  //               paddingY: 30,
+  //               type: TextBackgroundType.stretchX,
+  //               color: '#15192399',
+  //             },
+  //           },
+  //         },
+  //       ],
+  //       scale: 1,
+  //       quality: 100,
+  //       filename: 'oto-track-djmail',
+  //       saveFormat: ImageFormat.jpg,
+  //     };
+  //     const path = await Marker.markText(options);
+  //     console.log('path', path);
+  //     setUriImage('file:' + path);
+  //   } catch (error) {
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Error capture',
+  //       text2: JSON.stringify(error),
+  //     });
+  //   }
+  // };
 
   return (
     <>

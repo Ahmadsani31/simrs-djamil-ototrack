@@ -1,8 +1,8 @@
-import { View, Alert, SafeAreaView, BackHandler } from 'react-native';
+import { View, Alert, SafeAreaView, BackHandler, Text, TouchableOpacity } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import BarcodeScanner from '@/components/BarcodeScanner';
-import { router } from 'expo-router';
+import { Link, router, useFocusEffect } from 'expo-router';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
@@ -10,6 +10,8 @@ import PageService from '@/components/PageService';
 import PageHome from '@/components/PageHome';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
+import Feather from '@expo/vector-icons/Feather';
+import { FontAwesome6 } from '@expo/vector-icons';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -32,12 +34,45 @@ export default function IndexScreen() {
 
   const [jenisAksi, setJenisAksi] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [rawData, setRawData] = useState<rawData>();
+  const [rawDataService, setRawDataService] = useState<rawData>();
+
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  useEffect(() => {
-    fetchData();
-    // getValueFor();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+      fetchDataAktif();
+    }, [])
+  );
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await secureApi.get(`reservasi/aktif`);
+      // console.log('response', response);
+      setRawData(response.data);
+    } catch (error: any) {
+      // console.log('response', error.response.data);
+      setRawData(undefined);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDataAktif = async () => {
+    setLoading(true);
+    try {
+      const response = await secureApi.get(`service/aktif`);
+      console.log('response', response);
+      setRawDataService(response.data);
+    } catch (error: any) {
+      console.log('response', error.response.data);
+      setRawDataService(undefined);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
@@ -100,21 +135,23 @@ export default function IndexScreen() {
     }
   };
 
-  const [rawData, setRawData] = useState<rawData>();
+  const colors = [
+    'bg-red-500',
+    'bg-amber-500',
+    'bg-pink-500',
+    'bg-yellow-500',
+    'bg-purple-500',
+    'bg-pink-500',
+  ];
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await secureApi.get(`reservasi/aktif`);
-      // console.log('response', response);
-      setRawData(response.data);
-    } catch (error: any) {
-      // console.log('response', error.response.data);
-      setRawData(undefined);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [colorIndex, setColorIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setColorIndex((prevIndex) => (prevIndex + 1) % colors.length);
+    }, 500); // ganti warna setiap 2 detik
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -122,12 +159,28 @@ export default function IndexScreen() {
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
 
         <View className="px-4">
+          {rawDataService ? (
+            <Link href={'/pemiliharaan'} push asChild>
+              <TouchableOpacity className={`rounded-lg p-2 ${colors[colorIndex]} border`}>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center gap-2">
+                    <Feather name="info" size={24} color="white" />
+                    <View>
+                      <Text className="text-white">Pemiliharaan Aktif</Text>
+                      <View className="flex-row gap-2">
+                        <Text className="text-white">{rawDataService.kendaraan}</Text>
+                        <Text className="text-white">{rawDataService.no_polisi}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <FontAwesome6 name="square-arrow-up-right" size={24} color="white" />
+                </View>
+              </TouchableOpacity>
+            </Link>
+          ) : null}
+
           {rawData ? (
-            rawData.name == 'DAILY' ? (
-              <PageDaily item={rawData} />
-            ) : (
-              <PageService item={rawData} />
-            )
+            <PageDaily item={rawData} />
           ) : (
             <PageHome onPress={(e) => handleSnapPress(e)} />
           )}

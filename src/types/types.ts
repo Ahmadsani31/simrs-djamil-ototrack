@@ -73,6 +73,7 @@ export interface Checkpoint {
   checkpoint_in: string;
   checkpoint_out: string;
   image: string;
+  spidometer: string;
   data: CheckpointBBM[];
 }
 

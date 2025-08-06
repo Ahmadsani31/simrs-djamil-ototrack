@@ -17,7 +17,7 @@ const blurhash =
 export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: propsImage) {
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onPress}>
-      <View className="flex-1  items-center justify-end bg-black/75">
+      <View className="flex-1  items-center justify-end bg-black/25">
         {imgUrl && (
           <View className="rounded-t-2xl bg-white">
             <TouchableOpacity

@@ -4,8 +4,9 @@ import { View, Text, TouchableHighlight, FlatList, ScrollView, RefreshControl } 
 import { Checkpoint } from '@/types/types';
 import { Entypo } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ModalPreviewImage from './ModalPreviewImage';
+import { useFocusEffect } from 'expo-router';
 
 const fetchDataLog = async (reservasi_id: number) => {
   try {
@@ -20,9 +21,11 @@ const fetchDataLog = async (reservasi_id: number) => {
   }
 };
 export default function PageDailyCheckpoint({ id }: { id: number }) {
-  useEffect(() => {
-    refetch();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   const {
     data: fetch_checkpoint,
@@ -58,7 +61,7 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
     <>
       {fetch_checkpoint && fetch_checkpoint.length > 0 ? (
         <View className="my-2 rounded-lg bg-white p-4">
-          <Text className="mb-3 text-xl font-bold">Log Pemakaian</Text>
+          <Text className="mb-3 text-xl font-bold">Log Pengisian BBM</Text>
           <FlatList
             data={fetch_checkpoint}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
@@ -73,9 +76,12 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
                   <TouchableHighlight
                     onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')}
                     className="rounded-lg bg-gray-300 p-1 ">
-                    <View className="flex-row items-center">
+                    <View className="flex-row items-center gap-2">
                       <Entypo name="images" size={24} color="black" />
-                      <Text className="ms-5 text-center">gambar pengisian</Text>
+                      <View>
+                        <Text className="text-center">gambar pengisian</Text>
+                        <Text className="text-center text-xs">{item.spidometer} Km</Text>
+                      </View>
                     </View>
                   </TouchableHighlight>
                 </View>
@@ -95,9 +101,12 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
                           handleShowImage(bbm.image, 'Foto Bon / Struck pembelian BBM')
                         }
                         className="rounded-lg bg-gray-300 p-1 ">
-                        <View className="flex-row items-center">
+                        <View className="flex-row items-center gap-2">
                           <Entypo name="images" size={24} color="black" />
-                          <Text className="ms-5 text-center">gambar struk / bon</Text>
+                          <View>
+                            <Text className="text-center">gambar struk / bon</Text>
+                            <Text className="text-center text-xs">klik untuk melihat</Text>
+                          </View>
                         </View>
                       </TouchableHighlight>
                     </View>

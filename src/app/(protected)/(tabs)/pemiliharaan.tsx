@@ -22,6 +22,22 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 import { Image } from 'expo-image';
+import { useFocusEffect } from 'expo-router';
+import { useLoadingStore } from '@/stores/loadingStore';
+import PageService from '@/components/PageService';
+
+type rawData = {
+  id: number;
+  name: string;
+  kendaraan: string;
+  kendaraan_id: string;
+  no_polisi: string;
+  kegiatan: string;
+  created_at: string;
+  keterangan: string;
+  jenis_kerusakan: string;
+  lokasi: string;
+};
 
 const LIMIT = 10;
 
@@ -55,6 +71,30 @@ const fetchData = async ({
   }
 };
 export default function PemiliharaanScreen() {
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const [rawData, setRawData] = useState<rawData>();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDataAktif();
+    }, [])
+  );
+
+  const fetchDataAktif = async () => {
+    setLoading(true);
+    try {
+      const response = await secureApi.get(`service/aktif`);
+      console.log('response', response);
+      setRawData(response.data);
+    } catch (error: any) {
+      console.log('response', error.response.data);
+      setRawData(undefined);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -138,104 +178,114 @@ export default function PemiliharaanScreen() {
               Semua list pemiliharaan kendaraan Operasional RS Djamil
             </Text>
           </View>
-          <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
-            <Fontisto
-              className="absolute left-6 top-5 z-10"
-              name="date"
-              size={24}
-              color={'black'}
-            />
-            <TextInput
-              className="rounded-md border border-gray-300 bg-gray-100 py-4 ps-14"
-              placeholder="Select Date"
-              editable={false}
-              value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
-            />
-            {dateInput && (
-              <TouchableOpacity onPress={handleResetTanggal} className="absolute right-3 top-5">
-                <Entypo name="circle-with-cross" size={28} color="black" />
-              </TouchableOpacity>
-            )}
-          </Pressable>
-          <FlatList
-            data={flatData}
-            keyExtractor={(item, index) => index.toString()}
-            refreshControl={
-              <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
-            }
-            // stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 120 }}
-            renderItem={({ item }) => (
-              <>
-                <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
-                  <Text className={` text-black`}>
-                    {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
-                  </Text>
-                  <TouchableOpacity
-                    className={`my-2 flex-row items-center justify-center gap-2 rounded-lg px-3 py-1 ${colors.secondary}`}
-                    onPress={() => handleSnapPressDetail(item.images)}>
-                    <Text className="text-white">Detail</Text>
-                    <MaterialCommunityIcons
-                      name="arrow-top-right-bold-box"
-                      size={18}
-                      color="white"
-                    />
+          {rawData ? (
+            <PageService item={rawData} />
+          ) : (
+            <>
+              <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
+                <Fontisto
+                  className="absolute left-6 top-5 z-10"
+                  name="date"
+                  size={24}
+                  color={'black'}
+                />
+                <TextInput
+                  className="rounded-md border border-gray-300 bg-gray-100 py-4 ps-14"
+                  placeholder="Select Date"
+                  editable={false}
+                  value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
+                />
+                {dateInput && (
+                  <TouchableOpacity onPress={handleResetTanggal} className="absolute right-3 top-5">
+                    <Entypo name="circle-with-cross" size={28} color="black" />
                   </TouchableOpacity>
-                </View>
-                <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
-                  <View style={{ flex: 1 }} className="flex flex-row">
-                    <View className="flex-1">
-                      <Text className="text-wrap text-xl font-bold text-black">
-                        {item.kendaraan}
+                )}
+              </Pressable>
+              <FlatList
+                data={flatData}
+                keyExtractor={(item, index) => index.toString()}
+                refreshControl={
+                  <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
+                }
+                // stickyHeaderIndices={[0]}
+                contentContainerStyle={{ paddingBottom: 120 }}
+                renderItem={({ item }) => (
+                  <>
+                    <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
+                      <Text className={` text-black`}>
+                        {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                       </Text>
-                      <Text className="text-secondary text-sm">{item.no_polisi}</Text>
-                    </View>
-                    <View className="mt-2 justify-center rounded-lg bg-blue-200 px-4">
-                      <Text className="text-center font-medium">Biaya : Rp. {item.nominal}</Text>
-                    </View>
-                  </View>
-
-                  <View className="mb-3 mt-2 rounded-lg">
-                    <View className="w-full flex-1 flex-row items-start gap-5">
-                      <Pressable onPress={() => handleModalImageShow(item.image)}>
-                        <Image
-                          source={{ uri: item.image }}
-                          style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
-                          contentFit="contain"
+                      <TouchableOpacity
+                        className={`my-2 flex-row items-center justify-center gap-2 rounded-lg px-3 py-1 ${colors.secondary}`}
+                        onPress={() => handleSnapPressDetail(item.images)}>
+                        <Text className="text-white">Detail</Text>
+                        <MaterialCommunityIcons
+                          name="arrow-top-right-bold-box"
+                          size={18}
+                          color="white"
                         />
-                      </Pressable>
-                      <View className="flex-1 gap-2">
-                        <View className=" rounded-md bg-slate-200 p-2">
-                          <Text className="text-lg font-bold">{item.jenis_kerusakan}</Text>
-                          <Text className="text-wrap">{item.keterangan}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
+                      <View style={{ flex: 1 }} className="flex flex-row">
+                        <View className="flex-1">
+                          <Text className="text-wrap text-xl font-bold text-black">
+                            {item.kendaraan}
+                          </Text>
+                          <Text className="text-secondary text-sm">{item.no_polisi}</Text>
                         </View>
-                        <View className=" rounded-md bg-slate-200 p-2">
-                          <Text className="text-lg font-bold">Spidometer</Text>
-                          <Text className="text-wrap">{item.spidometer} Km</Text>
+                        <View className="mt-2 justify-center rounded-lg bg-blue-200 px-4">
+                          <Text className="text-center font-medium">
+                            Biaya : Rp. {item.nominal}
+                          </Text>
                         </View>
                       </View>
+
+                      <View className="mb-3 mt-2 rounded-lg">
+                        <View className="w-full flex-1 flex-row items-start gap-5">
+                          <Pressable onPress={() => handleModalImageShow(item.image)}>
+                            <Image
+                              source={{ uri: item.image }}
+                              style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
+                              contentFit="contain"
+                            />
+                          </Pressable>
+                          <View className="flex-1 gap-2">
+                            <View className=" rounded-md bg-slate-200 p-2">
+                              <Text className="text-lg font-bold">{item.jenis_kerusakan}</Text>
+                              <Text className="text-wrap">{item.keterangan}</Text>
+                            </View>
+                            <View className=" rounded-md bg-slate-200 p-2">
+                              <Text className="text-lg font-bold">Spidometer</Text>
+                              <Text className="text-wrap">{item.spidometer} Km</Text>
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                      <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
+                        <Text className="text-center text-lg font-bold">Keterangan</Text>
+                        <Text className="text-center font-medium">{item.keterangan_out}</Text>
+                      </View>
                     </View>
+                  </>
+                )}
+                onEndReached={() => {
+                  if (hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                  }
+                }}
+                onEndReachedThreshold={0.5}
+                ListEmptyComponent={
+                  <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
+                    <Text>Tidak ada proses pemiliharaan kendaraan</Text>
                   </View>
-                  <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
-                    <Text className="text-center text-lg font-bold">Keterangan</Text>
-                    <Text className="text-center font-medium">{item.keterangan_out}</Text>
-                  </View>
-                </View>
-              </>
-            )}
-            onEndReached={() => {
-              if (hasNextPage && !isFetchingNextPage) {
-                fetchNextPage();
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            ListEmptyComponent={
-              <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                <Text>Tidak ada proses pemiliharaan kendaraan</Text>
-              </View>
-            }
-            ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
-          />
+                }
+                ListFooterComponent={
+                  isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null
+                }
+              />
+            </>
+          )}
         </View>
       </View>
       <ModalPreviewImage

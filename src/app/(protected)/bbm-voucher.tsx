@@ -22,12 +22,15 @@ import { cn } from '@/utils/constants';
 import { Image as ImageExpo } from 'expo-image';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
+import ModalPreviewImage from '@/components/ModalPreviewImage';
+import CustomNumberInput from '@/components/CustomNumberInput';
 
 type propsBBMVoucher = {
   checkpoint_id: string;
   kendaraan_id: string;
   bbm_id: string;
   liter: string;
+  type_bbm: string;
 };
 
 export default function BbmVoucherScreen() {
@@ -42,6 +45,10 @@ export default function BbmVoucherScreen() {
   const [data, setData] = useState<propsBBMVoucher>();
   const [uriLokasi, setUriLokasi] = useState<string | null>(null);
   const [uriStruck, setUriStruck] = useState<string | null>(null);
+  const [spidometer, setSpidometer] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +110,19 @@ export default function BbmVoucherScreen() {
       Toast.show({
         type: 'error',
         text1: 'Warning!',
-        text2: 'Foto lokasi dan foto struck harus diisi',
+        text2: 'Foto nilai spidometer dan foto struk harus diisi',
+        closeIconSize: 18,
+        closeIconColor: '#ff0000',
+      });
+      setLoadingSubmit(false);
+      return;
+    }
+
+    if (spidometer == null || spidometer == '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Warning!',
+        text2: 'Nilai spidometer harus diisi',
         closeIconSize: 18,
         closeIconColor: '#ff0000',
       });
@@ -121,6 +140,7 @@ export default function BbmVoucherScreen() {
       formData.append('reservasi_id', reservasi_id ? reservasi_id.toString() : '');
       formData.append('kendaraan_id', data?.kendaraan_id || '');
       formData.append('bbm_id', data?.bbm_id || '');
+      formData.append('spidometer', spidometer);
       formData.append('imageLokasi', {
         uri: uriLokasi,
         name: 'lokasi-capture.jpg',
@@ -132,12 +152,13 @@ export default function BbmVoucherScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
+      console.log('formData', formData);
+      // return;
       await secureApi.postForm('/bbm/checkpoint_voucher', formData);
-      router.replace('/(protected)/(tabs)');
-      setLoadingSubmit(false);
+      router.dismissTo('/(protected)/(tabs)');
     } catch (error: any) {
       HandleError(error);
+    } finally {
       setLoadingSubmit(false);
     }
   };
@@ -167,70 +188,108 @@ export default function BbmVoucherScreen() {
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <Text className="text-center text-5xl font-bold">
-                  Voucher : {data?.liter} Liter Pertamax
+                  Voucher : {data?.liter} Liter, {data?.type_bbm}
                 </Text>
-                <Text className="text-center text-sm font-bold">
-                  Silahkan foto kondisi terkini saat melakukan proses pengisian BBM Kendaraan
+                <Text className="text-center text-sm">
+                  Silahkan foto nilai spidometer terkini saat melakukan proses pengisian BBM
+                  Kendaraan
                 </Text>
               </View>
-              <View className="gap-4">
-                <View className="w-full gap-1">
-                  <Text className="text-sm">Foto lokasi pengisian BBM</Text>
-                  {!uriLokasi ? (
+              <View className="mb-3">
+                <Text className="mb-1 font-bold text-gray-700">Foto nilai spidometer</Text>
+                {!uriLokasi ? (
+                  <TouchableOpacity
+                    className={`flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
+                    onPress={() => handleOpenCamera('lokasi')}>
+                    <AntDesign name="camera" size={24} color={'black'} />
+                    <Text className="font-bold">Klik untuk ambil gambar</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View className="h-16 flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
                     <TouchableOpacity
-                      className="flex-row items-center rounded-lg bg-indigo-500 px-3 py-1"
-                      onPress={() => handleOpenCamera('lokasi')}>
-                      <AntDesign name="camera" size={32} color={'white'} />
-                      <Text className="ms-2 font-light text-white">Foto Lokasi</Text>
+                      className="flex-row items-center gap-2"
+                      onPress={() => {
+                        setImgBase64(uriLokasi);
+                        setModalVisible(true);
+                      }}>
+                      <Image source={{ uri: uriLokasi }} className="size-10 rounded-lg" />
+                      <View>
+                        <Text className="font-bold">foto-spidometer.jpg</Text>
+                        <Text className="text-start text-xs">klik disini untuk lihat.</Text>
+                      </View>
                     </TouchableOpacity>
-                  ) : (
-                    <View className="w-full rounded-lg bg-black">
-                      <Image
-                        source={{ uri: uriLokasi }}
-                        className="aspect-[3/4] w-full rounded-lg"
-                      />
-                      <ButtonCloseImage onPress={() => setUriLokasi(null)} loading={loading} />
-                    </View>
-                  )}
-                </View>
-                <View className="w-full gap-1">
-                  <Text className="text-sm">Foto struck pembelian BBM</Text>
-                  {!uriStruck ? (
                     <TouchableOpacity
-                      className="flex-row items-center  rounded-lg bg-indigo-500 px-3 py-1"
-                      onPress={() => handleOpenCamera('struck')}>
-                      <AntDesign name="camera" size={32} color={'white'} />
-                      <Text className="ms-2 font-light text-white">Stuck Pembelian</Text>
+                      className="rounded-full bg-white p-1"
+                      disabled={loading}
+                      onPress={() => setUriLokasi(null)}>
+                      <AntDesign name="closecircleo" size={24} color="red" />
                     </TouchableOpacity>
-                  ) : (
-                    <View className="w-full rounded-lg bg-black">
-                      <Image
-                        source={{ uri: uriStruck }}
-                        className="aspect-[3/4] w-full rounded-lg"
-                      />
-                      <ButtonCloseImage
-                        onPress={() => setUriStruck(null)}
-                        loading={loadingSubmit}
-                      />
-                    </View>
-                  )}
-                </View>
-                <ButtonCostum
-                  classname={colors.secondary}
-                  title="Simpan Pengisian BBM"
-                  loading={loadingSubmit}
-                  onPress={handleSubmitProsesBBM}
-                />
+                  </View>
+                )}
               </View>
+              <View className="mb-4">
+                <Text className="mb-1 font-bold text-gray-700">Foto struk pembelian</Text>
+                {!uriStruck ? (
+                  <TouchableOpacity
+                    className={`flex-1 flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
+                    onPress={() => handleOpenCamera('struck')}>
+                    <AntDesign name="camera" size={24} color={'black'} />
+                    <Text className="font-bold">Klik untuk ambil gambar</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View className="h-16 flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
+                    <TouchableOpacity
+                      className="flex-row items-center gap-2"
+                      onPress={() => {
+                        setImgBase64(uriStruck);
+                        setModalVisible(true);
+                      }}>
+                      <Image source={{ uri: uriStruck }} className="size-10 rounded-lg" />
+                      <View>
+                        <Text className="font-bold">foto-struk-pembelian.jpg</Text>
+                        <Text className="text-start text-xs">klik disini untuk lihat.</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="rounded-full bg-white p-1"
+                      disabled={loading}
+                      onPress={() => setUriStruck(null)}>
+                      <AntDesign name="closecircleo" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+              <CustomNumberInput
+                className="bg-gray-50"
+                placeholder="Masukan nilai Spidometer"
+                label="Nilai Spidometer"
+                onFormattedValue={(raw) => setSpidometer(raw)}
+              />
+              <ButtonCostum
+                classname={colors.secondary}
+                title="Simpan Pengisian BBM"
+                loading={loadingSubmit}
+                onPress={handleSubmitProsesBBM}
+              />
             </>
           )}
         </View>
       </ScrollView>
-      <ModalCamera
-        visible={dialogCamera}
-        onClose={() => setDialogCamera(false)}
-        setUriImage={(e) => (typeImage == 'lokasi' ? setUriLokasi(e) : setUriStruck(e))}
-      />
+      {modalVisible && (
+        <ModalPreviewImage
+          title="Gambar Spidometer"
+          visible={modalVisible}
+          imgUrl={imgBase64 || ''}
+          onPress={() => setModalVisible(false)}
+        />
+      )}
+      {dialogCamera && (
+        <ModalCamera
+          visible={dialogCamera}
+          onClose={() => setDialogCamera(false)}
+          setUriImage={(e) => (typeImage == 'lokasi' ? setUriLokasi(e) : setUriStruck(e))}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }

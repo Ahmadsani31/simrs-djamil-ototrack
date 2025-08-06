@@ -24,11 +24,14 @@ import { dataDetail } from '@/types/types';
 import { Picker } from '@react-native-picker/picker';
 import CustomNumberInput from '@/components/CustomNumberInput';
 import HandleError from '@/utils/handleError';
+import { Dropdown } from 'react-native-element-dropdown';
+import { StyleSheet } from 'react-native';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
   lokasi: yup.string().required('lokasi / alamat pemiliharaan harus diisi'),
   jenis_kerusakan: yup.string().required('Jenis Kerusakan harus diisi'),
+  spidometer: yup.number().required('Nilai spidometer harus diisi'),
 });
 
 const fetchData = async (uuid: string) => {
@@ -101,7 +104,7 @@ export default function ServiceScreen() {
 
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       // console.log(response.message);
-      router.replace('(tabs)');
+      router.dismissTo('/(protected)/(tabs)/pemiliharaan');
     } catch (error: any) {
       // console.log(error.response.data);
       HandleError(error);
@@ -109,6 +112,19 @@ export default function ServiceScreen() {
       setLoading(false);
     }
   };
+
+  const dataDrowdown = [
+    { label: 'Service Rutin', value: 'Service Rutin' },
+    { label: 'Service Radiator', value: 'Service Radiator' },
+    { label: 'Ganti Sparepart', value: 'Ganti Sparepart' },
+    { label: 'Ganti Oli', value: 'Ganti Oli' },
+    { label: 'Ganti Aki', value: 'Ganti Aki' },
+    { label: 'Ganti Ban', value: 'Ganti Ban' },
+    { label: 'Tune Up Mesin', value: 'Tune Up Mesin' },
+    { label: 'Ganti Kaca Film', value: 'Ganti Kaca Film' },
+    { label: 'Dan Lain-lainnya...', value: 'Dan Lain-lainnya...' },
+  ];
+  const [isFocus, setIsFocus] = useState(false);
 
   return (
     <KeyboardAvoidingView
@@ -139,28 +155,36 @@ export default function ServiceScreen() {
                 initialValues={{ jenis_kerusakan: '', keterangan: '', lokasi: '', spidometer: '' }}
                 validationSchema={validationSchema}
                 onSubmit={async (values) => await handleSubmitDetail(values)}>
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                {({ handleChange, handleSubmit, values, errors, touched, setFieldValue }) => (
                   <>
-                    <View className="mb-3">
-                      <Text className="mb-1 font-bold text-gray-700">Jenis Kerusakan</Text>
-                      <View
-                        className={`border ${errors.jenis_kerusakan ? 'border-red-500' : 'border-gray-500'} rounded-lg `}>
-                        <Picker
-                          style={{ padding: 0, margin: 0 }}
-                          onValueChange={handleChange('jenis_kerusakan')}>
-                          <Picker.Item label="-Pilih jenis kerusakan-" value="" />
-                          <Picker.Item label="Service Rutin" value="Service Rutin" />
-                          <Picker.Item label="Ganti Sparepart" value="Ganti Sparepart" />
-                          <Picker.Item label="Ganti Oli" value="Ganti Oli" />
-                          <Picker.Item label="Ganti Aki" value="Ganti Aki" />
-                          <Picker.Item label="Ganti Ban" value="Ganti Ban" />
-                          <Picker.Item label="Tune Up Mesin" value="Tune Up Mesin" />
-                          <Picker.Item label="Dan Lain-lainnya..." value="Dan Lain-lainnya..." />
-                        </Picker>
-                      </View>
-                      {touched.jenis_kerusakan ? (
+                    <View className="mb-4">
+                      <Text className="mb-1 font-bold text-gray-700">Jenis BBM</Text>
+                      <Dropdown
+                        style={[
+                          styles.dropdown,
+                          isFocus && { borderColor: 'blue' },
+                          errors.jenis_kerusakan && { borderColor: 'red' },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dataDrowdown}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? 'Pilih jenis kerusakan' : '...'}
+                        value={values.jenis_kerusakan}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                          setFieldValue('jenis_kerusakan', item.value);
+                          setIsFocus(false);
+                        }}
+                      />
+                      {errors.jenis_kerusakan && (
                         <Text className="mt-1 text-xs text-red-500">{errors.jenis_kerusakan}</Text>
-                      ) : undefined}
+                      )}
                     </View>
 
                     <Input
@@ -203,3 +227,43 @@ export default function ServiceScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    padding: 16,
+  },
+  dropdown: {
+    height: 42,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+});

@@ -2,7 +2,14 @@ import { Toast } from 'toastify-react-native';
 
 const HandleError = (error: any) => {
   if (error.response && error.response.data) {
-    const msg = error.response.data.message || 'Terjadi kesalahan.';
+    let msg = error.response.data.message || 'Terjadi kesalahan.';
+    // Jika message adalah object (misalnya { spidometer: "..." })
+
+    if (typeof msg === 'object' && msg !== null) {
+      // Gabungkan semua pesan menjadi satu string
+      msg = Object.values(msg).join('\n');
+    }
+
     Toast.show({
       position: 'center',
       type: 'error',
@@ -10,6 +17,7 @@ const HandleError = (error: any) => {
       text2: msg,
       backgroundColor: '#000',
       textColor: '#fff',
+      visibilityTime: 5000,
     });
   } else if (error.request) {
     Toast.show({

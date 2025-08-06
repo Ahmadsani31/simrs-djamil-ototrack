@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../../global.css';
 import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
-import { Alert, BackHandler } from 'react-native';
+import { Alert, BackHandler, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -148,8 +148,8 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
-          {/* <NotifikasiNewVersion />
-          <NotifikasiNewVersionMinor /> */}
+          <NotifikasiNewVersion />
+          <NotifikasiNewVersionMinor />
           <ToastManager useModal={false} />
         </GestureHandlerRootView>
       </SafeAreaProvider>

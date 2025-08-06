@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from '@/components/Input';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from '@/components/ModalCamera';
@@ -30,6 +30,7 @@ import * as SecureStore from 'expo-secure-store';
 import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
+import CustomNumberInput from '@/components/CustomNumberInput';
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -48,15 +49,20 @@ export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
 
-  const { data, isLoading, error, isError } = useQuery<dataDetail>({
+  const { data, isLoading, error, refetch, isError } = useQuery<dataDetail>({
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
   });
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isError) {
     Alert.alert('Peringatan!', 'Data tidak valid atau kendaraan tidak aktif!', [
       { text: 'Kembali', onPress: () => router.back() },
     ]);
+    return null;
   }
 
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -104,7 +110,7 @@ export default function PengembalianScreen() {
 
       await SecureStore.deleteItemAsync('DataAktif');
       // console.log(response.message);
-      router.replace('(tabs)');
+      router.dismissTo('/(protected)/(tabs)');
     } catch (error: any) {
       HandleError(error);
     } finally {
@@ -174,14 +180,13 @@ export default function PengembalianScreen() {
                             <AntDesign name="closecircleo" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
-                        <Input
+                        <CustomNumberInput
                           className="bg-gray-200"
+                          placeholder="Masukan nilai spidometer"
                           label="Spidometer"
-                          placeholder="Angka spidometer"
-                          inputMode={'numeric'}
                           value={values.spidometer}
                           error={touched.spidometer ? errors.spidometer : undefined}
-                          onChangeText={handleChange('spidometer')}
+                          onFormattedValue={handleChange('spidometer')}
                         />
                       </>
                     )}

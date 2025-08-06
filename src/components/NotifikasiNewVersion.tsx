@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Application from 'expo-application';
 import semver from 'semver';
-import { URL_PLAY_STORE } from '@/utils/constants';
-import secureApi from '@/services/service';
+import { URL_PLAY_STORE, API_URL } from '@/utils/constants';
+import axios from 'axios';
 
 export default function NotifikasiNewVersion() {
   const [visible, setVisible] = useState(false);
@@ -15,8 +15,8 @@ export default function NotifikasiNewVersion() {
       const currentVersion = Application.nativeApplicationVersion ?? '1.0.0';
 
       try {
-        const response = await secureApi.get('auth/version_new_android');
-        if (semver.lt(currentVersion, response.latest_version)) {
+        const response = await axios.get(API_URL + '/auth/version_new_android');
+        if (semver.lt(currentVersion, response.data.latest_version)) {
           setVisible(true);
         }
       } catch (error) {

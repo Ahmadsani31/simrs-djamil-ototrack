@@ -78,8 +78,7 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ],
-      "expo-web-browser",
-      "react-native-image-marker"
+      "expo-web-browser"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",

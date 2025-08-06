@@ -24,6 +24,7 @@ import { Toast } from 'toastify-react-native';
 import CustomNumberInput from '@/components/CustomNumberInput';
 import InputArea from '@/components/InputArea';
 import HandleError from '@/utils/handleError';
+import ModalPreviewImage from '@/components/ModalPreviewImage';
 
 type propsService = {
   id: string;
@@ -56,6 +57,8 @@ type propsSubmit = {
 
 export default function PengembalianServiceScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
+  const [modalImageVisible, setModalImageVisible] = useState(false);
+  const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
   const { data, isLoading, error, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
@@ -145,7 +148,7 @@ export default function PengembalianServiceScreen() {
                     <View className="flex-row items-center text-sm text-gray-500">
                       <View className="flex-grow border-t border-gray-300" />
                       <Text className="mx-2 text-lg text-[#205781]">
-                        Proses Pengembalian Kendaraan
+                        Proses Pengembalian pemiliharaan Kendaraan
                       </Text>
                       <View className="flex-grow border-t border-gray-300" />
                     </View>
@@ -156,42 +159,51 @@ export default function PengembalianServiceScreen() {
                   </View>
                   <View className="mb-4 w-full border border-b-2" />
                   <Text className="mb-3 text-center">
-                    Silahkan foto spidometer kendaraan yang terbaru
+                    Silahkan foto struk atau bon belanja pemiliharaan kendaraan
                   </Text>
 
                   <CustomNumberInput
                     className="bg-gray-100"
                     placeholder="Masukan nominal"
-                    label="Uang"
+                    label="Nominal Uang"
                     value={values.nominal}
                     error={touched.nominal ? errors.nominal : undefined}
                     onFormattedValue={handleChange('nominal')}
                   />
-                  <Text className="text-center text-sm text-gray-500">
-                    Ambil foto struk / bon pengisian BBM
-                  </Text>
-                  {!uri ? (
-                    <TouchableOpacity
-                      className="my-3 flex-row items-center rounded-lg bg-indigo-500 px-3 py-1"
-                      onPress={() => setModalVisible(true)}>
-                      <AntDesign name="camera" size={32} color={'white'} />
-                      <Text className="ms-2 font-bold text-white">Open Camera</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <View className="my-4 w-full rounded-lg bg-black">
-                      <Image
-                        source={{ uri: uri || undefined }}
-                        className="aspect-[3/4] w-full rounded-lg"
-                      />
+
+                  <View className="mb-3">
+                    <Text className="mb-1 font-bold text-gray-700">
+                      Foto struk / bon pemiliharaan
+                    </Text>
+                    {!uri ? (
                       <TouchableOpacity
-                        className="absolute right-1 top-1 rounded-full bg-white p-1"
-                        onPress={() => {
-                          setUri(null);
-                        }}>
-                        <AntDesign name="closecircleo" size={32} color="red" />
+                        className={`flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
+                        onPress={() => setModalVisible(true)}>
+                        <AntDesign name="camera" size={24} color={'black'} />
+                        <Text className="font-bold">Klik untuk ambil gambar</Text>
                       </TouchableOpacity>
-                    </View>
-                  )}
+                    ) : (
+                      <View className="h-16 flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
+                        <TouchableOpacity
+                          className="flex-row items-center gap-2"
+                          onPress={() => {
+                            setImgBase64(uri);
+                            setModalImageVisible(true);
+                          }}>
+                          <Image source={{ uri: uri }} className="size-10 rounded-lg" />
+                          <View>
+                            <Text className="font-bold">foto-struk-bon-pemiliharaan.jpg</Text>
+                            <Text className="text-start text-xs">klik disini untuk lihat.</Text>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          className="rounded-full bg-white p-1"
+                          onPress={() => setUri(null)}>
+                          <AntDesign name="closecircleo" size={24} color="red" />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
                   <InputArea
                     className="bg-gray-50"
                     label="Keterangan"
@@ -211,6 +223,14 @@ export default function PengembalianServiceScreen() {
           )}
         </View>
       </ScrollView>
+      {modalImageVisible && (
+        <ModalPreviewImage
+          title="Gambar Spidometer"
+          visible={modalImageVisible}
+          imgUrl={imgBase64 || ''}
+          onPress={() => setModalImageVisible(false)}
+        />
+      )}
       <ModalCamera
         visible={modalVisible}
         onClose={() => setModalVisible(false)}

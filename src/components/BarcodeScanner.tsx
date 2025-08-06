@@ -105,7 +105,7 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
             height: 260,
             borderRadius: 10,
           }}
-          zoom={0.2}
+          zoom={0.3}
           facing="back"
           ratio="1:1"
           autofocus="on"

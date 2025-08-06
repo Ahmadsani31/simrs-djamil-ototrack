@@ -35,7 +35,7 @@ export default function IndexScreen() {
   const [jenisAksi, setJenisAksi] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [rawData, setRawData] = useState<rawData>();
-  const [rawDataService, setRawDataService] = useState<rawData>();
+  const [rawDataService, setRawDataService] = useState<rawData[]>();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -64,11 +64,11 @@ export default function IndexScreen() {
     setLoading(true);
     try {
       const response = await secureApi.get(`service/aktif`);
-      console.log('response', response);
+      // console.log('response', response);
       setRawDataService(response.data);
     } catch (error: any) {
-      console.log('response', error.response.data);
-      setRawDataService(undefined);
+      // console.log('response', error.response.data);
+      setRawDataService([]);
     } finally {
       setLoading(false);
     }
@@ -98,6 +98,7 @@ export default function IndexScreen() {
 
   const handleScan = async (data: string) => {
     // console.log('Scanned data:', data);
+    setLoading(true);
     try {
       const res = await secureApi.get(`reservasi/qrcode`, {
         params: {
@@ -132,26 +133,9 @@ export default function IndexScreen() {
     } finally {
       setIsSheetOpen(false);
       bottomSheetRef.current?.close();
+      setLoading(false);
     }
   };
-
-  const colors = [
-    'bg-red-500',
-    'bg-amber-500',
-    'bg-pink-500',
-    'bg-yellow-500',
-    'bg-purple-500',
-    'bg-pink-500',
-  ];
-
-  const [colorIndex, setColorIndex] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setColorIndex((prevIndex) => (prevIndex + 1) % colors.length);
-    }, 500); // ganti warna setiap 2 detik
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -159,18 +143,21 @@ export default function IndexScreen() {
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
 
         <View className="px-4">
-          {rawDataService ? (
-            <Link href={'/pemiliharaan'} push asChild>
-              <TouchableOpacity className={`rounded-lg p-2 ${colors[colorIndex]} border`}>
+          {(rawDataService?.length ?? 0) > 0 ? (
+            <Link href={'/(pemiliharaan)'} push asChild>
+              <TouchableOpacity className={`rounded-lg border bg-sky-500 p-2`}>
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center gap-2">
                     <Feather name="info" size={24} color="white" />
                     <View>
-                      <Text className="text-white">Pemiliharaan Aktif</Text>
-                      <View className="flex-row gap-2">
-                        <Text className="text-white">{rawDataService.kendaraan}</Text>
-                        <Text className="text-white">{rawDataService.no_polisi}</Text>
-                      </View>
+                      <Text className="text-white">Pemiliharaan sedang aktif</Text>
+                      {rawDataService?.length === 1 ? (
+                        <Text className="font-bold text-white">
+                          {rawDataService[0].kendaraan} {rawDataService[0].no_polisi}
+                        </Text>
+                      ) : (rawDataService?.length ?? 0) > 1 ? (
+                        <Text>...Total ada {rawDataService?.length} kendaraan</Text>
+                      ) : null}
                     </View>
                   </View>
                   <FontAwesome6 name="square-arrow-up-right" size={24} color="white" />

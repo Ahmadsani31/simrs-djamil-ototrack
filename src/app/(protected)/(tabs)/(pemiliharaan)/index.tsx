@@ -14,7 +14,7 @@ import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
-import { Entypo, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome6, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from '@/components/SkeletonList';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { colors } from '@/constants/colors';
@@ -22,9 +22,8 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 import { Image } from 'expo-image';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useLoadingStore } from '@/stores/loadingStore';
-import PageService from '@/components/PageService';
 
 type rawData = {
   id: number;
@@ -70,13 +69,14 @@ const fetchData = async ({
     };
   }
 };
-export default function PemiliharaanScreen() {
+export default function IndexScreen() {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [rawData, setRawData] = useState<rawData>();
+  const [rawData, setRawData] = useState<rawData[]>();
 
   useFocusEffect(
     useCallback(() => {
+      refetch();
       fetchDataAktif();
     }, [])
   );
@@ -85,10 +85,10 @@ export default function PemiliharaanScreen() {
     setLoading(true);
     try {
       const response = await secureApi.get(`service/aktif`);
-      console.log('response', response);
+      // console.log('response', response);
       setRawData(response.data);
     } catch (error: any) {
-      console.log('response', error.response.data);
+      // console.log('response', error.response.data);
       setRawData(undefined);
     } finally {
       setLoading(false);
@@ -124,10 +124,6 @@ export default function PemiliharaanScreen() {
 
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');
-
-  useEffect(() => {
-    refetch();
-  }, []);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({
@@ -178,8 +174,44 @@ export default function PemiliharaanScreen() {
               Semua list pemiliharaan kendaraan Operasional RS Djamil
             </Text>
           </View>
-          {rawData ? (
-            <PageService item={rawData} />
+          {rawData && rawData.length > 0 ? (
+            rawData.map((itx, i) => (
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: '/(pemiliharaan)/pemiliharaan-nested',
+                    params: {
+                      service_id: itx?.id,
+                    },
+                  })
+                }
+                key={i}>
+                <View className="my-2 rounded-lg bg-white p-4">
+                  <View className="mb-2 flex-row items-center justify-between gap-3 border-b-2">
+                    <Text>{dayjs(itx.created_at).format('dddd ,DD MMMM YYYY | HH:mm')}</Text>
+                    <View className="flex-row items-center gap-2">
+                      <Text className="text-xs">Klik untuk detail</Text>
+                      <FontAwesome6 name="square-arrow-up-right" size={24} color="black" />
+                    </View>
+                  </View>
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-1">
+                      <Text className="text-2xl font-bold">{itx?.kendaraan}</Text>
+                      <Text className="mb-2 text-xl font-medium">{itx?.no_polisi}</Text>
+                    </View>
+                    <View className="rounded-lg bg-amber-500 p-2 text-center">
+                      <Text className="text-xs font-bold text-white">Kerusakan :</Text>
+                      <Text className="text-xl font-bold text-white">{itx?.jenis_kerusakan}</Text>
+                    </View>
+                  </View>
+
+                  <View className=" rounded-lg bg-gray-200 p-1 px-3">
+                    <Text className="text-center font-medium">{itx?.keterangan}</Text>
+                    <Text className="text-center font-medium">{itx?.lokasi}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
           ) : (
             <>
               <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>

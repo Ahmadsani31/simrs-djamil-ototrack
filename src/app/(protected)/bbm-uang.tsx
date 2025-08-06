@@ -48,7 +48,8 @@ export default function BbmUangScreen() {
   const [uriStruck, setUriStruck] = useState<string | null>(null);
   const [uang, setUang] = useState('');
   const [spidometer, setSpidometer] = useState('');
-
+  const [typeBbm, setTypeBbm] = useState('');
+  const [isFocus, setIsFocus] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
@@ -96,6 +97,18 @@ export default function BbmUangScreen() {
       return;
     }
 
+    if (typeBbm == null || typeBbm == '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Warning!',
+        text2: 'Jenis BBM harus diisi',
+        closeIconSize: 18,
+        closeIconColor: '#ff0000',
+      });
+      setLoading(false);
+      return;
+    }
+
     if (spidometer == null || spidometer == '') {
       Toast.show({
         type: 'error',
@@ -117,13 +130,14 @@ export default function BbmUangScreen() {
       formData.append('kendaraan_id', kendaraan_id ? kendaraan_id.toString() : '');
       formData.append('jenis', 'Uang');
       formData.append('uang', uang);
+      formData.append('type_bbm', typeBbm);
       formData.append('spidometer', spidometer);
-      formData.append('imageSpidometer', {
+      formData.append('imgSpidometer', {
         uri: uriSpidometer,
         name: 'spidometer-capture.jpg',
         type: 'image/jpeg',
       } as any);
-      formData.append('imageStruck', {
+      formData.append('imgStruk', {
         uri: uriStruck,
         name: 'struck-capture.jpg',
         type: 'image/jpeg',
@@ -131,7 +145,7 @@ export default function BbmUangScreen() {
 
       console.log('formData', formData);
       // return;
-      await secureApi.postForm('/bbm/checkpoint_uang', formData);
+      await secureApi.postForm('/bbm/store_uang', formData);
       router.dismissTo('/(protected)/(tabs)');
       // console.log('response save ', JSON.stringify(response));
       // await SecureStore.setItemAsync('Checkpoint', JSON.stringify(response.data));
@@ -165,10 +179,8 @@ export default function BbmUangScreen() {
     { label: 'Pertamax Turbo', value: 'Pertamax Turbo' },
     { label: 'Dexlite', value: 'Dexlite' },
     { label: 'Pertamina Dex', value: 'Pertamina Dex' },
-    { label: 'Solar', value: 'Solar' },
+    { label: 'Bio Solar (Solar)', value: 'Bio Solar (Solar)' },
   ];
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
 
   return (
     <KeyboardAvoidingView
@@ -244,11 +256,11 @@ export default function BbmUangScreen() {
               valueField="value"
               placeholder={!isFocus ? 'Pilih Jenis BBM' : '...'}
               searchPlaceholder="Search..."
-              value={value}
+              value={typeBbm}
               onFocus={() => setIsFocus(true)}
               onBlur={() => setIsFocus(false)}
               onChange={(item) => {
-                setValue(item.value);
+                setTypeBbm(item.value);
                 setIsFocus(false);
               }}
             />

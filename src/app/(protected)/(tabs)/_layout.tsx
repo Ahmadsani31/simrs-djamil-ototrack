@@ -90,7 +90,7 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="pemiliharaan"
+          name="(pemiliharaan)"
           options={{
             title: 'Pemiliharaan',
             tabBarIcon: ({ color }) => (

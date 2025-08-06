@@ -117,7 +117,7 @@ export default function PengembalianServiceScreen() {
 
       // await SecureStore.deleteItemAsync('DataAktif');
       // console.log(response.message);
-      router.replace('(tabs)');
+      router.replace('(tabs)/(pemiliharaan)');
     } catch (error: any) {
       // console.log(error.response);
       HandleError(error);

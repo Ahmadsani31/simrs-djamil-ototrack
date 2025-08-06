@@ -82,7 +82,7 @@ ModalRN.Header = function Header({ children }: { children: React.ReactNode }) {
 };
 
 ModalRN.Content = function Content({ children }: { children: React.ReactNode }) {
-  return <View style={styles.content}>{children}</View>;
+  return <View className="px-4 py-2">{children}</View>;
 };
 
 ModalRN.Footer = function Footer({ children }: { children: React.ReactNode }) {
@@ -109,7 +109,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7f7',
   },
   content: {
-    padding: 20,
+    paddingTop: 10,
+    paddingEnd: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   footer: {
     padding: 10,

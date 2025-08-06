@@ -1,28 +1,16 @@
 import secureApi from '@/services/service';
 import { useQuery } from '@tanstack/react-query';
 import { View, Text, TouchableHighlight, FlatList, ScrollView, RefreshControl } from 'react-native';
-import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Checkpoint } from '@/types/types';
+import { Entypo } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import ModalPreviewImage from './ModalPreviewImage';
 import { useFocusEffect } from 'expo-router';
 
-interface propsBbm {
-  id: number;
-  jenis: string;
-  uang: string;
-  liter: string;
-  bbm_date: string;
-  created_at: string;
-  spidometer: string;
-  image_spidometer: string;
-  image_struk: string;
-  type_bbm: string;
-}
-
 const fetchDataLog = async (reservasi_id: number) => {
   try {
-    const response = await secureApi.get(`/bbm/list_pengisian`, {
+    const response = await secureApi.get(`/checkpoint/pemakaian`, {
       params: {
         reservasi_id: reservasi_id,
       },
@@ -45,7 +33,7 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
     isError,
     error,
     refetch,
-  } = useQuery<propsBbm[]>({
+  } = useQuery<Checkpoint[]>({
     queryKey: ['fetch_checkpoint', id],
     queryFn: async () => await fetchDataLog(id),
     enabled: !!id,
@@ -78,55 +66,52 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
             data={fetch_checkpoint}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
             renderItem={({ item }) => (
-              <View className="mb-2 gap-2 rounded-lg bg-[#F2E5BF] p-4">
-                <View className="flex-row items-center justify-between rounded-lg">
-                  <View className="justify-center">
-                    <Text>{dayjs(item.bbm_date).format('dddd ,DD MMMM YYYY')}</Text>
-                    <Text>Jam : {dayjs(item.bbm_date).format('HH:mm')}</Text>
+              <View className="mb-2 rounded-lg bg-[#F2E5BF] p-4">
+                <View className="mb-1 flex-row items-center justify-between rounded-lg">
+                  <View>
+                    <Text className="font-bold">{item.checkpoint_name}</Text>
+                    <Text>{dayjs(item.checkpoint_in).format('dddd ,DD MMMM YYYY')}</Text>
+                    <Text>Jam : {dayjs(item.checkpoint_in).format('HH:ss')}</Text>
                   </View>
                   <TouchableHighlight
-                    onPress={() =>
-                      handleShowImage(item.image_spidometer, 'Foto proses pengisian BBM')
-                    }
-                    className="rounded-lg bg-gray-300 p-1">
+                    onPress={() => handleShowImage(item.image, 'Foto proses pengisian BBM')}
+                    className="rounded-lg bg-gray-300 p-1 ">
                     <View className="flex-row items-center gap-2">
                       <Entypo name="images" size={24} color="black" />
                       <View>
+                        <Text className="text-center">gambar pengisian</Text>
                         <Text className="text-center text-xs">{item.spidometer} Km</Text>
-                        <Text className="text-center text-xs">klik untuk detail</Text>
                       </View>
                     </View>
                   </TouchableHighlight>
                 </View>
-                <View className="mb-3 rounded-lg bg-white p-4">
-                  <View className="flex-row items-center gap-2">
-                    <MaterialCommunityIcons name="gas-station" size={24} color="black" />
-                    <Text className="text-lg font-bold">{item.type_bbm}</Text>
-                  </View>
-                  <View className="flex-row">
-                    <Text className="font-bold">Dengan {item.jenis}</Text>
-                    <Text>
-                      {item.jenis == 'Voucher'
-                        ? ` : ${item.liter} Liter`
-                        : ` : Nominal Rp.${parseFloat(Number(item.uang).toFixed(2)).toLocaleString()}`}
-                    </Text>
-                  </View>
-                  <View>
-                    <TouchableHighlight
-                      onPress={() =>
-                        handleShowImage(item.image_struk, 'Foto Bon / Struck pembelian BBM')
-                      }
-                      className="rounded-lg bg-gray-300 p-1 ">
-                      <View className="flex-row items-center gap-2">
-                        <Entypo name="images" size={24} color="black" />
-                        <View>
-                          <Text className="text-center">gambar struk / bon</Text>
-                          <Text className="text-center text-xs">klik untuk melihat</Text>
+                {item.data.map((bbm, index) => (
+                  <View className="mb-3 gap-2 rounded-lg bg-white p-4" key={index}>
+                    <View className="flex-row">
+                      <Text className="font-bold">Dengan {bbm.jenis}</Text>
+                      <Text>
+                        {bbm.jenis == 'Voucher'
+                          ? ` : ${bbm.liter} Liter`
+                          : ` : Nominal Rp.${parseFloat(Number(bbm.uang).toFixed(2)).toLocaleString()}`}
+                      </Text>
+                    </View>
+                    <View>
+                      <TouchableHighlight
+                        onPress={() =>
+                          handleShowImage(bbm.image, 'Foto Bon / Struck pembelian BBM')
+                        }
+                        className="rounded-lg bg-gray-300 p-1 ">
+                        <View className="flex-row items-center gap-2">
+                          <Entypo name="images" size={24} color="black" />
+                          <View>
+                            <Text className="text-center">gambar struk / bon</Text>
+                            <Text className="text-center text-xs">klik untuk melihat</Text>
+                          </View>
                         </View>
-                      </View>
-                    </TouchableHighlight>
+                      </TouchableHighlight>
+                    </View>
                   </View>
-                </View>
+                ))}
               </View>
             )}
             keyExtractor={(item) => item.id.toString()}

@@ -26,8 +26,6 @@ import ModalPreviewImage from '@/components/ModalPreviewImage';
 import CustomNumberInput from '@/components/CustomNumberInput';
 
 type propsBBMVoucher = {
-  checkpoint_id: string;
-  kendaraan_id: string;
   bbm_id: string;
   liter: string;
   type_bbm: string;
@@ -133,20 +131,18 @@ export default function BbmVoucherScreen() {
     try {
       const formData = new FormData();
 
-      formData.append('id', data?.checkpoint_id || '');
+      formData.append('id', data?.bbm_id || '');
 
       formData.append('latitude', coordinate?.lat?.toString());
       formData.append('longitude', coordinate?.long.toString());
       formData.append('reservasi_id', reservasi_id ? reservasi_id.toString() : '');
-      formData.append('kendaraan_id', data?.kendaraan_id || '');
-      formData.append('bbm_id', data?.bbm_id || '');
       formData.append('spidometer', spidometer);
-      formData.append('imageLokasi', {
+      formData.append('imgSpidometer', {
         uri: uriLokasi,
         name: 'lokasi-capture.jpg',
         type: 'image/jpeg',
       } as any);
-      formData.append('imageStruck', {
+      formData.append('imgStruk', {
         uri: uriStruck,
         name: 'struck-capture.jpg',
         type: 'image/jpeg',
@@ -154,7 +150,7 @@ export default function BbmVoucherScreen() {
 
       console.log('formData', formData);
       // return;
-      await secureApi.postForm('/bbm/checkpoint_voucher', formData);
+      await secureApi.postForm('/bbm/store_voucher', formData);
       router.dismissTo('/(protected)/(tabs)');
     } catch (error: any) {
       HandleError(error);

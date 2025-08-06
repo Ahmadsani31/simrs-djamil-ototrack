@@ -39,7 +39,7 @@ const fetchData = async (uuid: string) => {
   return response.data;
 };
 
-export default function ServiceScreen() {
+export default function PemiliharaanDetailScreen() {
   const { uuid } = useLocalSearchParams();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -104,7 +104,7 @@ export default function ServiceScreen() {
 
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       // console.log(response.message);
-      router.dismissTo('/(protected)/(tabs)/(pemiliharaan)');
+      router.dismissTo('/(protected)/(tabs)/pemiliharaan');
     } catch (error: any) {
       // console.log(error.response.data);
       HandleError(error);

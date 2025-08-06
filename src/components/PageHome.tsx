@@ -36,7 +36,7 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
 
       setBarData(chart);
     } catch (error: any) {
-      console.log('response', error.response.data);
+      // console.log('response', error.response.data);
       setBarData([]);
     } finally {
       setLoading(false);

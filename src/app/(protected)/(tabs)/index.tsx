@@ -11,7 +11,7 @@ import PageHome from '@/components/PageHome';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import Feather from '@expo/vector-icons/Feather';
-import { FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -173,7 +173,14 @@ export default function IndexScreen() {
           )}
         </View>
       </View>
-
+      <View className="absolute bottom-1 right-1 z-10">
+        <TouchableOpacity
+          className="flex-row items-center gap-2 rounded-lg bg-[#205781] px-2 py-1"
+          onPress={fetchDataAktif}>
+          <Text className="text-white">Refresh</Text>
+          <FontAwesome name="refresh" size={14} color="white" />
+        </TouchableOpacity>
+      </View>
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={['100%']}

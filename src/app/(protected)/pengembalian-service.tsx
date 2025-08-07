@@ -165,7 +165,7 @@ export default function PengembalianServiceScreen() {
                   <CustomNumberInput
                     className="bg-gray-100"
                     placeholder="Masukan nominal"
-                    label="Nominal Uang"
+                    label="Biaya Pemiliharaan"
                     value={values.nominal}
                     error={touched.nominal ? errors.nominal : undefined}
                     onFormattedValue={handleChange('nominal')}

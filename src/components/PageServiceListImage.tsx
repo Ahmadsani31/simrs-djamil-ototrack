@@ -43,7 +43,7 @@ export default function PageServiceListImage({
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingBottom: 920, gap: 10 }}
+        contentContainerStyle={{ paddingBottom: 520, gap: 10 }}
         ListEmptyComponent={
           isLoading ? (
             <SkeletonList loop={8} />

@@ -223,6 +223,12 @@ export default function BbmVoucherScreen() {
                   </View>
                 )}
               </View>
+              <CustomNumberInput
+                className="bg-gray-50"
+                placeholder="Masukan nilai Spidometer"
+                label="Nilai Spidometer"
+                onFormattedValue={(raw) => setSpidometer(raw)}
+              />
               <View className="mb-4">
                 <Text className="mb-1 font-bold text-gray-700">Foto struk pembelian</Text>
                 {!uriStruck ? (
@@ -255,12 +261,7 @@ export default function BbmVoucherScreen() {
                   </View>
                 )}
               </View>
-              <CustomNumberInput
-                className="bg-gray-50"
-                placeholder="Masukan nilai Spidometer"
-                label="Nilai Spidometer"
-                onFormattedValue={(raw) => setSpidometer(raw)}
-              />
+
               <ButtonCostum
                 classname={colors.secondary}
                 title="Simpan Pengisian BBM"

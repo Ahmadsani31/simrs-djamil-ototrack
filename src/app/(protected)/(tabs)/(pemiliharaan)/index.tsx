@@ -14,7 +14,13 @@ import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
-import { Entypo, FontAwesome6, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  Entypo,
+  FontAwesome,
+  FontAwesome6,
+  Fontisto,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import SkeletonList from '@/components/SkeletonList';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { colors } from '@/constants/colors';
@@ -162,7 +168,7 @@ export default function IndexScreen() {
   };
 
   const flatData = data?.pages.flatMap((page) => page.data) ?? [];
-  // console.log('flatData pemakaiana', fetchData);
+  // console.log('flatData pemakaiana', flatData);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -319,6 +325,14 @@ export default function IndexScreen() {
             </>
           )}
         </View>
+      </View>
+      <View className="absolute bottom-1 right-1 z-10">
+        <TouchableOpacity
+          className="flex-row items-center gap-2 rounded-lg bg-[#205781] px-2 py-1"
+          onPress={fetchDataAktif}>
+          <Text className="text-white">Refresh</Text>
+          <FontAwesome name="refresh" size={14} color="white" />
+        </TouchableOpacity>
       </View>
       <ModalPreviewImage
         title="Gambar Pemiliharaan"

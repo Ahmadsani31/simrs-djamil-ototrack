@@ -169,15 +169,13 @@ export default function IndexScreen() {
                 ) : null}
               </View>
               <View className="mb-2 gap-2 rounded-b-lg bg-white p-4 shadow">
-                <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center justify-between gap-2">
                   <Text className={`text-center text-xl font-bold text-black`}>
                     {item.nameUser}
                   </Text>
-                  <View className="items-center justify-between">
-                    <View>
-                      <Text className={`text-lg font-bold text-black`}>{item.model}</Text>
-                      <Text className="text-secondary text-sm">{item.no_polisi}</Text>
-                    </View>
+                  <View>
+                    <Text className={`text-wrap text-lg font-bold text-black`}>{item.model}</Text>
+                    <Text className="text-secondary text-sm">{item.no_polisi}</Text>
                   </View>
                 </View>
                 <View className="rounded-md bg-slate-100 p-3">

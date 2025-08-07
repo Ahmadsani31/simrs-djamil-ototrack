@@ -23,8 +23,13 @@ export default function NotifikasiNewVersion() {
         console.log('error', JSON.stringify(error));
       }
     };
+    const timeout = setTimeout(() => {
+      cekNewVersion(); // ganti warna setelah 2 detik
+      console.log('cek version');
+    }, 5000);
+
+    return () => clearTimeout(timeout);
     // call the function
-    cekNewVersion();
   }, []);
 
   return (

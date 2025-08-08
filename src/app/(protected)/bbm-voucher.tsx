@@ -24,6 +24,7 @@ import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import CustomNumberInput from '@/components/CustomNumberInput';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type propsBBMVoucher = {
   bbm_id: string;
@@ -33,6 +34,8 @@ type propsBBMVoucher = {
 
 export default function BbmVoucherScreen() {
   const { kendaraan_id, reservasi_id } = useLocalSearchParams();
+
+  const insets = useSafeAreaInsets();
 
   const [dialogCamera, setDialogCamera] = useState(false);
 
@@ -169,9 +172,9 @@ export default function BbmVoucherScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="m-4 rounded-lg bg-white p-4">
           {loading || isError ? (
             <SkeletonList loop={5} />
@@ -233,13 +236,13 @@ export default function BbmVoucherScreen() {
                 <Text className="mb-1 font-bold text-gray-700">Foto struk pembelian</Text>
                 {!uriStruck ? (
                   <TouchableOpacity
-                    className={`flex-1 flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
+                    className={`flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
                     onPress={() => handleOpenCamera('struck')}>
                     <AntDesign name="camera" size={24} color={'black'} />
                     <Text className="font-bold">Klik untuk ambil gambar</Text>
                   </TouchableOpacity>
                 ) : (
-                  <View className="h-16 flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
+                  <View className="flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
                     <TouchableOpacity
                       className="flex-row items-center gap-2"
                       onPress={() => {

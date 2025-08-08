@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalCamera from '@/components/ModalCamera';
 import secureApi from '@/services/service';
-import { Formik } from 'formik';
+import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
@@ -26,6 +26,9 @@ import InputArea from '@/components/InputArea';
 import HandleError from '@/utils/handleError';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import InputDate from '@/components/InputDate';
+import InputFile from '@/components/InputFile';
+import dayjs from 'dayjs';
 
 type propsService = {
   id: string;
@@ -36,10 +39,11 @@ type propsService = {
   lokasi: string;
 };
 
-const fetchData = async (service_id: string) => {
-  const response = await secureApi.get(`/service/data_aktif`, {
+const fetchData = async (service_id: string, kendaraan_id: string) => {
+  const response = await secureApi.get(`/service/data_aktif_admin`, {
     params: {
       service_id: service_id,
+      kendaraan_id: kendaraan_id,
     },
   });
   // console.log(`fetchData response`, response.data);
@@ -49,22 +53,21 @@ const fetchData = async (service_id: string) => {
 
 const validationSchema = yup.object().shape({
   nominal: yup.number().required('Uang wajib isi'),
+  tanggal: yup.string().required('Tanggal wajib isi'),
+  keterangan: yup.string().required('Keterangan wajib isi'),
+  fileUpload: yup.string().required('File image wajib diisi (required)'),
 });
-
-type propsSubmit = {
-  nominal: string;
-  keterangan: string;
-};
 
 export default function PengembalianServiceScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
+
   const insets = useSafeAreaInsets();
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
   const { data, isLoading, error, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
-    queryFn: () => fetchData(service_id.toString()),
+    queryFn: () => fetchData(service_id.toString(), kendaraan_id.toString()),
   });
 
   if (isError) {
@@ -75,20 +78,10 @@ export default function PengembalianServiceScreen() {
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [uri, setUri] = useState<string | null>(null);
-
-  const postSubmitData = async (values: propsSubmit) => {
+  const postSubmitData = async (values: FormikValues) => {
     console.log(values);
 
     setLoading(true);
-
-    if (!uri) {
-      Toast.error('Foto struk / bon belum di ambil');
-      setLoading(false);
-      return;
-    }
 
     const coordinate = await reLocation.getCoordinate();
 
@@ -105,21 +98,22 @@ export default function PengembalianServiceScreen() {
       formData.append('kendaraan_id', kendaraan_id.toString());
       formData.append('nominal', values.nominal);
       formData.append('keterangan', values.keterangan);
+      formData.append('tanggal', dayjs(values.tanggal).format('YYYY-MM-DD HH:mm:ss'));
       formData.append('fileImage', {
-        uri: uri,
+        uri: values.fileUpload,
         name: 'bon-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
+      console.log('formData', formData);
       // return;
 
-      await secureApi.postForm('/service/update', formData);
+      await secureApi.postForm('/service/update_admin', formData);
       // console.log('response ', JSON.stringify(response.data));
 
       // await SecureStore.deleteItemAsync('DataAktif');
       // console.log(response.message);
-      router.replace('(tabs)/(pemiliharaan)');
+      router.dismissTo('(tabs-admin)/pemiliharaan');
     } catch (error: any) {
       // console.log(error.response);
       HandleError(error);
@@ -141,10 +135,10 @@ export default function PengembalianServiceScreen() {
             <SkeletonList loop={5} />
           ) : (
             <Formik
-              initialValues={{ nominal: '', keterangan: '' }}
+              initialValues={{ nominal: '', keterangan: '', tanggal: '', fileUpload: '' }}
               validationSchema={validationSchema}
               onSubmit={async (values) => postSubmitData(values)}>
-              {({ handleChange, handleSubmit, values, touched, errors }) => (
+              {({ handleChange, handleSubmit, setFieldValue, values, touched, errors }) => (
                 <>
                   <View className="mb-3 items-center gap-4 py-2">
                     <View className="flex-row items-center text-sm text-gray-500">
@@ -172,46 +166,27 @@ export default function PengembalianServiceScreen() {
                     error={touched.nominal ? errors.nominal : undefined}
                     onFormattedValue={handleChange('nominal')}
                   />
+                  <InputDate
+                    label="Waktu Pengembalian"
+                    onChangeDate={(e) => setFieldValue('tanggal', e)}
+                    onResetDate={() => setFieldValue('tanggal', '')}
+                    value={values.tanggal}
+                    error={touched.tanggal ? errors.tanggal : undefined}
+                  />
+                  <InputFile
+                    label="Upload file"
+                    onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                    placeholder={'Chose file'}
+                    error={touched.fileUpload ? errors.fileUpload : undefined}
+                  />
 
-                  <View className="mb-3">
-                    <Text className="mb-1 font-bold text-gray-700">
-                      Foto struk / bon pemiliharaan
-                    </Text>
-                    {!uri ? (
-                      <TouchableOpacity
-                        className={`flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
-                        onPress={() => setModalVisible(true)}>
-                        <AntDesign name="camera" size={24} color={'black'} />
-                        <Text className="font-bold">Klik untuk ambil gambar</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <View className="h-16 flex-row items-center justify-between gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-1">
-                        <TouchableOpacity
-                          className="flex-row items-center gap-2"
-                          onPress={() => {
-                            setImgBase64(uri);
-                            setModalImageVisible(true);
-                          }}>
-                          <Image source={{ uri: uri }} className="size-10 rounded-lg" />
-                          <View>
-                            <Text className="font-bold">foto-struk-bon-pemiliharaan.jpg</Text>
-                            <Text className="text-start text-xs">klik disini untuk lihat.</Text>
-                          </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          className="rounded-full bg-white p-1"
-                          onPress={() => setUri(null)}>
-                          <AntDesign name="closecircleo" size={24} color="red" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
                   <InputArea
                     className="bg-gray-50"
                     label="Keterangan"
                     placeholder="Keterangan pengembalian (opsional)"
                     value={values.keterangan}
                     onChangeText={handleChange('keterangan')}
+                    error={touched.keterangan ? errors.keterangan : undefined}
                   />
                   <TouchableOpacity
                     className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
@@ -233,11 +208,6 @@ export default function PengembalianServiceScreen() {
           onPress={() => setModalImageVisible(false)}
         />
       )}
-      <ModalCamera
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        setUriImage={(e) => setUri(e)}
-      />
     </KeyboardAvoidingView>
   );
 }

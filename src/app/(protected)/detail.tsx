@@ -1,11 +1,13 @@
 import {
   Alert,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -25,10 +27,12 @@ import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/SkeletonList';
 import * as SecureStore from 'expo-secure-store';
 
-import { startTracking } from '@/utils/locationUtils';
+import { startTracking, stopTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 import CustomNumberInput from '@/components/CustomNumberInput';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLocationStore } from '@/stores/locationStore';
 
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),
@@ -41,13 +45,21 @@ const fetchData = async (uuid: string) => {
 };
 
 export default function DetailScreen() {
+  const insets = useSafeAreaInsets();
   const { uuid } = useLocalSearchParams();
+  const { clearCoordinates } = useLocationStore();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   useEffect(() => {
     refetch();
+    resetTracking();
   }, [uuid]);
+
+  const resetTracking = async () => {
+    clearCoordinates();
+    await stopTracking();
+  };
 
   const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
@@ -122,9 +134,10 @@ export default function DetailScreen() {
       className="bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />

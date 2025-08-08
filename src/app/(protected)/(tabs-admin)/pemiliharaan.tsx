@@ -22,6 +22,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 import { Image } from 'expo-image';
+import { router, useFocusEffect } from 'expo-router';
 
 const LIMIT = 10;
 
@@ -55,6 +56,12 @@ const fetchData = async ({
   }
 };
 export default function PemiliharaanScreen() {
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -76,10 +83,6 @@ export default function PemiliharaanScreen() {
 
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');
-
-  useEffect(() => {
-    refetch();
-  }, []);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({
@@ -160,7 +163,7 @@ export default function PemiliharaanScreen() {
           // stickyHeaderIndices={[0]}
           contentContainerStyle={{ paddingBottom: 120 }}
           renderItem={({ item }) => (
-            <>
+            <View>
               <View className="flex-row items-center justify-between rounded-t-lg bg-[#f8d260] px-4">
                 <Text className={` text-black`}>
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
@@ -203,12 +206,29 @@ export default function PemiliharaanScreen() {
                     </View>
                   </View>
                 </View>
-                <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
-                  <Text className="text-center text-lg font-bold">Keterangan</Text>
-                  <Text className="text-center font-medium">{item.keterangan_out}</Text>
-                </View>
+                {item.keterangan_out ? (
+                  <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
+                    <Text className="text-center text-lg font-bold">Keterangan</Text>
+                    <Text className="text-center font-medium">{item.keterangan_out}</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    className={`flex-row items-center justify-center gap-2 rounded-lg p-2 ${colors.primary}`}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/pengembalian-service-manual',
+                        params: {
+                          service_id: item?.id,
+                          kendaraan_id: item?.kendaraan_id,
+                        },
+                      })
+                    }>
+                    <Text className="font-bold">Pengembalian Pemiliharaan</Text>
+                    <MaterialCommunityIcons name="garage" size={24} color="black" />
+                  </TouchableOpacity>
+                )}
               </View>
-            </>
+            </View>
           )}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
@@ -224,20 +244,24 @@ export default function PemiliharaanScreen() {
           ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
         />
       </View>
-      <ModalPreviewImage
-        title="Gambar Pemiliharaan"
-        visible={modalVisible}
-        imgUrl={imgBase64 || ''}
-        onPress={() => setModalVisible(false)}
-      />
-      <BottomSheet
-        ref={bottomSheetDetailRef}
-        snapPoints={snapPoints}
-        index={-1}
-        enablePanDownToClose
-        animationConfigs={animationConfigs}>
-        <ListDetailServiceSheet items={rawService} />
-      </BottomSheet>
+      {modalVisible && (
+        <ModalPreviewImage
+          title="Gambar Pemiliharaan"
+          visible={modalVisible}
+          imgUrl={imgBase64 || ''}
+          onPress={() => setModalVisible(false)}
+        />
+      )}
+      {rawService && (
+        <BottomSheet
+          ref={bottomSheetDetailRef}
+          snapPoints={snapPoints}
+          index={-1}
+          enablePanDownToClose
+          animationConfigs={animationConfigs}>
+          <ListDetailServiceSheet items={rawService} />
+        </BottomSheet>
+      )}
     </SafeAreaView>
   );
 }

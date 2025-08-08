@@ -26,6 +26,7 @@ import CustomNumberInput from '@/components/CustomNumberInput';
 import HandleError from '@/utils/handleError';
 import { Dropdown } from 'react-native-element-dropdown';
 import { StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -40,6 +41,8 @@ const fetchData = async (uuid: string) => {
 };
 
 export default function ServiceScreen() {
+  const insets = useSafeAreaInsets();
+
   const { uuid } = useLocalSearchParams();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
@@ -131,9 +134,9 @@ export default function ServiceScreen() {
       className="bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />
@@ -162,8 +165,9 @@ export default function ServiceScreen() {
                       <Dropdown
                         style={[
                           styles.dropdown,
-                          isFocus && { borderColor: 'blue' },
-                          errors.jenis_kerusakan && { borderColor: 'red' },
+                          touched.jenis_kerusakan && errors.jenis_kerusakan
+                            ? { borderColor: 'red' }
+                            : { borderColor: 'gray' },
                         ]}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -182,9 +186,9 @@ export default function ServiceScreen() {
                           setIsFocus(false);
                         }}
                       />
-                      {errors.jenis_kerusakan && (
+                      {touched.jenis_kerusakan && errors.jenis_kerusakan ? (
                         <Text className="mt-1 text-xs text-red-500">{errors.jenis_kerusakan}</Text>
-                      )}
+                      ) : null}
                     </View>
 
                     <Input

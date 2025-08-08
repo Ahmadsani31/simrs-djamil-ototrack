@@ -1,6 +1,9 @@
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import { AntDesign, Entypo } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { useState } from 'react';
+import { MotiView } from 'moti';
+import { Skeleton } from 'moti/skeleton';
 
 interface propsImage {
   visible: boolean;
@@ -15,6 +18,7 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: propsImage) {
+  const [loading, setLoading] = useState(false);
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onPress}>
       <View className="flex-1  items-center justify-end bg-black/25">
@@ -28,12 +32,23 @@ export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: p
             </TouchableOpacity>
             {/* <Text className="mt-2 rounded-md text-center text-xl font-bold">{title}</Text> */}
             <View style={{ width: width, padding: 15 }}>
+              {loading ? (
+                <MotiView
+                  from={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ type: 'timing', duration: 300 }}
+                  className="flex-row items-center justify-center space-x-4 p-4">
+                  <Skeleton colorMode="light" height={300} width={340} radius={15} />
+                </MotiView>
+              ) : null}
               <Image
                 style={{ aspectRatio: 3 / 4, borderRadius: 10 }}
                 source={{ uri: imgUrl }}
                 contentFit="contain"
                 placeholder={blurhash}
                 transition={500}
+                onLoadStart={() => setLoading(true)}
+                onLoadEnd={() => setLoading(false)}
               />
             </View>
           </View>

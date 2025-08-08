@@ -204,6 +204,27 @@ export default function ProtectedLayout() {
           }}
         />
         <Stack.Screen
+          name="pengembalian-service-manual"
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            headerRight: () => (
+              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
+                <Image
+                  style={{ width: 53, height: 30 }}
+                  source={require('@asset/images/logo/logo-kemenkes.png')}
+                />
+                <Text className="font-bold">Oto RS-Djamil</Text>
+              </View>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
+                <Ionicons name="arrow-back-circle" size={24} color="red" />
+              </TouchableOpacity>
+            ),
+          }}
+        />
+        <Stack.Screen
           name="pemiliharaan-detail"
           options={{
             presentation: 'modal',

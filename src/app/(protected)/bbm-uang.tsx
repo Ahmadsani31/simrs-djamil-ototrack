@@ -26,6 +26,7 @@ import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import { Dropdown } from 'react-native-element-dropdown';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fetchData = async (reservasi_id: string) => {
   const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
@@ -37,6 +38,8 @@ const fetchData = async (reservasi_id: string) => {
 };
 
 export default function BbmUangScreen() {
+  const insets = useSafeAreaInsets();
+
   const { kendaraan_id, reservasi_id } = useLocalSearchParams();
 
   const [dialogCamera, setDialogCamera] = useState(false);
@@ -187,9 +190,9 @@ export default function BbmUangScreen() {
       className="bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="m-4 rounded-lg bg-white p-4">
           <View className="mb-3 items-center gap-4 py-2">
             <View className="flex-row items-center text-sm text-gray-500">

@@ -31,6 +31,7 @@ import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import CustomNumberInput from '@/components/CustomNumberInput';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -48,7 +49,7 @@ const fetchData = async (reservasi_id: string) => {
 export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
-
+  const insets = useSafeAreaInsets();
   const { data, isLoading, error, refetch, isError } = useQuery<dataDetail>({
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
@@ -123,9 +124,9 @@ export default function PengembalianScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />

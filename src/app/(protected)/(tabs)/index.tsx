@@ -138,7 +138,7 @@ export default function IndexScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
         <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
 
@@ -199,6 +199,6 @@ export default function IndexScreen() {
           {isSheetOpen && <BarcodeScanner onScan={handleScan} />}
         </BottomSheetView>
       </BottomSheet>
-    </SafeAreaView>
+    </View>
   );
 }

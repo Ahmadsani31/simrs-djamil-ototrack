@@ -26,6 +26,7 @@ import InputFile from '@/components/InputFile';
 import dayjs from 'dayjs';
 import CustomNumberInput from '@/components/CustomNumberInput';
 import HandleError from '@/utils/handleError';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer wajib diisi (required)'),
@@ -46,7 +47,7 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
-
+  const insets = useSafeAreaInsets();
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
     queryFn: () => fetchData(reservasi_id.toString(), user_id.toString()),
@@ -83,7 +84,7 @@ export default function PengembalianManualScreen() {
 
       // await SecureStore.deleteItemAsync('pemakaianAktif');
       // console.log(response.message);
-      router.replace('(tabs)');
+      router.dismissTo('(tabs-admin)');
     } catch (error: any) {
       // console.log(JSON.stringify(error));
       HandleError(error);
@@ -97,9 +98,9 @@ export default function PengembalianManualScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />

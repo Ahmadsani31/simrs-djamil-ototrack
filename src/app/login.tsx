@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   Image,
   Platform,
   KeyboardAvoidingView,
-  Button,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
-import SafeAreaView from '@/components/SafeAreaView';
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import Input from '@/components/Input';
@@ -23,8 +22,7 @@ import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
 import Constants from 'expo-constants';
-import { API_URL, APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
-import * as Updates from 'expo-updates';
+import { API_URL } from '@/utils/constants';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),
@@ -40,6 +38,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Toast } from 'toastify-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const [submitLogin, setSubmitLogin] = useState(false);
@@ -143,12 +142,14 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <SafeAreaView noBottom className="flex-1 justify-center bg-slate-300">
+    <SafeAreaView className="flex-1 bg-slate-300" edges={['left', 'right', 'bottom']}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          keyboardShouldPersistTaps="handled">
           <Animated.View
             style={{ width: WiconTL, height: HiconTL }}
             className="absolute left-[-80] top-[-80] rounded-full bg-[#4F959D]"
@@ -157,7 +158,7 @@ export default function LoginScreen() {
             style={{ width: WiconTR, height: HiconTR }}
             className="absolute right-[-100] top-16 rounded-full bg-[#205781]"
           />
-          <View className="mb-5 items-center">
+          <View className="mb-5 mt-10 items-center">
             <View className="rounded-2xl bg-white/85 p-2">
               <Image
                 className="h-[80] w-[250] object-cover"
@@ -165,7 +166,7 @@ export default function LoginScreen() {
               />
             </View>
           </View>
-          <View className=" z-10 mx-4 mb-24 rounded-lg bg-white p-6">
+          <View className="z-10 mx-4 mb-24 rounded-lg bg-white p-6">
             <View className="mb-5 mt-2">
               <Text className="text-center text-xl font-medium">Pencatatan</Text>
               <Text className="text-center text-2xl font-bold">Kendaraan Operasional</Text>
@@ -238,14 +239,14 @@ export default function LoginScreen() {
           </View>
           <Animated.View
             style={{ width: WiconBL, height: HiconBL }}
-            className="absolute bottom-24 left-[-60] rounded-full bg-[#497D74]"
+            className="absolute bottom-16 left-[-60] rounded-full bg-[#497D74]"
           />
           <Animated.View
             style={{ width: WiconBR, height: HiconBR }}
             className="absolute bottom-0 right-0 rounded-full  bg-[#03A791]"
           />
-        </SafeAreaView>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

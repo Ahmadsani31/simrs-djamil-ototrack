@@ -3,9 +3,11 @@ import { PrivateRoute } from '@/components/PrivateRoute';
 import { Image, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabsAdminLayout() {
   const user = useAuthStore((state) => state.user);
+  const insets = useSafeAreaInsets();
   if (user?.role != 'admin') {
     return <Redirect href={'(protected)/(tabs)'} />;
   }
@@ -21,7 +23,8 @@ export default function TabsAdminLayout() {
             backgroundColor: '#205781', // Set your desired background color here
             // paddingBottom: 10,  // ⬇️ Padding bawah TabBar
             paddingTop: 10, // ⬆️ Padding atas TabBar
-            height: 70, // ⬆️ Tinggi TabBar jika padding terlalu besar
+            height: 70 + insets.bottom, // naik sesuai safe area
+            paddingBottom: insets.bottom,
           },
           headerStyle: {
             backgroundColor: '#205781',

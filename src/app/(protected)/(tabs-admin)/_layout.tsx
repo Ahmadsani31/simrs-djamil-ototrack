@@ -58,7 +58,7 @@ export default function TabsAdminLayout() {
         <Tabs.Screen
           name="pemiliharaan"
           options={{
-            title: 'Pemiliharaan',
+            title: 'Pemeliharaan',
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="car-cog" size={28} color={color} />
             ),

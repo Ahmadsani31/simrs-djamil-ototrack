@@ -177,7 +177,7 @@ export default function Profile() {
           <Text className="text-lg font-bold">RSUP DR. M. DJAMIL PADANG</Text>
           <Text className="mt-4">Vesion</Text>
           <Text className="text-sm">{Constants.expoConfig?.version}</Text>
-          <Text className="text-xs">{API_URL}</Text>
+          {/* <Text className="text-xs">{API_URL}</Text> */}
         </View>
       </View>
       <ModalRN visible={isModal} onClose={() => setIsModal(false)}>

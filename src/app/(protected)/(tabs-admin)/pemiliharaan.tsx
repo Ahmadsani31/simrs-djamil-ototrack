@@ -137,7 +137,7 @@ export default function PemiliharaanScreen() {
       <View className="px-4">
         <View className="mb-4 ">
           <Text className="text-center text-white">
-            Berikut semua list pemiliharaan kendaraan Operasional RS Djamil
+            Berikut semua list pemeliharaan kendaraan Operasional RS Djamil
           </Text>
         </View>
         <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
@@ -223,7 +223,7 @@ export default function PemiliharaanScreen() {
                         },
                       })
                     }>
-                    <Text className="font-bold">Pengembalian Pemiliharaan</Text>
+                    <Text className="font-bold">Pengembalian Pemeliharaan</Text>
                     <MaterialCommunityIcons name="garage" size={24} color="black" />
                   </TouchableOpacity>
                 )}
@@ -238,7 +238,7 @@ export default function PemiliharaanScreen() {
           onEndReachedThreshold={0.5}
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-              <Text>Tidak ada pengambilan foto pemiliharaan kendaraan</Text>
+              <Text>Tidak ada pengambilan foto pemeliharaan kendaraan</Text>
             </View>
           }
           ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
@@ -246,7 +246,7 @@ export default function PemiliharaanScreen() {
       </View>
       {modalVisible && (
         <ModalPreviewImage
-          title="Gambar Pemiliharaan"
+          title="Gambar Pemeliharaan"
           visible={modalVisible}
           imgUrl={imgBase64 || ''}
           onPress={() => setModalVisible(false)}

@@ -21,7 +21,7 @@ export default function ListDetailServiceSheet({ items }: { items: itemsProps[] 
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-            <Text>Tidak ada pemiliharaan kendaraan yang di lakukan</Text>
+            <Text>Tidak ada pemeliharaan kendaraan yang di lakukan</Text>
           </View>
         }
         renderItem={({ item, index }) => (

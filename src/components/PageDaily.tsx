@@ -33,7 +33,7 @@ const PageDaily = ({ item }: rawData) => {
       <View className="rounded-lg bg-white p-4">
         <View className="flex items-center justify-center gap-4 rounded-lg bg-white">
           <TouchableOpacity
-            className="w-full rounded-lg bg-slate-500 p-2"
+            className="w-full rounded-lg bg-gray-300 p-2"
             onPress={() =>
               router.push({
                 pathname: 'pengembalian',
@@ -48,13 +48,13 @@ const PageDaily = ({ item }: rawData) => {
                 source={require('@asset/images/return-car.png')}
               />
               <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold text-white">Pengembalian Kendaraan</Text>
+                <Text className="text-xl font-bold">Pengembalian Kendaraan</Text>
                 <Text className="text-sm">Klik disini untuk mengembalikan kendaraan</Text>
               </View>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            className="w-full rounded-lg bg-red-400 p-2"
+            className="w-full rounded-lg bg-red-300 p-2"
             onPress={() => setModalVisible(true)}>
             <View className="w-full flex-row items-center gap-5">
               <Image
@@ -62,7 +62,7 @@ const PageDaily = ({ item }: rawData) => {
                 source={require('@asset/images/gas-station1.png')}
               />
               <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold text-white">Pengisian BBM Kendaraan</Text>
+                <Text className="text-xl font-bold">Pengisian BBM Kendaraan</Text>
                 <Text className="text-sm">Klik disini untuk proses isi BBM ke SPBU</Text>
               </View>
             </View>
@@ -83,7 +83,7 @@ const PageDaily = ({ item }: rawData) => {
             </Text>
             <View className="my-5 flex-row items-center justify-center gap-4">
               <TouchableOpacity
-                className="size-44 items-center justify-center gap-2 rounded-lg bg-green-300 p-2"
+                className="size-44 items-center justify-center gap-2 rounded-lg bg-green-200 p-2"
                 onPress={() => {
                   router.push({
                     pathname: '/(protected)/bbm-uang',
@@ -103,7 +103,7 @@ const PageDaily = ({ item }: rawData) => {
                 <Text className="font-bold">Dengan Uang</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="size-44 items-center justify-center gap-2 rounded-lg bg-amber-300 p-2"
+                className="size-44 items-center justify-center gap-2 rounded-lg bg-amber-200 p-2"
                 onPress={() => {
                   router.push({
                     pathname: '/(protected)/bbm-voucher',

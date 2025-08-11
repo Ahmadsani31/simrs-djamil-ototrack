@@ -54,11 +54,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#232323",
+          "backgroundColor": "#205781",
           "image": "./assets/icon/splash-icon-light.png",
           "dark": {
             "image": "./assets/icon/splash-icon-dark.png",
-            "backgroundColor": "#000000"
+            "backgroundColor": "#90ABC0"
           },
           "imageWidth": 200
         }
@@ -66,8 +66,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/icon/icon-notification.png",
-          "color": "#ffffff",
+          "icon": "./assets/icon/notification-icon.png",
+          "color": "#205781",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
         }
@@ -104,6 +104,10 @@
         "foregroundImage": "./assets/icon/adaptive-icon.png",
         "monochromeImage": "./assets/icon/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "notification": {
+        "icon": "./assets/icon/notification-icon.png",
+        "color": "#205781"
       },
       "versionCode": 2,
       "package": "com.darma31.simrsdjamilototrack",

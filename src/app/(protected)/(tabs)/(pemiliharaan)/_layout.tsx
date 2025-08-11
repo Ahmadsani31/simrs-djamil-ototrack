@@ -6,7 +6,7 @@ export default function Layout() {
       <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
       <Stack.Screen
         name="pemiliharaan-nested"
-        options={{ title: 'pemiliharaan Nested', headerShown: false }}
+        options={{ title: 'pemeliharaan Nested', headerShown: false }}
       />
     </Stack>
   );

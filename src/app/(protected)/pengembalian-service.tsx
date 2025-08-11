@@ -68,7 +68,7 @@ export default function PengembalianServiceScreen() {
   });
 
   if (isError) {
-    Alert.alert('Peringatan!', 'Tidak ada pemiliharaan kendaraan yang aktif!', [
+    Alert.alert('Peringatan!', 'Tidak ada pemeliharaan kendaraan yang aktif!', [
       { text: 'Kembali', onPress: () => router.back() },
     ]);
   }
@@ -150,7 +150,7 @@ export default function PengembalianServiceScreen() {
                     <View className="flex-row items-center text-sm text-gray-500">
                       <View className="flex-grow border-t border-gray-300" />
                       <Text className="mx-2 text-lg text-[#205781]">
-                        Proses Pengembalian pemiliharaan Kendaraan
+                        Proses Pengembalian pemeliharaan Kendaraan
                       </Text>
                       <View className="flex-grow border-t border-gray-300" />
                     </View>
@@ -161,13 +161,13 @@ export default function PengembalianServiceScreen() {
                   </View>
                   <View className="mb-4 w-full border border-b-2" />
                   <Text className="mb-3 text-center">
-                    Silahkan foto struk atau bon belanja pemiliharaan kendaraan
+                    Silahkan foto struk atau bon belanja pemeliharaan kendaraan
                   </Text>
 
                   <CustomNumberInput
                     className="bg-gray-100"
                     placeholder="Masukan nominal"
-                    label="Biaya Pemiliharaan"
+                    label="Biaya Pemeliharaan"
                     value={values.nominal}
                     error={touched.nominal ? errors.nominal : undefined}
                     onFormattedValue={handleChange('nominal')}
@@ -175,7 +175,7 @@ export default function PengembalianServiceScreen() {
 
                   <View className="mb-3">
                     <Text className="mb-1 font-bold text-gray-700">
-                      Foto struk / bon pemiliharaan
+                      Foto struk / bon pemeliharaan
                     </Text>
                     {!uri ? (
                       <TouchableOpacity
@@ -194,7 +194,7 @@ export default function PengembalianServiceScreen() {
                           }}>
                           <Image source={{ uri: uri }} className="size-10 rounded-lg" />
                           <View>
-                            <Text className="font-bold">foto-struk-bon-pemiliharaan.jpg</Text>
+                            <Text className="font-bold">foto-struk-bon-pemeliharaan.jpg</Text>
                             <Text className="text-start text-xs">klik disini untuk lihat.</Text>
                           </View>
                         </TouchableOpacity>
@@ -216,7 +216,7 @@ export default function PengembalianServiceScreen() {
                   <TouchableOpacity
                     className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
                     onPress={() => handleSubmit()}>
-                    <Text className="font-bold text-white">Pemiliharaan Selesai</Text>
+                    <Text className="font-bold text-white">Pemeliharaan Selesai</Text>
                     <MaterialCommunityIcons name="car" size={22} color="white" />
                   </TouchableOpacity>
                 </>

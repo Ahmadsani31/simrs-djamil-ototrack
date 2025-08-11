@@ -2,14 +2,9 @@ import { Redirect, router, Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { Alert, BackHandler, Image, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-
-import * as Location from 'expo-location';
 import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const LOCATION_TASK_NAME = 'background-location-task';
 
 export default function TabsLayout() {
   const trackingStatus = statusTrackingStore((state) => state.trackingStatus);
@@ -98,12 +93,12 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="(pemiliharaan)"
           options={{
-            title: 'Pemiliharaan',
+            title: 'Pemeliharaan',
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="car-cog" size={28} color={color} />
             ),
             headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pemiliharaan Kendaraan</Text>
+              <Text className="text-xl font-bold text-white">Pemeliharaan Kendaraan</Text>
             ),
           }}
         />

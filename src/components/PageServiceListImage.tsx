@@ -49,7 +49,7 @@ export default function PageServiceListImage({
             <SkeletonList loop={8} />
           ) : (
             <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-              <Text>Tidak ada laporan pemiliharaan</Text>
+              <Text>Tidak ada laporan pemeliharaan</Text>
             </View>
           )
         }

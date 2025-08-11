@@ -15,6 +15,7 @@ import { Toast } from 'toastify-react-native';
 import PageServiceListImage from '@/components/PageServiceListImage';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
 import { useLoadingStore } from '@/stores/loadingStore';
+import dayjs from 'dayjs';
 
 type rawData = {
   id: number;
@@ -192,12 +193,14 @@ export default function PemiliharaanNestedScreen() {
           <Text className="text-white">Kembali</Text>
         </View>
       </TouchableOpacity>
-      <View className="rounded-lg bg-amber-500 p-4">
+      <View className="rounded-lg bg-amber-200 p-4">
         <Text className="text-center">Kendaraan</Text>
         <Text className="text-center text-4xl font-bold">{row?.name}</Text>
         <Text className="mb-2 text-center text-xl font-medium">{row?.no_polisi}</Text>
-        <Text className="mb-2 text-center font-medium text-white">{row?.created_at}</Text>
-        <View className=" rounded-lg bg-white p-1 px-3">
+        <Text className="mb-2 text-center font-medium">
+          {dayjs(row?.created_at).format('dddd ,DD MMMM YYYY | HH:mm')}
+        </Text>
+        <View className=" rounded-lg bg-gray-100 p-1 px-3">
           <Text className="text-center text-xl font-bold">{row?.jenis_kerusakan}</Text>
           <Text className="text-center font-medium">{row?.keterangan}</Text>
           <Text className="text-center">Lokasi : </Text>
@@ -207,7 +210,7 @@ export default function PemiliharaanNestedScreen() {
       <View className="mb-2 rounded-lg bg-white p-4">
         <View className="flex items-center justify-center gap-4 rounded-lg bg-white">
           <TouchableOpacity
-            className="w-full rounded-lg bg-slate-500 p-2"
+            className="w-full rounded-lg bg-slate-200 p-2"
             onPress={() =>
               router.push({
                 pathname: 'pengembalian-service',
@@ -223,16 +226,16 @@ export default function PemiliharaanNestedScreen() {
                 source={require('@asset/images/done-service.png')}
               />
               <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold text-white">Selesai Pemiliharaan</Text>
+                <Text className="text-xl font-bold">Selesai Pemeliharaan</Text>
                 <Text className="text-sm">
-                  Klik disini untuk memproses mengembalikan kendaraan / pemiliharaan kendaraan telah
+                  Klik disini untuk memproses mengembalikan kendaraan / pemeliharaan kendaraan telah
                   selesai
                 </Text>
               </View>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            className="w-full rounded-lg bg-teal-400 p-2"
+            className="w-full rounded-lg bg-teal-200 p-2"
             onPress={() => setModalVisible(true)}>
             <View className="w-full flex-row items-center gap-5">
               <Image
@@ -242,7 +245,7 @@ export default function PemiliharaanNestedScreen() {
               <View className="w-72 text-wrap">
                 <Text className="text-xl font-bold">Foto Aktivitas</Text>
                 <Text className="text-sm">
-                  Klik disini untuk pengambilan gambar waktu pemiliharaan / foto struk pembelian
+                  Klik disini untuk pengambilan gambar waktu pemeliharaan / foto struk pembelian
                   barang
                 </Text>
               </View>
@@ -261,7 +264,7 @@ export default function PemiliharaanNestedScreen() {
             Foto Aktivitas Pemiliharan Kendaraan
           </Text>
           <Text className="text-center">
-            Silahkan aktivitas pemiliharaan atau struck dari pemiliharaan Kendaraan sebagai bukti
+            Silahkan foto aktivitas atau struck dari pemeliharaan Kendaraan, untuk sebagai bukti
           </Text>
         </ModalRN.Header>
         <ModalRN.Content>

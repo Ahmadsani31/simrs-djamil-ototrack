@@ -177,7 +177,7 @@ export default function IndexScreen() {
         <View className="px-4">
           <View className="mb-4 ">
             <Text className="text-center text-white">
-              Semua list pemiliharaan kendaraan Operasional RS Djamil
+              Semua list pemeliharaan kendaraan Operasional RS Djamil
             </Text>
           </View>
           {rawData && rawData.length > 0 ? (
@@ -205,14 +205,15 @@ export default function IndexScreen() {
                       <Text className="text-2xl font-bold">{itx?.kendaraan}</Text>
                       <Text className="mb-2 text-xl font-medium">{itx?.no_polisi}</Text>
                     </View>
-                    <View className="rounded-lg bg-amber-500 p-2 text-center">
-                      <Text className="text-xs font-bold text-white">Kerusakan :</Text>
-                      <Text className="text-xl font-bold text-white">{itx?.jenis_kerusakan}</Text>
+                    <View className="rounded-lg bg-amber-200 p-2 text-center">
+                      <Text className="text-xs">Pemeliharaan :</Text>
+                      <Text className="text-xl font-bold">{itx?.jenis_kerusakan}</Text>
                     </View>
                   </View>
 
                   <View className=" rounded-lg bg-gray-200 p-1 px-3">
                     <Text className="text-center font-medium">{itx?.keterangan}</Text>
+                    <Text className="text-center font-bold">Lokasi :</Text>
                     <Text className="text-center font-medium">{itx?.lokasi}</Text>
                   </View>
                 </View>
@@ -315,7 +316,7 @@ export default function IndexScreen() {
                 onEndReachedThreshold={0.5}
                 ListEmptyComponent={
                   <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                    <Text>Tidak ada proses pemiliharaan kendaraan</Text>
+                    <Text>Tidak ada proses pemeliharaan kendaraan</Text>
                   </View>
                 }
                 ListFooterComponent={
@@ -335,7 +336,7 @@ export default function IndexScreen() {
         </TouchableOpacity>
       </View>
       <ModalPreviewImage
-        title="Gambar Pemiliharaan"
+        title="Gambar Pemeliharaan"
         visible={modalVisible}
         imgUrl={imgBase64 || ''}
         onPress={() => setModalVisible(false)}

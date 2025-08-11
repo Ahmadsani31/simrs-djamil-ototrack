@@ -23,9 +23,9 @@ export async function startTracking() {
       pausesUpdatesAutomatically: false, // terus update walau idle
       showsBackgroundLocationIndicator: true,
       foregroundService: {
-        notificationTitle: 'Pemakaian Aktif',
-        notificationBody: 'Aplikasi aktif dan berjalan di background untuk pemakaian kendaraan',
-        notificationColor: '#04b8a3',
+        notificationTitle: 'Oto RS-Djamil',
+        notificationBody: 'Aplikasi sedang memantau lokasi Anda dalam pemakaian kendaraan',
+        notificationColor: '#205781',
         killServiceOnDestroy: false, // jangan matikan service saat aplikasi ditutup
 
         // Optional: Add a custom icon for the notification

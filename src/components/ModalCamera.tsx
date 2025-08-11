@@ -43,7 +43,7 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
 
   const takePicture = async () => {
     setLoading(true);
-    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6 });
+    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6, shutterSound: false });
     // await manipulatorImage(photo?.uri ?? null);
     // console.log(photo);
 

@@ -150,7 +150,7 @@ export default function IndexScreen() {
                   <View className="flex-row items-center gap-2">
                     <Feather name="info" size={24} color="white" />
                     <View>
-                      <Text className="text-white">Pemiliharaan sedang aktif</Text>
+                      <Text className="text-white">Pemeliharaan sedang aktif</Text>
                       {rawDataService?.length === 1 ? (
                         <Text className="font-bold text-white">
                           {rawDataService[0].kendaraan} {rawDataService[0].no_polisi}
@@ -176,7 +176,10 @@ export default function IndexScreen() {
       <View className="absolute bottom-1 right-1 z-10">
         <TouchableOpacity
           className="flex-row items-center gap-2 rounded-lg bg-[#205781] px-2 py-1"
-          onPress={fetchDataAktif}>
+          onPress={() => {
+            fetchDataAktif();
+            fetchData();
+          }}>
           <Text className="text-white">Refresh</Text>
           <FontAwesome name="refresh" size={14} color="white" />
         </TouchableOpacity>

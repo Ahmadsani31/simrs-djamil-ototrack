@@ -30,7 +30,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
-  lokasi: yup.string().required('lokasi / alamat pemiliharaan harus diisi'),
+  lokasi: yup.string().required('lokasi / alamat pemeliharaan harus diisi'),
   jenis_kerusakan: yup.string().required('Jenis Kerusakan harus diisi'),
   spidometer: yup.number().required('Nilai spidometer harus diisi'),
 });
@@ -145,7 +145,7 @@ export default function ServiceScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-[#205781]">Pemiliharaan Kendaaraan</Text>
+                  <Text className="mx-2 text-lg text-[#205781]">Pemeliharaan Kendaaraan</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <View>
@@ -193,7 +193,7 @@ export default function ServiceScreen() {
 
                     <Input
                       label="Lokasi"
-                      placeholder="lokasi / alamat pemiliharaan"
+                      placeholder="lokasi / alamat pemeliharaan"
                       value={values.lokasi}
                       onChangeText={handleChange('lokasi')}
                       error={touched.lokasi ? errors.lokasi : undefined}

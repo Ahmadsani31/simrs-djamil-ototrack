@@ -164,7 +164,8 @@ export default function PemiliharaanScreen() {
           contentContainerStyle={{ paddingBottom: 120 }}
           renderItem={({ item }) => (
             <View>
-              <View className="flex-row items-center justify-between rounded-t-lg bg-[#f8d260] px-4">
+              <View
+                className={`flex-row items-center justify-between rounded-t-lg  ${item.date_out ? ' bg-teal-300' : 'bg-[#f8d260]'} px-4`}>
                 <Text className={` text-black`}>
                   {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
                 </Text>
@@ -187,12 +188,17 @@ export default function PemiliharaanScreen() {
                 </View>
                 <View className="mb-3 mt-2 rounded-lg">
                   <View className="w-full flex-1 flex-row items-start gap-5">
-                    <Pressable onPress={() => handleModalImageShow(item.image)}>
+                    <Pressable
+                      onPress={() => handleModalImageShow(item.image)}
+                      className="items-center justify-center">
                       <Image
                         source={{ uri: item.image }}
                         style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
                         contentFit="contain"
                       />
+                      <Text className="absolute rounded-lg bg-black/50 p-1 text-center text-xs text-white">
+                        Ketuk untuk melihat
+                      </Text>
                     </Pressable>
                     <View className="flex-1 gap-2">
                       <View className=" rounded-md bg-slate-200 p-2">
@@ -206,7 +212,7 @@ export default function PemiliharaanScreen() {
                     </View>
                   </View>
                 </View>
-                {item.keterangan_out ? (
+                {item.date_out ? (
                   <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
                     <Text className="text-center text-lg font-bold">Keterangan</Text>
                     <Text className="text-center font-medium">{item.keterangan_out}</Text>
@@ -223,7 +229,7 @@ export default function PemiliharaanScreen() {
                         },
                       })
                     }>
-                    <Text className="font-bold">Pengembalian Pemeliharaan</Text>
+                    <Text className="font-bold text-white">Pengembalian Pemeliharaan</Text>
                     <MaterialCommunityIcons name="garage" size={24} color="black" />
                   </TouchableOpacity>
                 )}

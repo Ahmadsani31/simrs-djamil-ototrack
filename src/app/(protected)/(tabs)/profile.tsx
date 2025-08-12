@@ -102,13 +102,13 @@ export default function Profile() {
       <View className="flex-1 bg-slate-300">
         <View className="rounded-bl-[50] rounded-br-[50]  bg-[#205781] shadow">
           <View className="px-4">
-            <View className="flex-row items-center justify-center gap-5 rounded-lg bg-white p-4">
-              <View className="my-3">
+            <View className="flex-row items-center justify-center gap-5 rounded-lg bg-white">
+              <View className="my-2">
                 <Image
                   style={{
                     borderRadius: 100,
-                    width: 180,
-                    height: 180,
+                    width: 150,
+                    height: 150,
                   }}
                   source={require('@asset/images/profile.png')}
                 />

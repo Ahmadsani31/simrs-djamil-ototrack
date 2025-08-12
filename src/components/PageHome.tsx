@@ -45,12 +45,10 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
 
   return (
     <View>
-      <View className="my-5">
-        <Text className="text-center text-2xl font-bold text-white">Pilih Jenis Penggunaan</Text>
-        <Text className="text-center text-sm text-white">
-          Silahkan pilih jenis penggunaan dan scan qrcode yang ada pada masing-masing kendaraan
-        </Text>
-      </View>
+      <Text className="text-center text-2xl font-bold text-white">Pilih Jenis Penggunaan</Text>
+      <Text className="text-center text-sm text-white">
+        Silahkan pilih jenis penggunaan dan scan qrcode yang ada pada masing-masing kendaraan
+      </Text>
       <View className="mt-10">
         <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
           <TouchableOpacity

@@ -207,7 +207,7 @@ export default function PemiliharaanNestedScreen() {
           <Text className="text-center font-medium">{row?.lokasi}</Text>
         </View>
       </View>
-      <View className="mb-2 rounded-lg bg-white p-4">
+      <View className="rounded-lg bg-white p-4">
         <View className="flex items-center justify-center gap-4 rounded-lg bg-white">
           <TouchableOpacity
             className="w-full rounded-lg bg-slate-200 p-2"
@@ -258,77 +258,87 @@ export default function PemiliharaanNestedScreen() {
         isLoading={isLoading}
         onPress={(e) => handleOpenPreviewImage(e)}
       />
-      <ModalRN visible={isModalVisible} onClose={handleDialogBBM}>
-        <ModalRN.Header>
-          <Text className="text-center text-xl font-bold">
-            Foto Aktivitas Pemiliharan Kendaraan
-          </Text>
-          <Text className="text-center">
-            Silahkan foto aktivitas atau struck dari pemeliharaan Kendaraan, untuk sebagai bukti
-          </Text>
-        </ModalRN.Header>
-        <ModalRN.Content>
-          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
-            <View className="mb-4">
-              <Text className="font-bold">Foto</Text>
-              {!imgUrl ? (
-                <>
-                  <TouchableOpacity
-                    className="my-2 flex-row items-center justify-center rounded-lg bg-indigo-500 p-2"
-                    onPress={() => setDialogCamera(true)}>
-                    <AntDesign name="camera" size={28} />
-                    <Text className="ms-2 font-bold text-white">Ambil Gambar</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <View className="w-full rounded-lg bg-black">
-                  <ImageLocal source={{ uri: imgUrl }} className="aspect-[3/4] w-full rounded-lg" />
-                  <TouchableOpacity
-                    className="absolute right-2 top-2 rounded-full bg-white p-1"
-                    onPress={() => setImgUrl(null)}>
-                    <AntDesign name="closecircleo" size={32} color="red" />
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
+      {isModalVisible && (
+        <ModalRN visible={isModalVisible} onClose={handleDialogBBM}>
+          <ModalRN.Header>
+            <Text className="text-center text-xl font-bold">
+              Foto Aktivitas Pemiliharan Kendaraan
+            </Text>
+            <Text className="text-center">
+              Silahkan foto aktivitas atau struck dari pemeliharaan Kendaraan, untuk sebagai bukti
+            </Text>
+          </ModalRN.Header>
+          <ModalRN.Content>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
+              <View className="mb-4">
+                <Text className="font-bold">Foto</Text>
+                {!imgUrl ? (
+                  <>
+                    <TouchableOpacity
+                      className="my-2 flex-row items-center justify-center rounded-lg bg-indigo-500 p-2"
+                      onPress={() => setDialogCamera(true)}>
+                      <AntDesign name="camera" size={28} />
+                      <Text className="ms-2 font-bold text-white">Ambil Gambar</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <View className="w-full rounded-lg bg-black">
+                    <ImageLocal
+                      source={{ uri: imgUrl }}
+                      className="aspect-[3/4] w-full rounded-lg"
+                    />
+                    <TouchableOpacity
+                      className="absolute right-2 top-2 rounded-full bg-white p-1"
+                      onPress={() => setImgUrl(null)}>
+                      <AntDesign name="closecircleo" size={32} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
 
-            <InputArea
-              className="bg-gray-50"
-              label="Keterangan"
-              placeholder="keteragan..."
-              value={note}
-              onChangeText={(note) => setNote(note)}
-            />
-          </ScrollView>
-        </ModalRN.Content>
-        <ModalRN.Footer>
-          <View className="flex-row gap-2">
-            <ButtonCostum
-              classname={colors.warning}
-              title="Exit"
-              loading={loadingSubmit}
-              onPress={handleDialogBBM}
-            />
-            <ButtonCostum
-              classname={colors.primary}
-              title="Simpan"
-              loading={loadingSubmit}
-              onPress={handleSubmit}
-            />
-          </View>
-        </ModalRN.Footer>
-      </ModalRN>
-      <ModalCamera
-        visible={dialogCamera}
-        onClose={() => setDialogCamera(false)}
-        setUriImage={(e) => setImgUrl(e)}
-      />
-      <ModalPreviewImage
-        title={'Preview Image'}
-        imgUrl={imgPreviewUrl || ''}
-        visible={previewImage}
-        onPress={() => handleCloseImage()}
-      />
+              <InputArea
+                className="bg-gray-50"
+                label="Keterangan"
+                placeholder="keteragan..."
+                value={note}
+                onChangeText={(note) => setNote(note)}
+              />
+            </ScrollView>
+          </ModalRN.Content>
+          <ModalRN.Footer>
+            <View className="flex-row gap-2">
+              <ButtonCostum
+                classname={colors.warning}
+                title="Exit"
+                loading={loadingSubmit}
+                onPress={handleDialogBBM}
+              />
+              <ButtonCostum
+                classname={colors.primary}
+                title="Simpan"
+                loading={loadingSubmit}
+                onPress={handleSubmit}
+              />
+            </View>
+          </ModalRN.Footer>
+        </ModalRN>
+      )}
+
+      {dialogCamera && (
+        <ModalCamera
+          visible={dialogCamera}
+          onClose={() => setDialogCamera(false)}
+          setUriImage={(e) => setImgUrl(e)}
+        />
+      )}
+      {previewImage && (
+        <ModalPreviewImage
+          title={'Preview Image'}
+          imgUrl={imgPreviewUrl || ''}
+          visible={previewImage}
+          onPress={() => handleCloseImage()}
+        />
+      )}
     </View>
   );
 }

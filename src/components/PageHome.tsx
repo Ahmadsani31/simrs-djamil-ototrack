@@ -54,7 +54,7 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
       <View className="mt-10">
         <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
           <TouchableOpacity
-            className="flex-auto items-center justify-center gap-4 rounded-lg bg-blue-300 p-5 shadow"
+            className="flex-auto items-center justify-center gap-4 rounded-lg bg-blue-200 p-5 shadow"
             onPress={() => onPress('daily')}>
             <Image
               style={{ width: 100, height: 100 }}
@@ -66,7 +66,7 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-auto items-center justify-center gap-4 rounded-lg bg-amber-300 p-5 shadow"
+            className="flex-auto items-center justify-center gap-4 rounded-lg bg-amber-200 p-5 shadow"
             onPress={() => onPress('service')}>
             <Image
               style={{ width: 100, height: 100 }}

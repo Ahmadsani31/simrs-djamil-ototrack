@@ -282,12 +282,17 @@ export default function IndexScreen() {
 
                       <View className="mb-3 mt-2 rounded-lg">
                         <View className="w-full flex-1 flex-row items-start gap-5">
-                          <Pressable onPress={() => handleModalImageShow(item.image)}>
+                          <Pressable
+                            onPress={() => handleModalImageShow(item.image)}
+                            className="items-center justify-center">
                             <Image
                               source={{ uri: item.image }}
                               style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
                               contentFit="contain"
                             />
+                            <Text className="absolute rounded-lg bg-black/50 p-1 text-center text-xs text-white">
+                              Ketuk untuk melihat
+                            </Text>
                           </Pressable>
                           <View className="flex-1 gap-2">
                             <View className=" rounded-md bg-slate-200 p-2">
@@ -335,12 +340,15 @@ export default function IndexScreen() {
           <FontAwesome name="refresh" size={14} color="white" />
         </TouchableOpacity>
       </View>
-      <ModalPreviewImage
-        title="Gambar Pemeliharaan"
-        visible={modalVisible}
-        imgUrl={imgBase64 || ''}
-        onPress={() => setModalVisible(false)}
-      />
+      {modalVisible && (
+        <ModalPreviewImage
+          title="Gambar Pemeliharaan"
+          visible={modalVisible}
+          imgUrl={imgBase64 || ''}
+          onPress={() => setModalVisible(false)}
+        />
+      )}
+
       <BottomSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}

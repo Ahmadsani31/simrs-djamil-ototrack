@@ -203,32 +203,44 @@ export default function PemakaianScreen() {
                   </View>
                   <View className="mt-2 flex justify-center gap-2">
                     <TouchableOpacity onPress={() => handleModalImageShow(item.spidometer_file_in)}>
-                      <View className="flex-row items-center gap-10 rounded-lg bg-blue-300 p-2">
-                        <Text className=" text-2xl font-bold">Pergi</Text>
-                        <View className="flex-1 gap-2">
-                          <Text className=" text-black">
-                            {dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')}
-                          </Text>
-                          <View className="flex-row items-center justify-between">
-                            <Text className="text-black ">Spidometer</Text>
-                            <Text className="font-bold text-black">{item.spidometer_in} Km</Text>
+                      <View className=" rounded-lg bg-blue-300 p-2">
+                        <View className="flex-row items-center gap-10">
+                          <Text className=" text-2xl font-bold">Pergi</Text>
+                          <View className="flex-1 gap-2">
+                            <Text className=" text-black">
+                              {dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')}
+                            </Text>
+                            <View className="flex-row items-center justify-between">
+                              <Text className="text-black ">Spidometer</Text>
+                              <Text className="font-bold text-black">{item.spidometer_in} Km</Text>
+                            </View>
                           </View>
+                        </View>
+                        <View className="items-cente flex-row items-center justify-center">
+                          <Text className="text-xs">Ketuk untuk melihat gambar.</Text>
+                          <View className="flex-grow border-t border-white" />
                         </View>
                       </View>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleModalImageShow(item.spidometer_file_out)}>
-                      <View className="flex-row items-center gap-5 rounded-lg bg-amber-300 p-2">
-                        <Text className="text-2xl font-bold">Pulang</Text>
+                      <View className=" rounded-lg bg-amber-300 p-2">
+                        <View className="flex-row items-center gap-5">
+                          <Text className="text-2xl font-bold">Pulang</Text>
 
-                        <View className="flex-1 gap-2">
-                          <Text className=" text-black">
-                            {dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')}
-                          </Text>
-                          <View className="flex-row items-center justify-between">
-                            <Text className="text-black ">Spidometer</Text>
-                            <Text className="font-bold text-black">{item.spidometer_out} Km</Text>
+                          <View className="flex-1 gap-2">
+                            <Text className=" text-black">
+                              {dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')}
+                            </Text>
+                            <View className="flex-row items-center justify-between">
+                              <Text className="text-black ">Spidometer</Text>
+                              <Text className="font-bold text-black">{item.spidometer_out} Km</Text>
+                            </View>
                           </View>
+                        </View>
+                        <View className="items-cente flex-row items-center justify-center">
+                          <Text className="text-xs">Ketuk untuk melihat gambar.</Text>
+                          <View className="flex-grow border-t border-white" />
                         </View>
                       </View>
                     </TouchableOpacity>

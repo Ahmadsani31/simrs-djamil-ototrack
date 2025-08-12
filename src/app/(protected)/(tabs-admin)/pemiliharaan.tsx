@@ -24,6 +24,9 @@ import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 
+const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
 const LIMIT = 10;
 
 const fetchData = async ({
@@ -190,11 +193,12 @@ export default function PemiliharaanScreen() {
                   <View className="w-full flex-1 flex-row items-start gap-5">
                     <Pressable
                       onPress={() => handleModalImageShow(item.image)}
-                      className="items-center justify-center">
+                      className="flex items-center justify-center">
                       <Image
                         source={{ uri: item.image }}
                         style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
                         contentFit="contain"
+                        placeholder={blurhash}
                       />
                       <Text className="absolute rounded-lg bg-black/50 p-1 text-center text-xs text-white">
                         Ketuk untuk melihat

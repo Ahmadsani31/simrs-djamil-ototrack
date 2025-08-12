@@ -79,7 +79,7 @@ export default function PengembalianServiceScreen() {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const postSubmitData = async (values: FormikValues) => {
-    console.log(values);
+    // console.log(values);
 
     setLoading(true);
 
@@ -105,7 +105,7 @@ export default function PengembalianServiceScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       // return;
 
       await secureApi.postForm('/service/update_admin', formData);

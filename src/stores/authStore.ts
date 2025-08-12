@@ -52,15 +52,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login successful :', user);
-      console.log('Token :', token);
+      // console.log('Login successful :', user);
+      // console.log('Token :', token);
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return user;
     } catch (error: any) {
       // Alert.alert('Warning!', error.message as string);
-      console.log('Login error:', error.message as string);
+      // console.log('Login error:', error.message as string);
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Username atau password salah';
         set({
@@ -91,15 +91,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login successful :', user);
-      console.log('Token :', token);
+      // console.log('Login successful :', user);
+      // console.log('Token :', token);
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return true;
     } catch (error: any) {
       // Alert.alert('Warning!', error.message as string);
-      console.log('Login error:', error.message as string);
+      // console.log('Login error:', error.message as string);
       if (error.response && error.response.data) {
         const msg = error.response.data.message || 'Email tidak terdaftar';
         set({

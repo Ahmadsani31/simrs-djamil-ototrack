@@ -71,7 +71,7 @@ export default function BbmVoucherScreen() {
   }, [kendaraan_id]);
 
   // console.log(error);
-  console.log(data);
+  // console.log(data);
 
   if (isError) {
     return (
@@ -151,7 +151,7 @@ export default function BbmVoucherScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       // return;
       await secureApi.postForm('/bbm/store_voucher', formData);
       router.dismissTo('/(protected)/(tabs)');

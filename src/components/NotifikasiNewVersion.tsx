@@ -25,7 +25,7 @@ export default function NotifikasiNewVersion() {
     };
     const timeout = setTimeout(() => {
       cekNewVersion(); // ganti warna setelah 2 detik
-      console.log('cek version');
+      // console.log('cek version');
     }, 5000);
 
     return () => clearTimeout(timeout);

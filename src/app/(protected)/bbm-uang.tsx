@@ -146,7 +146,7 @@ export default function BbmUangScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       // return;
       await secureApi.postForm('/bbm/store_uang', formData);
       router.dismissTo('/(protected)/(tabs)');

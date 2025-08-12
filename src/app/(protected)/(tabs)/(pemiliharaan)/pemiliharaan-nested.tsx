@@ -140,7 +140,7 @@ export default function PemiliharaanNestedScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', formData);
+      // console.log('formData', formData);
       // return;
       await secureApi.postForm('/service/image_store', formData);
       // console.log('response save ', JSON.stringify(response));

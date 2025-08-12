@@ -33,7 +33,7 @@ export async function startTracking() {
       },
     });
     statusTrackingStore.getState().setTrackingStatus(true);
-    console.log('Location tracking started');
+    // console.log('Location tracking started');
   }
 }
 

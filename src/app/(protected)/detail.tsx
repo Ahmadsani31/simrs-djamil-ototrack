@@ -115,7 +115,7 @@ export default function DetailScreen() {
       // console.log(response.message);
       router.dismissTo('/(protected)/(tabs)');
     } catch (error: any) {
-      console.log(error.response.data);
+      // console.log(error.response.data);
       HandleError(error);
     } finally {
       setLoading(false);

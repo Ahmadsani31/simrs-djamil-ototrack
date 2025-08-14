@@ -2,9 +2,9 @@ import axios from 'axios';
 import { LoginData, LoginSSOData } from '@/types/types';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
-import { API_URL } from '@/utils/constants';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,

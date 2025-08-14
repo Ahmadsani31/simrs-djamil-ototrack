@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/stores/authStore';
-import { API_URL } from '@/utils/constants';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 // Ganti dengan base URL API kamu
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 // Inisialisasi instance axios
 const api = axios.create({
   baseURL: API_URL,

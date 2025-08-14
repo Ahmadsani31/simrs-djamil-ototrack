@@ -15,7 +15,7 @@ import * as Notifications from 'expo-notifications';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ToastManager from 'toastify-react-native';
 import '@/utils/backgroundLocationTask';
-import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID, URL_PLAY_STORE, VERSION_NEW } from '@/utils/constants';
+import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
 import NotifikasiNewVersion from '@/components/NotifikasiNewVersion';
 import NotifikasiNewVersionMinor from '@/components/NotifikasiNewVersionMinor';
 

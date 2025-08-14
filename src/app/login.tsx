@@ -22,7 +22,8 @@ import ViewError from '@/components/ViewError';
 import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
 import Constants from 'expo-constants';
-import { API_URL } from '@/utils/constants';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),

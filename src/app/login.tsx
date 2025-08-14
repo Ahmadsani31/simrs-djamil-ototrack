@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  Platform,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image, Platform, KeyboardAvoidingView } from 'react-native';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import * as yup from 'yup';
@@ -19,11 +10,10 @@ import { Feather } from '@expo/vector-icons';
 import ButtonCostum from '@/components/ButtonCostum';
 import { LoginData } from '@/types/types';
 import ViewError from '@/components/ViewError';
-import Animated, { useSharedValue, withSpring, FadeInDown } from 'react-native-reanimated';
+import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import useOnceEffect from '@/components/useOnceEffect';
 import Constants from 'expo-constants';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { API_URL } from '@/utils/constants';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),

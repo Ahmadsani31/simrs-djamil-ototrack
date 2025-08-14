@@ -89,5 +89,17 @@
     "root": true
   },
   "main": "expo-router/entry",
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "enabled": true,
+        "exclude": [
+          "react-native-element-dropdown",
+          "uri-scheme"
+        ],
+        "listUnknownPackages": false
+      }
+    }
+  }
 }

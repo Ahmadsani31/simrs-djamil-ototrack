@@ -9,6 +9,10 @@
       "output": "server",
       "bundler": "metro"
     },
+    "notification": {
+      "icon": "./assets/icon/notification-icon.png",
+      "color": "#205781"
+    },
     "experiments": {
       "tsconfigPaths": true
     },
@@ -104,10 +108,6 @@
         "foregroundImage": "./assets/icon/adaptive-icon.png",
         "monochromeImage": "./assets/icon/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "notification": {
-        "icon": "./assets/icon/notification-icon.png",
-        "color": "#205781"
       },
       "versionCode": 2,
       "package": "com.darma31.simrsdjamilototrack",

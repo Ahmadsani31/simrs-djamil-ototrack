@@ -233,11 +233,13 @@ export default function PengembalianServiceScreen() {
           onPress={() => setModalImageVisible(false)}
         />
       )}
-      <ModalCamera
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        setUriImage={(e) => setUri(e)}
-      />
+      {modalVisible ? (
+        <ModalCamera
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          setUriImage={(e) => setUri(e)}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }

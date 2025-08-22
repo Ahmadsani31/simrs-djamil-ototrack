@@ -52,7 +52,7 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
       <View className="mt-10">
         <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
           <TouchableOpacity
-            className="flex-auto items-center justify-center gap-4 rounded-lg bg-blue-200 p-5 shadow"
+            className="flex-1 items-center justify-center gap-4 rounded-lg bg-blue-200 p-5 shadow"
             onPress={() => onPress('daily')}>
             <Image
               style={{ width: 100, height: 100 }}
@@ -60,11 +60,13 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
               contentFit="contain"
               transition={500}
             />
-            <Text className="font-bold shadow-black">Aktifitas Harian</Text>
+            <Text adjustsFontSizeToFit numberOfLines={1} className="font-bold shadow-black">
+              Aktifitas Harian
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-auto items-center justify-center gap-4 rounded-lg bg-amber-200 p-5 shadow"
+            className="flex-1 items-center justify-center gap-4 rounded-lg bg-amber-200 p-5 shadow"
             onPress={() => onPress('service')}>
             <Image
               style={{ width: 100, height: 100 }}
@@ -72,7 +74,12 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
               contentFit="contain"
               transition={500}
             />
-            <Text className="font-bold shadow-black">Service Kendaraan</Text>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              className="text-center font-bold shadow-black ">
+              Service Kendaraan
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

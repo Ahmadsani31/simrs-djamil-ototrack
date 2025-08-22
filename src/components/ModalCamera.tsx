@@ -1,13 +1,22 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
-import { View, Modal, TouchableOpacity, StyleSheet, Text, Dimensions } from 'react-native';
+import {
+  View,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  Dimensions,
+  AppState,
+} from 'react-native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 // import Marker, { ImageFormat, Position, TextBackgroundType } from 'react-native-image-marker';
 import ButtonCostum from './ButtonCostum';
 import LoadingIndikator from './LoadingIndikator';
 import { Toast } from 'toastify-react-native';
 import dayjs from 'dayjs';
+import { useIsFocused } from '@react-navigation/native';
 import { useAuthStore } from '@/stores/authStore';
 // import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
 // import { Asset } from 'expo-asset';
@@ -29,12 +38,26 @@ interface LocationData {
 }
 
 export default function ModalCamera({ visible, onClose, setUriImage }: InputProps) {
-  const { user } = useAuthStore();
+  const isFocused = useIsFocused();
+  const [active, setActive] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const [flashlight, setFlashlight] = useState(false);
+
+  // Aktifkan hanya saat fokus + izin ada
+  useEffect(() => {
+    setActive(Boolean(isFocused && permission?.granted));
+  }, [isFocused, permission?.granted]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (s) => {
+      setActive(Boolean(s === 'active' && isFocused && permission?.granted));
+    });
+    return () => sub.remove();
+  }, [isFocused, permission?.granted]);
+
   // const [location, setLocation] = useState<LocationData | null>(null);
 
   // useEffect(() => {
@@ -139,15 +162,17 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
         <View className="flex-1 items-center justify-center bg-slate-600 ">
           {permission?.granted ? (
             <>
-              <CameraView
-                style={styles.camera}
-                mirror={true}
-                ratio={'4:3'}
-                facing="back"
-                autofocus="on"
-                enableTorch={flashlight}
-                ref={cameraRef}
-              />
+              {active ? (
+                <CameraView
+                  style={styles.camera}
+                  mirror={true}
+                  ratio={'4:3'}
+                  facing="back"
+                  autofocus="on"
+                  enableTorch={flashlight}
+                  ref={cameraRef}
+                />
+              ) : null}
 
               {/* Bottom controls */}
               <View className="absolute bottom-0 w-full items-center bg-black/50 p-24">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonCostum from './ButtonCostum';
 import { colors } from '@/constants/colors';
+import { Toast } from 'toastify-react-native';
 const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
@@ -45,6 +46,27 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
     setScanned(true);
     onScan(data);
   };
+
+  const [isReady, setIsReady] = useState(false);
+
+  const handleReady = useCallback(() => {
+    console.log('ready');
+
+    setIsReady(true);
+  }, []);
+
+  const handleMountError = useCallback((e: { message?: string }) => {
+    Toast.show({
+      position: 'center',
+      type: 'error',
+      text1: 'Camera Error!',
+      text2: e.message,
+      backgroundColor: '#000',
+      textColor: '#fff',
+    });
+    setIsReady(false);
+    // (opsional) kirim log ke error tracker di sini
+  }, []);
 
   const openAppSettings = () => {
     if (Platform.OS === 'ios') {
@@ -107,14 +129,16 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
           }}
           zoom={0.3}
           facing="back"
-          ratio="1:1"
-          autofocus="on"
+          // ratio="1:1"
           enableTorch={flashlight}
           barcodeScannerSettings={{
             barcodeTypes: ['qr'],
           }}
           onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+          onCameraReady={handleReady}
+          onMountError={handleMountError}
         />
+
         {/* Frame Scanner */}
         <View style={styles.scanFrame}>
           {/* Corner Borders */}

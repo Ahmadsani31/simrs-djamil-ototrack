@@ -226,7 +226,7 @@ export default function LoginScreen() {
           <View className="absolute bottom-0 w-full items-center">
             <Text className="text-sm font-medium">Pencatatan Kendaraan</Text>
             <Text className="text-xs font-bold">Version. {Constants.expoConfig?.version}</Text>
-            <Text className="text-xs">URL : {API_URL}</Text>
+            {/* <Text className="text-xs">URL : {API_URL}</Text> */}
           </View>
           <Animated.View
             style={{ width: WiconBL, height: HiconBL }}

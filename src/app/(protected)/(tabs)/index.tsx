@@ -1,17 +1,15 @@
-import { View, Alert, SafeAreaView, BackHandler, Text, TouchableOpacity } from 'react-native';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import BottomSheet, { BottomSheetView, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
-import BarcodeScanner from '@/components/BarcodeScanner';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useCallback, useState } from 'react';
 import { Link, router, useFocusEffect } from 'expo-router';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
 import PageDaily from '@/components/PageDaily';
-import PageService from '@/components/PageService';
 import PageHome from '@/components/PageHome';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import Feather from '@expo/vector-icons/Feather';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import BarcodeScannerCamera from '@/components/BarcodeScannerCamera';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -33,11 +31,11 @@ export default function IndexScreen() {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [jenisAksi, setJenisAksi] = useState('');
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const [barcodeScanner, SetBarcodeScanner] = useState(false);
+
   const [rawData, setRawData] = useState<rawData>();
   const [rawDataService, setRawDataService] = useState<rawData[]>();
-
-  const bottomSheetRef = useRef<BottomSheet>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -74,31 +72,15 @@ export default function IndexScreen() {
     }
   };
 
-  const animationConfigs = useBottomSheetSpringConfigs({
-    damping: 80,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
-    stiffness: 500,
-  });
-
-  // ref
-
-  const handleSheetChanges = useCallback((index: number) => {
-    if (index === -1) {
-      setIsSheetOpen(false);
-    }
-  }, []);
-
-  const handleSnapPress = useCallback((value: string) => {
-    setIsSheetOpen(true);
-    setJenisAksi(value);
-    bottomSheetRef.current?.expand();
-  }, []);
+  const handleOpenModalBarcode = (e: string) => {
+    setJenisAksi(e);
+    SetBarcodeScanner(true);
+  };
 
   const handleScan = async (data: string) => {
     // console.log('Scanned data:', data);
     setLoading(true);
+    SetBarcodeScanner(false);
     try {
       const res = await secureApi.get(`reservasi/qrcode`, {
         params: {
@@ -106,7 +88,6 @@ export default function IndexScreen() {
         },
       });
       if (res.status === true) {
-        setIsSheetOpen(false);
         // setUuid(data);
         if (jenisAksi == 'daily') {
           router.push({
@@ -131,8 +112,6 @@ export default function IndexScreen() {
       // toast.info(error.response.data.message);
       HandleError(error);
     } finally {
-      setIsSheetOpen(false);
-      bottomSheetRef.current?.close();
       setLoading(false);
     }
   };
@@ -169,7 +148,7 @@ export default function IndexScreen() {
           {rawData ? (
             <PageDaily item={rawData} />
           ) : (
-            <PageHome onPress={(e) => handleSnapPress(e)} />
+            <PageHome onPress={(e) => handleOpenModalBarcode(e)} />
           )}
         </View>
       </View>
@@ -184,24 +163,13 @@ export default function IndexScreen() {
           <FontAwesome name="refresh" size={14} color="white" />
         </TouchableOpacity>
       </View>
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={['100%']}
-        index={-1}
-        enablePanDownToClose={true}
-        animationConfigs={animationConfigs}
-        onChange={handleSheetChanges}>
-        <BottomSheetView
-          style={{
-            flex: 1,
-            padding: 36,
-            height: '100%',
-            alignItems: 'center',
-            backgroundColor: '#4f4f4f',
-          }}>
-          {isSheetOpen && <BarcodeScanner onScan={handleScan} />}
-        </BottomSheetView>
-      </BottomSheet>
+      {barcodeScanner ? (
+        <BarcodeScannerCamera
+          onScan={handleScan}
+          onVisible={() => SetBarcodeScanner(false)}
+          visible={barcodeScanner}
+        />
+      ) : null}
     </View>
   );
 }

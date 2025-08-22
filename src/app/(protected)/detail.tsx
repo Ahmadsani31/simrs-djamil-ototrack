@@ -221,11 +221,13 @@ export default function DetailScreen() {
           )}
         </View>
       </ScrollView>
-      <ModalCamera
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        setUriImage={(e) => setUriImageModal(e)}
-      />
+      {modalVisible ? (
+        <ModalCamera
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          setUriImage={(e) => setUriImageModal(e)}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }

@@ -70,7 +70,8 @@
     "toastify-react-native": "^7.2.3",
     "uri-scheme": "^1.4.9",
     "yup": "^1.6.1",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "expo-image-manipulator": "~13.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -79,7 +79,7 @@ export default function PengembalianManualScreen() {
         type: 'image/jpeg',
       } as any);
 
-      console.log('formData', JSON.stringify(formData));
+      // console.log('formData', JSON.stringify(formData));
       // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
       // console.log('response ', JSON.stringify(response.data));

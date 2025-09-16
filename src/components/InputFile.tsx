@@ -1,8 +1,8 @@
 import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-// import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-// import { SaveFormat, useImageManipulator } from 'expo-image-manipulator';
+// import { File } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
 import { useState } from 'react';
@@ -27,7 +27,7 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
       mediaTypes: ['images'],
       // allowsEditing: true,
       // aspect: [3, 4],
-      quality: 0.3,
+      quality: 1,
     });
 
     console.log(result.assets);
@@ -42,14 +42,20 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
         // 2. Mengompres gambar yang dipilih
         console.log('Mulai kompresi...');
         const context = ImageManipulator.manipulate(imageUri);
+        context.resize({ width: 1600 });
         const image = await context.renderAsync();
         const compressedImage = await image.saveAsync({
-          compress: 0.3,
+          compress: 0.8,
           format: SaveFormat.JPEG,
         });
 
+        const fileInfo = await FileSystem.getInfoAsync(compressedImage.uri, { size: true });
+        const compressedSize = (fileInfo as any).size ?? 0;
+        // console.log('Compressed path:', compressedImage.uri);
+        console.log('Compressed size (bytes):', compressedSize);
+
         console.log('Kompresi selesai, URI baru:', compressedImage);
-        onChangeFile(compressedImage.uri);
+        onChangeFile(compressedImage?.uri);
         // 3. Mengunggah gambar yang sudah dikompres
         // await uploadImageAsync(compressedImage);
       } catch (error) {

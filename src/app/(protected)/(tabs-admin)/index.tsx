@@ -1,6 +1,6 @@
 import secureApi from '@/services/service';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   TextInput,
   Text,
@@ -16,7 +16,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/SkeletonList';
-import { Link, router } from 'expo-router';
+import { Link, router, useFocusEffect } from 'expo-router';
 
 const LIMIT = 5;
 
@@ -58,9 +58,11 @@ export default function IndexScreen() {
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');
 
-  useEffect(() => {
-    refetch();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({

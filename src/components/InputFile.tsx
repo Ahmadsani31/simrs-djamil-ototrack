@@ -54,7 +54,7 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
         // console.log('Compressed path:', compressedImage.uri);
         console.log('Compressed size (bytes):', compressedSize);
 
-        console.log('Kompresi selesai, URI baru:', compressedImage);
+        // console.log('Kompresi selesai, URI baru:', compressedImage);
         onChangeFile(compressedImage?.uri);
         // 3. Mengunggah gambar yang sudah dikompres
         // await uploadImageAsync(compressedImage);

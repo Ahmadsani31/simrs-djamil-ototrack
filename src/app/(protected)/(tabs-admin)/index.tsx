@@ -149,7 +149,7 @@ export default function IndexScreen() {
                   <TouchableOpacity
                     onPress={() =>
                       router.push({
-                        pathname: '/pengembalianManual',
+                        pathname: '/pengembalian_manual',
                         params: {
                           reservasi_id: item?.id,
                           user_id: item?.user_id,

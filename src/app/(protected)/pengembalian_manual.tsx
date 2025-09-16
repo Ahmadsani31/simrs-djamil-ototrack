@@ -47,6 +47,8 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
+  console.log(reservasi_id);
+
   const insets = useSafeAreaInsets();
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
@@ -77,7 +79,7 @@ export default function PengembalianManualScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
+      console.log('formData', JSON.stringify(formData));
       // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
       // console.log('response ', JSON.stringify(response.data));
@@ -86,7 +88,7 @@ export default function PengembalianManualScreen() {
       // console.log(response.message);
       router.dismissTo('(tabs-admin)');
     } catch (error: any) {
-      // console.log(JSON.stringify(error));
+      console.log(JSON.stringify(error));
       HandleError(error);
     } finally {
       setLoading(false);

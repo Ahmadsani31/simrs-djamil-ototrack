@@ -120,7 +120,7 @@ export default function ProtectedLayout() {
           }}
         />
         <Stack.Screen
-          name="pengembalianManual"
+          name="pengembalian_manual"
           options={{
             headerShown: true,
             headerTitle: '',

@@ -1,8 +1,13 @@
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+// import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+// import { SaveFormat, useImageManipulator } from 'expo-image-manipulator';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+
 import { useState } from 'react';
+import { Toast } from 'toastify-react-native';
+import { useLoadingStore } from '@/stores/loadingStore';
 
 interface InputProps {
   label?: string;
@@ -12,6 +17,8 @@ interface InputProps {
 }
 
 export default function InputFile({ label, onChangeFile, placeholder, error }: InputProps) {
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
   const [fileName, setFileName] = useState<string | null>('');
 
   const pickImage = async () => {
@@ -20,33 +27,45 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
       mediaTypes: ['images'],
       // allowsEditing: true,
       // aspect: [3, 4],
-      quality: 1,
+      quality: 0.3,
     });
 
-    // console.log(result.assets[0].fileName);
+    console.log(result.assets);
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
       setFileName(result.assets[0].fileName ?? '');
-      onChangeFile(result.assets[0].uri);
+      // onChangeFile(result.assets[0].uri);
 
       try {
+        setLoading(true);
         // 2. Mengompres gambar yang dipilih
         console.log('Mulai kompresi...');
-        const compressedImage = await manipulateAsync(imageUri, [], {
-          compress: 0.6, // Kompresi 60% (keseimbangan baik antara ukuran & kualitas)
+        const context = ImageManipulator.manipulate(imageUri);
+        const image = await context.renderAsync();
+        const compressedImage = await image.saveAsync({
+          compress: 0.3,
           format: SaveFormat.JPEG,
         });
-        console.log('Kompresi selesai, URI baru:', compressedImage.uri);
 
+        console.log('Kompresi selesai, URI baru:', compressedImage);
+        onChangeFile(compressedImage.uri);
         // 3. Mengunggah gambar yang sudah dikompres
-        console.log('Mulai upload...');
         // await uploadImageAsync(compressedImage);
       } catch (error) {
         console.error('Proses gagal:', error);
+        Toast.show({
+          position: 'center',
+          type: 'error',
+          text1: 'Perhatian!',
+          text2: 'Terjadi kesalahan saat memproses gambar, Silahkan ambil ulang',
+          backgroundColor: '#000',
+          textColor: '#fff',
+          visibilityTime: 5000,
+        });
         // Alert.alert('Error', 'Terjadi kesalahan saat memproses gambar.');
       } finally {
-        // setIsUploading(false); // Sembunyikan loading indicator
+        setLoading(false);
       }
     }
   };

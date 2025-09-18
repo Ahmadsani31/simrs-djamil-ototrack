@@ -18,6 +18,7 @@ import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/SkeletonList';
 import { Link, router, useFocusEffect } from 'expo-router';
 import ModalPreviewImage from '@/components/ModalPreviewImage';
+import { Toast } from 'toastify-react-native';
 
 const LIMIT = 5;
 
@@ -207,7 +208,15 @@ export default function IndexScreen() {
                       <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
                     </View>
                   </Pressable>
-                  <Pressable onPress={() => handleModalImageShow(item.spidometer_file_in)}>
+                  <Pressable
+                    onPress={() =>
+                      item.reservasi_out
+                        ? handleModalImageShow(item.spidometer_file_out)
+                        : Toast.info(
+                            'Image tidak tersedia, kereana kendaraan masih terpakai',
+                            'center'
+                          )
+                    }>
                     <View className="w-48 items-center rounded-md bg-amber-200 p-2">
                       <Text className={`text-lg font-bold `}>Dikembalikan</Text>
                       <Text className="text-secondary text-center font-medium">

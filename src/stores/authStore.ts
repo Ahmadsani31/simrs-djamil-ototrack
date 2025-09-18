@@ -52,8 +52,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login successful :', user);
-      console.log('Token :', token);
+      // console.log('Login successful :', user);
+      // console.log('Token :', token);
 
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });

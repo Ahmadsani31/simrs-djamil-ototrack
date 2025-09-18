@@ -216,7 +216,7 @@ export default function PemakaianScreen() {
                             </View>
                           </View>
                         </View>
-                        <View className="items-cente flex-row items-center justify-center">
+                        <View className="items-cente flex-row items-center justify-center gap-2">
                           <Text className="text-xs">Ketuk untuk melihat gambar.</Text>
                           <View className="flex-grow border-t border-white" />
                         </View>
@@ -238,7 +238,7 @@ export default function PemakaianScreen() {
                             </View>
                           </View>
                         </View>
-                        <View className="items-cente flex-row items-center justify-center">
+                        <View className="items-cente flex-row items-center justify-center gap-2">
                           <Text className="text-xs">Ketuk untuk melihat gambar.</Text>
                           <View className="flex-grow border-t border-white" />
                         </View>

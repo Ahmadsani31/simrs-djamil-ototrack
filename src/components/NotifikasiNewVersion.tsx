@@ -16,6 +16,7 @@ export default function NotifikasiNewVersion() {
 
       try {
         const response = await axios.get(API_URL + '/auth/version_new_android');
+
         if (semver.lt(currentVersion, response.data.latest_version)) {
           setVisible(true);
         }

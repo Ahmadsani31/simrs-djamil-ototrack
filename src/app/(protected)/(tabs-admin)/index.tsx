@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/SkeletonList';
 import { Link, router, useFocusEffect } from 'expo-router';
+import ModalPreviewImage from '@/components/ModalPreviewImage';
 
 const LIMIT = 5;
 
@@ -97,6 +98,15 @@ export default function IndexScreen() {
   const handleResetTanggal = () => {
     setDateInput('');
     refetch();
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imgBase64, setImgBase64] = useState<Base64URLString>();
+
+  const handleModalImageShow = async (uri: any) => {
+    // console.log('show image modal');
+    setImgBase64(uri);
+    setModalVisible(true);
   };
 
   const flatData = data?.pages.flatMap((page) => page.data) || [];
@@ -186,26 +196,30 @@ export default function IndexScreen() {
                 <View className="border-1 my-1 h-px bg-gray-200 dark:bg-gray-700"></View>
 
                 <View className="flex-row items-center justify-between">
-                  <View className="w-48 items-center rounded-md bg-blue-200 p-2">
-                    <Text className={`text-lg font-bold`}>Dipakai</Text>
-                    <Text className="text-secondary text-center font-medium">
-                      {item.reservasi_in
-                        ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')
-                        : ''}
-                    </Text>
-                    <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
-                  </View>
-                  <View className="w-48 items-center rounded-md bg-amber-200 p-2">
-                    <Text className={`text-lg font-bold `}>Dikembalikan</Text>
-                    <Text className="text-secondary text-center font-medium">
-                      {item.reservasi_out
-                        ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')
-                        : '-'}
-                    </Text>
-                    <Text className="text-secondary text-sm">
-                      {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
-                    </Text>
-                  </View>
+                  <Pressable onPress={() => handleModalImageShow(item.spidometer_file_in)}>
+                    <View className="w-48 items-center rounded-md bg-blue-200 p-2">
+                      <Text className={`text-lg font-bold`}>Dipakai</Text>
+                      <Text className="text-secondary text-center font-medium">
+                        {item.reservasi_in
+                          ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')
+                          : ''}
+                      </Text>
+                      <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
+                    </View>
+                  </Pressable>
+                  <Pressable onPress={() => handleModalImageShow(item.spidometer_file_in)}>
+                    <View className="w-48 items-center rounded-md bg-amber-200 p-2">
+                      <Text className={`text-lg font-bold `}>Dikembalikan</Text>
+                      <Text className="text-secondary text-center font-medium">
+                        {item.reservasi_out
+                          ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')
+                          : '-'}
+                      </Text>
+                      <Text className="text-secondary text-sm">
+                        {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
+                      </Text>
+                    </View>
+                  </Pressable>
                 </View>
               </View>
             </>
@@ -224,6 +238,14 @@ export default function IndexScreen() {
           ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
         />
       </View>
+      {modalVisible && (
+        <ModalPreviewImage
+          title="Gambar Pemeliharaan"
+          visible={modalVisible}
+          imgUrl={imgBase64 || ''}
+          onPress={() => setModalVisible(false)}
+        />
+      )}
     </SafeAreaView>
   );
 }

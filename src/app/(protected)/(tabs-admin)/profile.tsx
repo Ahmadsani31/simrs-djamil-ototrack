@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { AntDesign } from '@expo/vector-icons';
 
 import { PieChart } from 'react-native-gifted-charts';
+import { API_URL } from '@/utils/constants';
 // const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Profile() {
@@ -138,7 +139,7 @@ export default function Profile() {
           <Text className="text-lg font-bold">RSUP DR. M. DJAMIL PADANG</Text>
           <Text className="mt-4">Vesion</Text>
           <Text className="text-sm">{Constants.expoConfig?.version}</Text>
-          {/* <Text className='text-xs'>{API_URL}</Text> */}
+          {/* <Text className="text-xs">{API_URL}</Text> */}
         </View>
       </View>
     </SafeAreaView>

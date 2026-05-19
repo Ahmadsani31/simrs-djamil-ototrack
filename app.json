@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oto RS-Djamil",
     "slug": "simrs-djamil-ototrack",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "scheme": "ototrack-djamil",
     "web": {
       "favicon": "./assets/icon/adaptive-icon.png",
@@ -82,9 +82,7 @@
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

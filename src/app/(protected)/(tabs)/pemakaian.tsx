@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   BackHandler,
+  RefreshControl,
 } from 'react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RefreshControl } from 'react-native-gesture-handler';
 import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 import ListDetailSectionSheet from '@/components/sections/ListDetailSectionSheet';
 

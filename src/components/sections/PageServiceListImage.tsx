@@ -1,5 +1,4 @@
-import { View, Text, TouchableOpacity, Image as ImageLocal, Image } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { View, Text, TouchableOpacity, Image as ImageLocal, Image, FlatList } from 'react-native';
 import SkeletonList from '@/components/feedback/SkeletonList';
 
 type propsUseQuery = {

@@ -28,6 +28,16 @@ SplashScreen.setOptions({
   fade: true,
 });
 
+// Agar notifikasi tetap tampil saat app di foreground (SDK 55 API).
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
 // Create a QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,15 +49,17 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  GoogleSignin.configure({
-    webClientId: GOOGLE_CLIENT_ID,
-    iosClientId: APPEL_CLIENT_ID,
-    profileImageSize: 120,
-  });
-
   const { isLoading } = useAutoLogin();
 
   const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: GOOGLE_CLIENT_ID,
+      iosClientId: APPEL_CLIENT_ID,
+      profileImageSize: 120,
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -78,14 +90,14 @@ export default function RootLayout() {
 
   async function registerForPushNotificationsAsync() {
     const existing = await Notifications.getPermissionsAsync();
-    let status = existing.status;
+    let isGranted = (existing as { granted?: boolean }).granted ?? false;
 
-    if (status !== 'granted') {
+    if (!isGranted) {
       const requested = await Notifications.requestPermissionsAsync();
-      status = requested.status;
+      isGranted = (requested as { granted?: boolean }).granted ?? false;
     }
 
-    if (status !== 'granted') {
+    if (!isGranted) {
       Alert.alert(
         'Notifikasi Diperlukan',
         `Aplikasi memerlukan izin notifikasi untuk digunakan.`,

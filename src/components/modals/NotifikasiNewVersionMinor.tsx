@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Modal, Text, TouchableHighlight, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Updates from 'expo-updates';
@@ -8,6 +8,9 @@ export default function NotifikasiNewVersionMinor() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // expo-updates API tidak tersedia di development build — skip pengecekan.
+    if (__DEV__) return;
+
     const cekNewVersion = async () => {
       try {
         const update = await Updates.checkForUpdateAsync();
@@ -18,7 +21,6 @@ export default function NotifikasiNewVersionMinor() {
         logger.warn('Error cek pembaruan minor :', e);
       }
     };
-    // call the function
     cekNewVersion();
   }, []);
 
@@ -62,5 +64,3 @@ export default function NotifikasiNewVersionMinor() {
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({});

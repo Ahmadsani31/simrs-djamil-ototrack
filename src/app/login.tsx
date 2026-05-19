@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import * as yup from 'yup';
@@ -13,7 +13,6 @@ import ViewError from '@/components/feedback/ViewError';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import useOnceEffect from '@/hooks/useOnceEffect';
 import Constants from 'expo-constants';
-import { API_URL } from '@/utils/constants';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),
@@ -27,7 +26,6 @@ import {
   isErrorWithCode,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import { ScrollView } from 'react-native-gesture-handler';
 import { Toast } from 'toastify-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 

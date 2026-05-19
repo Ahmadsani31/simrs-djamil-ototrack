@@ -5,15 +5,15 @@ import { Link, router, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import secureApi from '@/services/service';
 import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import { ModalRN } from '@/components/ModalRN';
-import ButtonCostum from '@/components/ButtonCostum';
+import { ModalRN } from '@/components/modals/ModalRN';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
-import ModalCamera from '@/components/ModalCamera';
-import InputArea from '@/components/InputArea';
+import ModalCamera from '@/components/modals/ModalCamera';
+import InputArea from '@/components/forms/InputArea';
 import { reLocation } from '@/hooks/locationRequired';
 import { Toast } from 'toastify-react-native';
-import PageServiceListImage from '@/components/PageServiceListImage';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
+import PageServiceListImage from '@/components/sections/PageServiceListImage';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { useLoadingStore } from '@/stores/loadingStore';
 import dayjs from 'dayjs';
 
@@ -189,7 +189,7 @@ export default function PemiliharaanNestedScreen() {
     <View className="flex-1 gap-4 bg-slate-300 p-4">
       <TouchableOpacity onPress={() => router.push('/')}>
         <View className="flex-row items-center justify-center gap-2 rounded-lg bg-stone-800 p-2">
-          <AntDesign name="back" size={24} color="white" />
+          <AntDesign name="left" size={24} color="white" />
           <Text className="text-white">Kembali</Text>
         </View>
       </TouchableOpacity>
@@ -290,7 +290,7 @@ export default function PemiliharaanNestedScreen() {
                     <TouchableOpacity
                       className="absolute right-2 top-2 rounded-full bg-white p-1"
                       onPress={() => setImgUrl(null)}>
-                      <AntDesign name="closecircleo" size={32} color="red" />
+                      <AntDesign name="close-circle" size={32} color="red" />
                     </TouchableOpacity>
                   </View>
                 )}

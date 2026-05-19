@@ -84,7 +84,7 @@ export default function Profile() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
-        <View className="rounded-bl-[50] rounded-br-[50]  bg-[#205781] shadow">
+        <View className="rounded-bl-[50] rounded-br-[50]  bg-brand shadow">
           <View className="px-4">
             <View className="flex-row items-center justify-center gap-5 rounded-lg bg-white p-4">
               <View className="my-3">

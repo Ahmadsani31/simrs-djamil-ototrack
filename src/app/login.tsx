@@ -4,14 +4,14 @@ import { router } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
 import * as yup from 'yup';
 import { Formik } from 'formik';
-import Input from '@/components/Input';
+import Input from '@/components/forms/Input';
 
 import { Feather } from '@expo/vector-icons';
-import ButtonCostum from '@/components/ButtonCostum';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { LoginData } from '@/types/types';
-import ViewError from '@/components/ViewError';
+import ViewError from '@/components/feedback/ViewError';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
-import useOnceEffect from '@/components/useOnceEffect';
+import useOnceEffect from '@/hooks/useOnceEffect';
 import Constants from 'expo-constants';
 import { API_URL } from '@/utils/constants';
 
@@ -66,6 +66,8 @@ export default function LoginScreen() {
 
   const handleLogin = async (value: LoginData) => {
     const log = await login(value);
+
+    if (!log) return; // login gagal, errorLogin sudah di-set di store
 
     if (log.role == 'admin') {
       router.replace('/(protected)/(tabs-admin)/');
@@ -147,7 +149,7 @@ export default function LoginScreen() {
           />
           <Animated.View
             style={{ width: WiconTR, height: HiconTR }}
-            className="absolute right-[-100] top-16 rounded-full bg-[#205781]"
+            className="absolute right-[-100] top-16 rounded-full bg-brand"
           />
           <View className="mb-5 mt-10 items-center">
             <View className="rounded-2xl bg-white/85 p-2">

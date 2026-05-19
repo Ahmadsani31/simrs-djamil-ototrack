@@ -1,6 +1,6 @@
 import { FlatList, Image, SafeAreaView, Text, View } from 'react-native';
 import secureApi from '@/services/service';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { useQuery } from '@tanstack/react-query';
 import { Kendaraan, KendaraanItemProps } from '@/types/types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -28,7 +28,7 @@ export default function KendaraanScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
-        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="px-4">
           <View className="flex flex-row items-center gap-2 rounded-lg bg-white p-2 ">
             <FontAwesome6 name="circle-dot" size={16} color="black" />

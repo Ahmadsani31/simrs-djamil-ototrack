@@ -1,27 +1,15 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
-import { LoginData, LoginSSOData, RegisterData, User } from '@/types/types';
+import { LoginData, LoginSSOData, User } from '@/types/types';
 import { restApi } from '@/services/auth';
 import { router } from 'expo-router';
-import { Alert } from 'react-native';
-
-type propLogin = {
-  email: string;
-  id: string;
-  name: string;
-  role: string;
-};
 
 interface AuthState {
   token: string | null;
   user: User | null;
   isLoading: boolean;
-  error: string | null;
   errorLogin: string | null;
-  errorRegister: string | null;
-  setToken: (token: string) => Promise<void>;
-  setUser: (user: User) => void;
-  login: (data: LoginData) => Promise<propLogin>;
+  login: (data: LoginData) => Promise<User | false>;
   loginSSO: (data: LoginSSOData) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -31,16 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   user: null,
   isLoading: false,
-  error: null,
   errorLogin: null,
-  errorRegister: null,
-
-  setToken: async (token) => {
-    await SecureStore.setItemAsync('token', token);
-    set({ token });
-  },
-
-  setUser: (user) => set({ user }),
 
   login: async (data: LoginData) => {
     // console.log('Login function called with data:', JSON.stringify(data));
@@ -91,9 +70,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      console.log('Login email successful :', user);
-      console.log('Token email :', token);
-
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return true;
@@ -126,8 +102,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const token = await SecureStore.getItemAsync('token');
     if (token) {
-      await restApi.logout(token);
-      // console.log('response logout ', response);
+      // Best-effort: kalau server error / offline, tetap lanjut bersihkan token lokal.
+      try {
+        await restApi.logout(token);
+      } catch {
+        // ignore
+      }
     }
     await SecureStore.deleteItemAsync('token');
     set({ token: null, user: null, isLoading: false });

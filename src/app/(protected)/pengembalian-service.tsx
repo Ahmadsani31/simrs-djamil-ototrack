@@ -11,7 +11,7 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import ModalCamera from '@/components/ModalCamera';
+import ModalCamera from '@/components/modals/ModalCamera';
 import secureApi from '@/services/service';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -19,12 +19,12 @@ import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { Toast } from 'toastify-react-native';
-import CustomNumberInput from '@/components/CustomNumberInput';
-import InputArea from '@/components/InputArea';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
+import InputArea from '@/components/forms/InputArea';
 import HandleError from '@/utils/handleError';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type propsService = {
@@ -135,7 +135,7 @@ export default function PengembalianServiceScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />
@@ -149,7 +149,7 @@ export default function PengembalianServiceScreen() {
                   <View className="mb-3 items-center gap-4 py-2">
                     <View className="flex-row items-center text-sm text-gray-500">
                       <View className="flex-grow border-t border-gray-300" />
-                      <Text className="mx-2 text-lg text-[#205781]">
+                      <Text className="mx-2 text-lg text-brand">
                         Proses Pengembalian pemeliharaan Kendaraan
                       </Text>
                       <View className="flex-grow border-t border-gray-300" />
@@ -201,7 +201,7 @@ export default function PengembalianServiceScreen() {
                         <TouchableOpacity
                           className="rounded-full bg-white p-1"
                           onPress={() => setUri(null)}>
-                          <AntDesign name="closecircleo" size={24} color="red" />
+                          <AntDesign name="close-circle" size={24} color="red" />
                         </TouchableOpacity>
                       </View>
                     )}

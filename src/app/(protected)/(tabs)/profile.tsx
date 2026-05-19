@@ -9,17 +9,17 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons';
-import { ModalRN } from '@/components/ModalRN';
+import { ModalRN } from '@/components/modals/ModalRN';
 import { useCallback, useState } from 'react';
 import { useFormik } from 'formik';
-import ButtonCostum from '@/components/ButtonCostum';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
 
 import * as yup from 'yup';
 import secureApi from '@/services/service';
-import Input from '@/components/Input';
+import Input from '@/components/forms/Input';
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { useFocusEffect } from 'expo-router';
 import { dataDashboard } from '@/types/types';
 import HandleError from '@/utils/handleError';
@@ -100,7 +100,7 @@ export default function Profile() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
-        <View className="rounded-bl-[50] rounded-br-[50]  bg-[#205781] shadow">
+        <View className="rounded-bl-[50] rounded-br-[50]  bg-brand shadow">
           <View className="px-4">
             <View className="flex-row items-center justify-center gap-5 rounded-lg bg-white">
               <View className="my-2">

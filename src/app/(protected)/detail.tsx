@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import Input from '@/components/Input';
-import InputArea from '@/components/InputArea';
-import ButtonCostum from '@/components/ButtonCostum';
+import Input from '@/components/forms/Input';
+import InputArea from '@/components/forms/InputArea';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { AntDesign } from '@expo/vector-icons';
-import ModalCamera from '@/components/ModalCamera';
+import ModalCamera from '@/components/modals/ModalCamera';
 import secureApi from '@/services/service';
 import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
@@ -24,13 +24,13 @@ import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import * as SecureStore from 'expo-secure-store';
 
 import { startTracking, stopTracking } from '@/utils/locationUtils';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocationStore } from '@/stores/locationStore';
 
@@ -136,7 +136,7 @@ export default function DetailScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
 
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
@@ -146,7 +146,7 @@ export default function DetailScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-sm text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-[#205781]">Jenis Kegiatan</Text>
+                  <Text className="mx-2 text-lg text-brand">Jenis Kegiatan</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <View>
@@ -196,7 +196,7 @@ export default function DetailScreen() {
                               setUri(null);
                               values.spidometer = '';
                             }}>
-                            <AntDesign name="closecircleo" size={32} color="red" />
+                            <AntDesign name="close-circle" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
                         <CustomNumberInput

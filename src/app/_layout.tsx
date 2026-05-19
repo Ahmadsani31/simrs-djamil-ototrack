@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../../global.css';
-import Loader from '@/components/Loader';
+import Loader from '@/components/feedback/Loader';
 import { useEffect, useState } from 'react';
 import { Alert, BackHandler, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -16,8 +16,9 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ToastManager from 'toastify-react-native';
 import '@/utils/backgroundLocationTask';
 import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
-import NotifikasiNewVersion from '@/components/NotifikasiNewVersion';
-import NotifikasiNewVersionMinor from '@/components/NotifikasiNewVersionMinor';
+import { logger } from '@/utils/logger';
+import NotifikasiNewVersion from '@/components/modals/NotifikasiNewVersion';
+import NotifikasiNewVersionMinor from '@/components/modals/NotifikasiNewVersionMinor';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -69,22 +70,22 @@ export default function RootLayout() {
         // Jika semua izin disetujui
         setIsReady(true);
       } catch (error) {
-        console.error('Error requesting permissions:', error);
+        logger.error('Error requesting permissions:', error);
       }
     })();
     registerForPushNotificationsAsync();
   }, []);
 
   async function registerForPushNotificationsAsync() {
-    const { status } = await Notifications.getPermissionsAsync();
-    let finalStatus = status;
+    const existing = await Notifications.getPermissionsAsync();
+    let status = existing.status;
 
     if (status !== 'granted') {
-      const { status: newStatus } = await Notifications.requestPermissionsAsync();
-      finalStatus = newStatus;
+      const requested = await Notifications.requestPermissionsAsync();
+      status = requested.status;
     }
 
-    if (finalStatus !== 'granted') {
+    if (status !== 'granted') {
       Alert.alert(
         'Notifikasi Diperlukan',
         `Aplikasi memerlukan izin notifikasi untuk digunakan.`,

@@ -1,5 +1,5 @@
-import ButtonCloseImage from '@/components/ButtonCloseImage';
-import ModalCamera from '@/components/ModalCamera';
+import ButtonCloseImage from '@/components/forms/ButtonCloseImage';
+import ModalCamera from '@/components/modals/ModalCamera';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import { useState } from 'react';
@@ -16,16 +16,16 @@ import {
 } from 'react-native';
 
 import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import ButtonCostum from '@/components/ButtonCostum';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { dataDetail } from '@/types/types';
 import { router, useLocalSearchParams } from 'expo-router';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import { Dropdown } from 'react-native-element-dropdown';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fetchData = async (reservasi_id: string) => {
@@ -192,12 +192,12 @@ export default function BbmUangScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
           <View className="mb-3 items-center gap-4 py-2">
             <View className="flex-row items-center text-sm text-gray-500">
               <View className="flex-grow border-t border-gray-300" />
-              <Text className="mx-2 text-lg font-bold text-[#205781]">
+              <Text className="mx-2 text-lg font-bold text-brand">
                 Pengisian BBM Dengan Uang
               </Text>
               <View className="flex-grow border-t border-gray-300" />
@@ -234,7 +234,7 @@ export default function BbmUangScreen() {
                   className="rounded-full bg-white p-1"
                   disabled={loading}
                   onPress={() => setUriSpidometer(null)}>
-                  <AntDesign name="closecircleo" size={24} color="red" />
+                  <AntDesign name="close-circle" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             )}
@@ -303,7 +303,7 @@ export default function BbmUangScreen() {
                   className="rounded-full bg-white p-1"
                   disabled={loading}
                   onPress={() => setUriStruck(null)}>
-                  <AntDesign name="closecircleo" size={24} color="red" />
+                  <AntDesign name="close-circle" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             )}

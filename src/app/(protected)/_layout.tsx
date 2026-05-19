@@ -1,16 +1,53 @@
-import LoadingIndikator from '@/components/LoadingIndikator';
-import { PrivateRoute } from '@/components/PrivateRoute';
+import LoadingIndikator from '@/components/feedback/LoadingIndikator';
+import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { router, Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { Alert, BackHandler, Image, Text, Touchable, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Image, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-// export const unstable_settings = {
-//     initialRouteName: "(tabs)", // anchor
-// };
+import { colors } from '@/constants/colors';
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+
+const BrandHeaderLeft = () => (
+  <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
+    <Image
+      style={{ width: 53, height: 30 }}
+      source={require('@asset/images/logo/logo-kemenkes.png')}
+    />
+    <Text className="font-bold">Oto RS-Djamil</Text>
+  </View>
+);
+
+const BackHeaderRight = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity className="rounded-full bg-white p-1" onPress={onPress}>
+    <Ionicons name="arrow-back-circle" size={24} color="red" />
+  </TouchableOpacity>
+);
+
+/**
+ * Header default semua screen di (protected): logo Kemenkes di kiri,
+ * tombol back di kanan. Pemakaian: `options={brandHeader(backAction)}`.
+ */
+const brandHeader = (onBack: () => void): NativeStackNavigationOptions => ({
+  headerShown: true,
+  headerTitle: '',
+  headerLeft: () => <BrandHeaderLeft />,
+  headerRight: () => <BackHeaderRight onPress={onBack} />,
+});
+
+/**
+ * Varian dengan posisi tombol back di kiri (dipakai untuk screen bbm-* dan
+ * pengembalian-service*). Tetap kasih nama agar konsisten dengan layout asli.
+ */
+const brandHeaderBackLeft = (onBack: () => void): NativeStackNavigationOptions => ({
+  headerShown: true,
+  headerTitle: '',
+  headerLeft: () => <BackHeaderRight onPress={onBack} />,
+  headerRight: () => <BrandHeaderLeft />,
+});
 
 export default function ProtectedLayout() {
-  const loading = useLoadingStore((state: any) => state.loading);
+  const loading = useLoadingStore((state) => state.loading);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
@@ -19,10 +56,8 @@ export default function ProtectedLayout() {
 
   const backAction = () => {
     if (router.canGoBack()) {
-      // Kalau masih bisa mundur (ada history), cukup back saja
       router.back();
     } else {
-      // Kalau tidak bisa mundur (sudah di root), tampilkan alert keluar
       Alert.alert('Konfirmasi Keluar', 'Apakah Anda yakin ingin keluar dari aplikasi home?', [
         {
           text: 'Batal',
@@ -36,7 +71,7 @@ export default function ProtectedLayout() {
       ]);
     }
 
-    return true; // <- Wajib! Supaya sistem back tidak langsung nutup
+    return true; // Wajib supaya sistem back tidak langsung nutup
   };
 
   return (
@@ -47,203 +82,33 @@ export default function ProtectedLayout() {
           headerTitleAlign: 'center',
           headerShown: false,
           headerStyle: {
-            backgroundColor: '#205781',
+            backgroundColor: colors.brand,
           },
         }}>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="detail"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="service"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="pengembalian"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="pengembalian_manual"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="bbm-voucher"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="bbm-uang"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="pengembalian-service"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-          }}
-        />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* Screens dengan logo kiri + back kanan */}
+        <Stack.Screen name="detail" options={brandHeader(backAction)} />
+        <Stack.Screen name="service" options={brandHeader(backAction)} />
+        <Stack.Screen name="pengembalian" options={brandHeader(backAction)} />
+        <Stack.Screen name="pengembalian_manual" options={brandHeader(backAction)} />
+
+        {/* Screens dengan back kiri + logo kanan */}
+        <Stack.Screen name="bbm-voucher" options={brandHeaderBackLeft(backAction)} />
+        <Stack.Screen name="bbm-uang" options={brandHeaderBackLeft(backAction)} />
+        <Stack.Screen name="pengembalian-service" options={brandHeaderBackLeft(backAction)} />
         <Stack.Screen
           name="pengembalian-service-manual"
-          options={{
-            headerShown: true,
-            headerTitle: '',
-            headerRight: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
-          }}
+          options={brandHeaderBackLeft(backAction)}
         />
+
+        {/* Modal */}
         <Stack.Screen
           name="pemiliharaan-detail"
           options={{
+            ...brandHeaderBackLeft(backAction),
             presentation: 'modal',
             headerShown: false,
-            headerTitle: '',
-            headerRight: () => (
-              <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
-                <Image
-                  style={{ width: 53, height: 30 }}
-                  source={require('@asset/images/logo/logo-kemenkes.png')}
-                />
-                <Text className="font-bold">Oto RS-Djamil</Text>
-              </View>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity className="rounded-full bg-white p-1" onPress={() => backAction()}>
-                <Ionicons name="arrow-back-circle" size={24} color="red" />
-              </TouchableOpacity>
-            ),
           }}
         />
       </Stack>

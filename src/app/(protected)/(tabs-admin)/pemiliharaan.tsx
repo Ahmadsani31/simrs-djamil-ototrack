@@ -10,17 +10,18 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshControl } from 'react-native-gesture-handler';
 import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
-import ListDetailSectionSheet from '@/components/ListDetailSectionSheet';
+import ListDetailSectionSheet from '@/components/sections/ListDetailSectionSheet';
 
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
 import { Entypo, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
-import SkeletonList from '@/components/SkeletonList';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
+import SkeletonList from '@/components/feedback/SkeletonList';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { colors } from '@/constants/colors';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import DateTimePicker from '@expo/ui/datetimepicker';
+import { useDatePicker } from '@/hooks/useDatePicker';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import ListDetailServiceSheet from '@/components/ListDetailServiceSheet';
+import ListDetailServiceSheet from '@/components/sections/ListDetailServiceSheet';
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 
@@ -38,7 +39,7 @@ const fetchData = async ({
 }) => {
   // queryKey is an array: [string, { date: Date | undefined }]
   const [_key, params] = queryKey;
-  const date = (params as { date?: String }).date;
+    const date = (params as { date?: string }).date;
   try {
     const response = await secureApi.get(`service/list_admin`, {
       params: {
@@ -68,8 +69,6 @@ export default function PemiliharaanScreen() {
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
     stiffness: 500,
   });
 
@@ -104,27 +103,15 @@ export default function PemiliharaanScreen() {
     setModalVisible(true);
   };
 
-  const showMode = (currentMode: any) => {
-    DateTimePickerAndroid.open({
-      value: date ?? new Date(),
-      onChange,
-      mode: currentMode,
-      is24Hour: true,
-      maximumDate: new Date(),
+  const showMode = (currentMode: 'date' | 'time' | 'datetime') => {
+    datePicker.openWithCallback(currentMode, (selectedDate) => {
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      setDateInput(formattedDate);
+      setDate(selectedDate);
     });
   };
 
-  const onChange = (event: any, selectedDate: any) => {
-    if (event.type == 'set') {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      const currentDate = selectedDate;
-      setDateInput(formattedDate);
-      setDate(currentDate);
-    }
-
-    // setInputDate(dayjs(selectedDate).format('dddd ,DD MMMM YYYY'));
-    // refetch()
-  };
+  const datePicker = useDatePicker({ initialValue: date ?? new Date(), maximumDate: new Date() });
 
   const handleResetTanggal = () => {
     setDateInput('');
@@ -136,14 +123,14 @@ export default function PemiliharaanScreen() {
 
   return (
     <SafeAreaView className="bg-slate-300" style={{ flex: 1 }}>
-      <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+      <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
       <View className="px-4">
         <View className="mb-4 ">
           <Text className="text-center text-white">
             Berikut semua list pemeliharaan kendaraan Operasional RS Djamil
           </Text>
         </View>
-        <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={showMode}>
+        <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={() => showMode('date')}>
           <Fontisto className="absolute left-6 top-5 z-10" name="date" size={24} color={'black'} />
           <TextInput
             className="rounded-md border border-gray-300 bg-gray-100 py-4 ps-14"
@@ -271,6 +258,17 @@ export default function PemiliharaanScreen() {
           animationConfigs={animationConfigs}>
           <ListDetailServiceSheet items={rawService} />
         </BottomSheet>
+      )}
+      {datePicker.visible && (
+        <DateTimePicker
+          value={datePicker.value}
+          mode={datePicker.mode}
+          presentation="dialog"
+          is24Hour
+          maximumDate={new Date()}
+          onValueChange={datePicker.handleChange}
+          onDismiss={datePicker.dismiss}
+        />
       )}
     </SafeAreaView>
   );

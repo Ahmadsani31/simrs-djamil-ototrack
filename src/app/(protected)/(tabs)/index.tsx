@@ -3,13 +3,13 @@ import { useCallback, useState } from 'react';
 import { Link, router, useFocusEffect } from 'expo-router';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-import PageDaily from '@/components/PageDaily';
-import PageHome from '@/components/PageHome';
+import PageDaily from '@/components/sections/PageDaily';
+import PageHome from '@/components/sections/PageHome';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
 import Feather from '@expo/vector-icons/Feather';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
-import BarcodeScannerCamera from '@/components/BarcodeScannerCamera';
+import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
 // import * as Location from 'expo-location';
 
 // const LOCATION_TASK_NAME = 'background-location-task';
@@ -119,7 +119,7 @@ export default function IndexScreen() {
   return (
     <View style={{ flex: 1 }}>
       <View className="flex-1 bg-slate-300">
-        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
 
         <View className="px-4">
           {(rawDataService?.length ?? 0) > 0 ? (
@@ -154,7 +154,7 @@ export default function IndexScreen() {
       </View>
       <View className="absolute bottom-1 right-1 z-10">
         <TouchableOpacity
-          className="flex-row items-center gap-2 rounded-lg bg-[#205781] px-2 py-1"
+          className="flex-row items-center gap-2 rounded-lg bg-brand px-2 py-1"
           onPress={() => {
             fetchDataAktif();
             fetchData();

@@ -1,6 +1,6 @@
-import ButtonCloseImage from '@/components/ButtonCloseImage';
-import ModalCamera from '@/components/ModalCamera';
-import SkeletonList from '@/components/SkeletonList';
+import ButtonCloseImage from '@/components/forms/ButtonCloseImage';
+import ModalCamera from '@/components/modals/ModalCamera';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import { useEffect, useState } from 'react';
@@ -15,15 +15,15 @@ import {
   View,
 } from 'react-native';
 import { AntDesign, Entypo } from '@expo/vector-icons';
-import ButtonCostum from '@/components/ButtonCostum';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
 import { router, useLocalSearchParams } from 'expo-router';
 import { cn } from '@/utils/constants';
 import { Image as ImageExpo } from 'expo-image';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
-import ModalPreviewImage from '@/components/ModalPreviewImage';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type propsBBMVoucher = {
@@ -82,7 +82,7 @@ export default function BbmVoucherScreen() {
           transition={1000}
         />
         <View className="m-5 flex-row items-center gap-3 rounded-lg bg-red-500 p-5">
-          <AntDesign name="exclamationcircle" size={24} color="white" />
+          <AntDesign name="exclamation-circle" size={24} color="white" />
           <Text className="font-bold text-white">
             Pengisian BBM dengan VOUCHER dibatasi, silahkan hubungi admin atau yang yang terkait
             untuk pengajuan pengisian BBM dengan voucher
@@ -174,7 +174,7 @@ export default function BbmVoucherScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
           {loading || isError ? (
             <SkeletonList loop={5} />
@@ -183,7 +183,7 @@ export default function BbmVoucherScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-sm text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg font-bold text-[#205781]">Pengisian BBM</Text>
+                  <Text className="mx-2 text-lg font-bold text-brand">Pengisian BBM</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <Text className="text-center text-5xl font-bold">
@@ -221,7 +221,7 @@ export default function BbmVoucherScreen() {
                       className="rounded-full bg-white p-1"
                       disabled={loading}
                       onPress={() => setUriLokasi(null)}>
-                      <AntDesign name="closecircleo" size={24} color="red" />
+                      <AntDesign name="close-circle" size={24} color="red" />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -259,7 +259,7 @@ export default function BbmVoucherScreen() {
                       className="rounded-full bg-white p-1"
                       disabled={loading}
                       onPress={() => setUriStruck(null)}>
-                      <AntDesign name="closecircleo" size={24} color="red" />
+                      <AntDesign name="close-circle" size={24} color="red" />
                     </TouchableOpacity>
                   </View>
                 )}

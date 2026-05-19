@@ -1,7 +1,8 @@
 import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-const LOCATION_TASK_NAME = 'background-location-task';
+import { colors } from '@/constants/colors';
+import { LOCATION_TASK_NAME } from '@/utils/backgroundLocationTask';
 
 export async function startTracking() {
   const { status } = await Location.requestForegroundPermissionsAsync();
@@ -25,7 +26,7 @@ export async function startTracking() {
       foregroundService: {
         notificationTitle: 'Oto RS-Djamil',
         notificationBody: 'Aplikasi sedang memantau lokasi Anda dalam pemakaian kendaraan',
-        notificationColor: '#205781',
+        notificationColor: colors.brand,
         killServiceOnDestroy: false, // jangan matikan service saat aplikasi ditutup
 
         // Optional: Add a custom icon for the notification

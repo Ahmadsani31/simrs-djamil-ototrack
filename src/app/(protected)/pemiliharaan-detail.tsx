@@ -4,14 +4,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import Input from '@/components/Input';
-import InputArea from '@/components/InputArea';
-import ButtonCostum from '@/components/ButtonCostum';
+import Input from '@/components/forms/Input';
+import InputArea from '@/components/forms/InputArea';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import secureApi from '@/services/service';
 import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
@@ -19,13 +20,12 @@ import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
 import { useLoadingStore } from '@/stores/loadingStore';
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { dataDetail } from '@/types/types';
 import { Picker } from '@react-native-picker/picker';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import HandleError from '@/utils/handleError';
 import { Dropdown } from 'react-native-element-dropdown';
-import { StyleSheet } from 'react-native';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -132,7 +132,7 @@ export default function PemiliharaanDetailScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 100}>
-      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+      <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
@@ -142,7 +142,7 @@ export default function PemiliharaanDetailScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-[#205781]">Pemeliharaan Kendaaraan</Text>
+                  <Text className="mx-2 text-lg text-brand">Pemeliharaan Kendaaraan</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <View>

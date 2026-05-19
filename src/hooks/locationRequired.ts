@@ -3,17 +3,11 @@ import { Alert } from 'react-native';
 
 export const reLocation = {
   enable: async () => {
-    let enabled = await Location.hasServicesEnabledAsync(); //returns true or false
-    // console.log('enable coordinate ', enabled);
+    const enabled = await Location.hasServicesEnabledAsync();
     if (!enabled) {
-      //if not enable
       Alert.alert('Location not enabled', 'Please enable your Location', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK' },
       ]);
     }
 
@@ -23,14 +17,12 @@ export const reLocation = {
     let location = await Location.getLastKnownPositionAsync();
 
     if (!location) {
-    location = await Location.getCurrentPositionAsync({
+      location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
         timeInterval: 1000,
         distanceInterval: 0,
       });
     }
-    //get current position lat and long
-    // console.log('location ', JSON.stringify(location));
 
     const { latitude, longitude } = location.coords;
 

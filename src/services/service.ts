@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/utils/constants';
+import { logger } from '@/utils/logger';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 // Ganti dengan base URL API kamu
@@ -34,10 +35,7 @@ api.interceptors.response.use(
     // console.log('message from error service ',message);
 
     if (error.response?.status === 401) {
-      console.log('Token expired, logging out...');
-      // SecureStore.deleteItemAsync('token');
-      // Alert.alert('Expired token')
-      // router.replace('/login');
+      logger.log('Token expired, logging out...');
       const { logout } = useAuthStore.getState();
       logout();
     }

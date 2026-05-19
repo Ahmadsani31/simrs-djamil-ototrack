@@ -1,5 +1,6 @@
 // lib/secureStorage.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@/utils/logger';
 
 export const getStoredCoords = async () => {
   try {
@@ -8,10 +9,10 @@ export const getStoredCoords = async () => {
 
     const parsed = JSON.parse(rawData);
     const coords = parsed?.state?.coords || [];
-    
+
     return coords;
   } catch (error) {
-    console.error('Gagal ambil coords:', error);
+    logger.error('Gagal ambil coords:', error);
     return [];
   }
 };

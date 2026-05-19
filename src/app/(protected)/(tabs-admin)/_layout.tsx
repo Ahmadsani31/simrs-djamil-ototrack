@@ -1,9 +1,10 @@
 import { Redirect, router, Tabs } from 'expo-router';
-import { PrivateRoute } from '@/components/PrivateRoute';
+import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { Image, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '@/constants/colors';
 
 export default function TabsAdminLayout() {
   const user = useAuthStore((state) => state.user);
@@ -20,14 +21,14 @@ export default function TabsAdminLayout() {
           headerTitleAlign: 'center',
           tabBarActiveTintColor: 'white',
           tabBarStyle: {
-            backgroundColor: '#205781', // Set your desired background color here
+            backgroundColor: colors.brand,
             // paddingBottom: 10,  // ⬇️ Padding bawah TabBar
             paddingTop: 10, // ⬆️ Padding atas TabBar
             height: 70 + insets.bottom, // naik sesuai safe area
             paddingBottom: insets.bottom,
           },
           headerStyle: {
-            backgroundColor: '#205781',
+            backgroundColor: colors.brand,
             elevation: 0,
             shadowOpacity: 0,
             borderBottomWidth: 0,

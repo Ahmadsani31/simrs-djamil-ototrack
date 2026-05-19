@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import Input from '@/components/Input';
+import Input from '@/components/forms/Input';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import ModalCamera from '@/components/ModalCamera';
+import ModalCamera from '@/components/modals/ModalCamera';
 import secureApi from '@/services/service';
 import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
@@ -24,13 +24,13 @@ import { stopTracking } from '@/utils/locationUtils';
 
 import { useLocationStore } from '@/stores/locationStore';
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { dataDetail } from '@/types/types';
 import * as SecureStore from 'expo-secure-store';
 import { getStoredCoords } from '@/lib/secureStorage';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
@@ -54,6 +54,9 @@ export default function PengembalianScreen() {
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
   });
+  const setLoading = useLoadingStore((state) => state.setLoading);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [uri, setUri] = useState<string | null>(null);
 
   useEffect(() => {
     refetch();
@@ -65,12 +68,6 @@ export default function PengembalianScreen() {
     ]);
     return null;
   }
-
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [uri, setUri] = useState<string | null>(null);
 
   const handleSubmitExit = async (values: FormikValues) => {
     setLoading(true);
@@ -126,7 +123,7 @@ export default function PengembalianScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />
@@ -135,7 +132,7 @@ export default function PengembalianScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-sm text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-[#205781]">Proses Pengembalian Kendaraan</Text>
+                  <Text className="mx-2 text-lg text-brand">Proses Pengembalian Kendaraan</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <View>
@@ -178,7 +175,7 @@ export default function PengembalianScreen() {
                               setUri(null);
                               values.spidometer = '';
                             }}>
-                            <AntDesign name="closecircleo" size={32} color="red" />
+                            <AntDesign name="close-circle" size={32} color="red" />
                           </TouchableOpacity>
                         </View>
                         <CustomNumberInput

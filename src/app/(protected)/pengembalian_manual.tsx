@@ -15,16 +15,16 @@ import { colors } from '@/constants/colors';
 import { useLoadingStore } from '@/stores/loadingStore';
 
 import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/SkeletonList';
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { dataDetail } from '@/types/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import InputArea from '@/components/InputArea';
-import InputDate from '@/components/InputDate';
-import InputFile from '@/components/InputFile';
+import InputArea from '@/components/forms/InputArea';
+import InputDate from '@/components/forms/InputDate';
+import InputFile from '@/components/forms/InputFile';
 import dayjs from 'dayjs';
-import CustomNumberInput from '@/components/CustomNumberInput';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import HandleError from '@/utils/handleError';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -47,7 +47,6 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
-  console.log(reservasi_id);
 
   const insets = useSafeAreaInsets();
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
@@ -88,7 +87,6 @@ export default function PengembalianManualScreen() {
       // console.log(response.message);
       router.dismissTo('(tabs-admin)');
     } catch (error: any) {
-      console.log(JSON.stringify(error));
       HandleError(error);
     } finally {
       setLoading(false);
@@ -102,7 +100,7 @@ export default function PengembalianManualScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-[#205781]" />
+        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
           {isLoading || isError ? (
             <SkeletonList loop={5} />
@@ -111,7 +109,7 @@ export default function PengembalianManualScreen() {
               <View className="mb-3 items-center gap-4 py-2">
                 <View className="flex-row items-center text-sm text-gray-500">
                   <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-[#205781]">Proses Pengembalian Kendaraan</Text>
+                  <Text className="mx-2 text-lg text-brand">Proses Pengembalian Kendaraan</Text>
                   <View className="flex-grow border-t border-gray-300" />
                 </View>
                 <Text className="text-center text-5xl font-bold">{data?.name}</Text>

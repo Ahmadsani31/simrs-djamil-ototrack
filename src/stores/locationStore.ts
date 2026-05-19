@@ -41,15 +41,11 @@ export const useLocationStore = create<LocationState>()(
         })),
     }),
     {
-      name: 'tracking-data', // Key di SecureStore
+      name: 'tracking-data', // Key di AsyncStorage
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
-        coords: state.coords, // Hanya coords yang disimpan
-        coord: null,
-        addToBatchCoordinate: () => {},
-        addToCoordinate: () => {},
-        clearCoordinates: () => {},
-      }),
+      // Hanya `coords` yang dipersist. Action functions otomatis
+      // dipertahankan dari initializer saat rehydrate.
+      partialize: (state) => ({ coords: state.coords }),
     }
   )
 );

@@ -9,10 +9,6 @@
       "output": "server",
       "bundler": "metro"
     },
-    "notification": {
-      "icon": "./assets/icon/notification-icon.png",
-      "color": "#205781"
-    },
     "experiments": {
       "tsconfigPaths": true
     },
@@ -86,7 +82,9 @@
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -103,7 +101,6 @@
       }
     },
     "android": {
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/adaptive-icon.png",
         "monochromeImage": "./assets/icon/adaptive-icon.png",
@@ -123,7 +120,6 @@
       ]
     },
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "owner": "darma31",
     "extra": {
       "router": {

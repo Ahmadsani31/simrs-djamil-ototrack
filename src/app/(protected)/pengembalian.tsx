@@ -1,12 +1,11 @@
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Formik, FormikValues } from 'formik';
+import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -19,8 +18,10 @@ import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
+import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
 import ModalCamera from '@/components/modals/ModalCamera';
-import { colors } from '@/constants/colors';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import { getStoredCoords } from '@/lib/secureStorage';
 import secureApi from '@/services/service';
@@ -30,8 +31,14 @@ import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 import { stopTracking } from '@/utils/locationUtils';
 
+type FormValues = {
+  spidometer: string;
+  fileImage: string;
+};
+
 const validationSchema = yup.object().shape({
-  spidometer: yup.number().required('Spidometer harus diisi'),
+  spidometer: yup.number().typeError('Harus angka').required('Spidometer harus diisi'),
+  fileImage: yup.string().required('Foto spidometer akhir harus diambil'),
 });
 
 const fetchData = async (reservasi_id: string) => {
@@ -46,13 +53,15 @@ const fetchData = async (reservasi_id: string) => {
 export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const [cameraVisible, setCameraVisible] = useState(false);
+  const [previewUri, setPreviewUri] = useState<string | null>(null);
+
   const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
   });
-  const setLoading = useLoadingStore((state) => state.setLoading);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [uri, setUri] = useState<string | null>(null);
 
   if (isError) {
     Alert.alert('Peringatan!', 'Data tidak valid atau kendaraan tidak aktif!', [
@@ -61,32 +70,29 @@ export default function PengembalianScreen() {
     return null;
   }
 
-  const handleSubmitExit = async (values: FormikValues) => {
-    setLoading(true);
-    if (!uri && values.spidometer === '') {
-      Toast.error('Foto spidometer belum di ambil');
-      setLoading(false);
-      return;
-    }
-
+  const handleSubmitExit = async (values: FormValues) => {
     const coordinate = await reLocation.getCoordinate();
-
-    if (!coordinate?.lat && coordinate?.long) {
-      Alert.alert('Peringatan!', 'Error device location', [{ text: 'Tutup', onPress: () => null }]);
-      setLoading(false);
+    if (!coordinate?.lat || !coordinate?.long) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lokasi tidak terdeteksi',
+        text2: 'Aktifkan GPS dan coba lagi.',
+      });
       return;
     }
-    const asyncCoords = await getStoredCoords();
 
+    setLoading(true);
     try {
+      const asyncCoords = await getStoredCoords();
+
       const formData = new FormData();
-      formData.append('latitude', coordinate?.lat?.toString() || '');
-      formData.append('longitude', coordinate?.long.toString() || '');
+      formData.append('latitude', coordinate.lat.toString());
+      formData.append('longitude', coordinate.long.toString());
       formData.append('spidometer', values.spidometer);
       formData.append('reservasi_id', reservasi_id.toString());
       formData.append('coordinates', JSON.stringify(asyncCoords));
       formData.append('fileImage', {
-        uri,
+        uri: values.fileImage,
         name: 'spidometer-capture.jpg',
         type: 'image/jpeg',
       } as any);
@@ -94,7 +100,6 @@ export default function PengembalianScreen() {
       await secureApi.postForm('/reservasi/return_kendaraan', formData);
       clearCoordinates();
       await stopTracking();
-
       await SecureStore.deleteItemAsync('DataAktif');
       router.dismissTo('/(protected)/(tabs)');
     } catch (error: unknown) {
@@ -106,96 +111,123 @@ export default function PengembalianScreen() {
 
   return (
     <KeyboardAvoidingView
-      className=" bg-slate-300"
-      style={{ flex: 1 }}
+      className="flex-1 bg-slate-100"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
-        <View className="m-4 rounded-lg bg-white p-4">
-          {isLoading || isError ? (
-            <SkeletonList loop={5} />
-          ) : (
+      {isLoading ? (
+        <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
+          <SkeletonList loop={5} />
+        </View>
+      ) : (
+        <Formik<FormValues>
+          initialValues={{ spidometer: '', fileImage: '' }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => await handleSubmitExit(values)}>
+          {({
+            handleChange,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
             <>
-              <View className="mb-3 items-center gap-4 py-2">
-                <View className="flex-row items-center text-sm text-gray-500">
-                  <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-brand">Proses Pengembalian Kendaraan</Text>
-                  <View className="flex-grow border-t border-gray-300" />
+              <ScrollView
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <VehicleHeaderCard
+                  variant="pengembalian"
+                  label="Pengembalian Kendaraan"
+                  name={data?.name}
+                  noPolisi={data?.no_polisi}
+                />
+
+                {/* Tracking stop notice */}
+                <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-sky-50 p-3">
+                  <View className="rounded-full bg-sky-100 p-1.5">
+                    <MaterialCommunityIcons name="check-decagram" size={14} color="#0284c7" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-xs font-semibold text-sky-700">
+                      Tracking akan dihentikan
+                    </Text>
+                    <Text className="mt-0.5 text-[11px] text-sky-600/80">
+                      Rute perjalanan akan dikirim ke server. Pastikan foto spidometer akhir & angka
+                      diisi dengan benar.
+                    </Text>
+                  </View>
                 </View>
-                <View>
-                  <Text className="text-center text-5xl font-bold">{data?.name}</Text>
-                  <Text className="mt-3 text-center font-medium">{data?.no_polisi}</Text>
+
+                <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                  <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                    <Feather name="log-out" size={16} color="#205781" />
+                    <Text className="text-base font-bold text-gray-800">Detail Pengembalian</Text>
+                  </View>
+
+                  <PhotoCaptureField
+                    label="Foto Spidometer Akhir"
+                    helper="Foto spidometer kendaraan yang terbaru"
+                    value={values.fileImage}
+                    onCapture={() => setCameraVisible(true)}
+                    onClear={() => {
+                      setFieldValue('fileImage', '');
+                      setFieldValue('spidometer', '');
+                    }}
+                    onPreview={() => setPreviewUri(values.fileImage)}
+                    error={touched.fileImage ? errors.fileImage : undefined}
+                    disabled={isSubmitting}
+                  />
+
+                  {values.fileImage ? (
+                    <CustomNumberInput
+                      className="bg-gray-50"
+                      placeholder="Masukan nilai spidometer"
+                      label="Nilai Spidometer"
+                      value={values.spidometer}
+                      error={touched.spidometer ? errors.spidometer : undefined}
+                      onFormattedValue={handleChange('spidometer')}
+                    />
+                  ) : null}
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    disabled={isSubmitting}
+                    onPress={() => handleSubmit()}
+                    className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                      isSubmitting ? 'bg-sky-300' : 'bg-sky-500'
+                    }`}>
+                    <MaterialCommunityIcons name="car-arrow-right" size={18} color="white" />
+                    <Text className="text-base font-bold text-white">
+                      {isSubmitting ? 'Memproses...' : 'Kembalikan Kendaraan'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </View>
-              <View className="mb-4 w-full border border-b-2" />
-              <Text className="text-center"> Silahkan foto spidometer kendaraan yang terbaru</Text>
-              <Formik
-                initialValues={{ spidometer: '' }}
-                validationSchema={validationSchema}
-                onSubmit={async (values) => await handleSubmitExit(values)}>
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
-                  <>
-                    {touched.spidometer && errors.spidometer && (
-                      <View className="my-4 rounded-lg bg-red-400 p-4">
-                        <Text className="text-white">
-                          Foto dan Spidometer wajib di ambil dan isi
-                        </Text>
-                      </View>
-                    )}
-                    {!uri ? (
-                      <TouchableOpacity
-                        className="my-3 flex-row items-center justify-center rounded-lg bg-indigo-500 px-3 py-1"
-                        onPress={() => setModalVisible(true)}>
-                        <AntDesign name="camera" size={32} />
-                        <Text className="ms-2 font-bold text-white">Open Camera</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <>
-                        <View className="my-4 w-full rounded-lg bg-black">
-                          <Image
-                            source={{ uri: uri || undefined }}
-                            className="aspect-[3/4] w-full rounded-lg"
-                          />
-                          <TouchableOpacity
-                            className="absolute right-1 top-1 rounded-full bg-white p-1"
-                            onPress={() => {
-                              setUri(null);
-                              values.spidometer = '';
-                            }}>
-                            <AntDesign name="close-circle" size={32} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                        <CustomNumberInput
-                          className="bg-gray-200"
-                          placeholder="Masukan nilai spidometer"
-                          label="Spidometer"
-                          value={values.spidometer}
-                          error={touched.spidometer ? errors.spidometer : undefined}
-                          onFormattedValue={handleChange('spidometer')}
-                        />
-                      </>
-                    )}
-                    <TouchableOpacity
-                      className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
-                      onPress={() => handleSubmit()}>
-                      <Text className="font-bold text-white">Kembaliankan Kendaraan</Text>
-                      <MaterialCommunityIcons name="car" size={22} color="white" />
-                    </TouchableOpacity>
-                  </>
-                )}
-              </Formik>
+              </ScrollView>
+
+              {cameraVisible && (
+                <ModalCamera
+                  visible={cameraVisible}
+                  onClose={() => setCameraVisible(false)}
+                  setUriImage={(uri) => {
+                    if (uri) setFieldValue('fileImage', uri);
+                  }}
+                />
+              )}
             </>
           )}
-        </View>
-      </ScrollView>
-      {modalVisible ? (
-        <ModalCamera
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          setUriImage={(e) => setUri(e)}
+        </Formik>
+      )}
+
+      {previewUri && (
+        <ModalPreviewImage
+          title="Foto Spidometer"
+          visible={!!previewUri}
+          imgUrl={previewUri}
+          onPress={() => setPreviewUri(null)}
         />
-      ) : null}
+      )}
     </KeyboardAvoidingView>
   );
 }

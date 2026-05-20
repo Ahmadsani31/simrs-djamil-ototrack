@@ -1,8 +1,8 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Formik, FormikValues } from 'formik';
+import { Formik } from 'formik';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -17,20 +17,26 @@ import * as yup from 'yup';
 import SkeletonList from '@/components/feedback/SkeletonList';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
-import { colors } from '@/constants/colors';
-import secureApi from '@/services/service';
-
-import { useLoadingStore } from '@/stores/loadingStore';
-import { dataDetail } from '@/types/types';
 import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
+import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
+import secureApi from '@/services/service';
+import { useLoadingStore } from '@/stores/loadingStore';
+import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 
+type FormValues = {
+  spidometer: string;
+  keterangan: string;
+  tanggal: string | Date;
+  fileUpload: string;
+};
+
 const validationSchema = yup.object().shape({
-  spidometer: yup.number().required('Spidometer wajib diisi (required)'),
-  keterangan: yup.string().required('Keterangan wajib diisi (required)'),
-  tanggal: yup.string().required('Tanggal wajib diisi (required)'),
-  fileUpload: yup.string().required('File image wajib diisi (required)'),
+  spidometer: yup.number().typeError('Harus angka').required('Spidometer wajib diisi'),
+  keterangan: yup.string().required('Keterangan wajib diisi'),
+  tanggal: yup.string().required('Tanggal wajib diisi'),
+  fileUpload: yup.string().required('Foto bukti wajib diisi'),
 });
 
 const fetchData = async (reservasi_id: string, user_id: string) => {
@@ -45,6 +51,7 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
+  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
@@ -57,13 +64,10 @@ export default function PengembalianManualScreen() {
     ]);
   }
 
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
-  const handlePengembalian = async (values: FormikValues) => {
+  const handlePengembalian = async (values: FormValues) => {
     setLoading(true);
     try {
       const formData = new FormData();
-
       formData.append('id', reservasi_id.toString());
       formData.append('spidometer_out', values.spidometer);
       formData.append('reservasi_out', dayjs(values.tanggal).format('YYYY-MM-DD HH:mm:ss'));
@@ -75,10 +79,7 @@ export default function PengembalianManualScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
-
-      // await SecureStore.deleteItemAsync('pemakaianAktif');
       router.dismissTo('(tabs-admin)');
     } catch (error: unknown) {
       HandleError(error);
@@ -89,77 +90,104 @@ export default function PengembalianManualScreen() {
 
   return (
     <KeyboardAvoidingView
-      className=" bg-slate-300"
-      style={{ flex: 1 }}
+      className="flex-1 bg-slate-100"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
-        <View className="m-4 rounded-lg bg-white p-4">
-          {isLoading || isError ? (
-            <SkeletonList loop={5} />
-          ) : (
-            <>
-              <View className="mb-3 items-center gap-4 py-2">
-                <View className="flex-row items-center text-sm text-gray-500">
-                  <View className="flex-grow border-t border-gray-300" />
-                  <Text className="mx-2 text-lg text-brand">Proses Pengembalian Kendaraan</Text>
-                  <View className="flex-grow border-t border-gray-300" />
-                </View>
-                <Text className="text-center text-5xl font-bold">{data?.name}</Text>
-                <Text className="mt-3 text-center font-medium">{data?.no_polisi}</Text>
-              </View>
-              <View className="mb-4 w-full border border-b-2" />
-              <Formik
-                initialValues={{ spidometer: '', keterangan: '', tanggal: '', fileUpload: '' }}
-                validationSchema={validationSchema}
-                onSubmit={async (values) => handlePengembalian(values)}>
-                {({ handleChange, handleSubmit, setFieldValue, values, errors, touched }) => (
-                  <>
-                    <CustomNumberInput
-                      className="bg-gray-100"
-                      placeholder="Angka spidometer kendaraan"
-                      value={values.spidometer}
-                      label="Spidometer"
-                      error={touched.spidometer ? errors.spidometer : undefined}
-                      onFormattedValue={handleChange('spidometer')}
-                    />
-                    <InputDate
-                      label="Waktu Pengembalian"
-                      onChangeDate={(e) => setFieldValue('tanggal', e)}
-                      onResetDate={() => setFieldValue('tanggal', '')}
-                      value={values.tanggal}
-                      error={touched.tanggal ? errors.tanggal : undefined}
-                    />
-
-                    <InputFile
-                      label="Upload file"
-                      onChangeFile={(e) => setFieldValue('fileUpload', e)}
-                      placeholder="Chose file"
-                      error={touched.fileUpload ? errors.fileUpload : undefined}
-                    />
-
-                    <InputArea
-                      className="bg-gray-200"
-                      label="Keterangan"
-                      placeholder="Keterangan pengembalian manual"
-                      value={values.keterangan}
-                      error={touched.keterangan ? errors.keterangan : undefined}
-                      onChangeText={handleChange('keterangan')}
-                    />
-                    <TouchableOpacity
-                      className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
-                      onPress={() => handleSubmit()}>
-                      <Text className="font-bold text-white">Pengembalian Kendaraan Manual</Text>
-                      <MaterialCommunityIcons name="car" size={22} color="white" />
-                    </TouchableOpacity>
-                  </>
-                )}
-              </Formik>
-            </>
-          )}
+      {isLoading ? (
+        <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
+          <SkeletonList loop={5} />
         </View>
-      </ScrollView>
+      ) : (
+        <Formik<FormValues>
+          initialValues={{ spidometer: '', keterangan: '', tanggal: '', fileUpload: '' }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => await handlePengembalian(values)}>
+          {({
+            handleChange,
+            handleSubmit,
+            setFieldValue,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              <VehicleHeaderCard
+                variant="pengembalian"
+                label="Pengembalian Manual (Admin)"
+                name={data?.name}
+                noPolisi={data?.no_polisi}
+              />
+
+              <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
+                <View className="rounded-full bg-amber-100 p-1.5">
+                  <Feather name="shield" size={14} color="#d97706" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
+                  <Text className="mt-0.5 text-[11px] text-amber-600/80">
+                    Pengembalian manual digunakan saat driver tidak dapat mengembalikan kendaraan
+                    sendiri. Isi semua field dengan teliti.
+                  </Text>
+                </View>
+              </View>
+
+              <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                  <Feather name="edit-3" size={16} color="#205781" />
+                  <Text className="text-base font-bold text-gray-800">Detail Pengembalian</Text>
+                </View>
+
+                <CustomNumberInput
+                  className="bg-gray-50"
+                  placeholder="Angka spidometer kendaraan"
+                  value={values.spidometer}
+                  label="Spidometer"
+                  error={touched.spidometer ? errors.spidometer : undefined}
+                  onFormattedValue={handleChange('spidometer')}
+                />
+                <InputDate
+                  label="Waktu Pengembalian"
+                  onChangeDate={(e) => setFieldValue('tanggal', e)}
+                  onResetDate={() => setFieldValue('tanggal', '')}
+                  value={values.tanggal}
+                  error={touched.tanggal ? errors.tanggal : undefined}
+                />
+                <InputFile
+                  label="Upload Foto Bukti"
+                  onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                  placeholder="Pilih file dari galeri"
+                  error={touched.fileUpload ? errors.fileUpload : undefined}
+                />
+                <InputArea
+                  className="bg-gray-50"
+                  label="Keterangan"
+                  placeholder="Alasan pengembalian manual"
+                  value={values.keterangan}
+                  error={touched.keterangan ? errors.keterangan : undefined}
+                  onChangeText={handleChange('keterangan')}
+                />
+
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  disabled={isSubmitting}
+                  onPress={() => handleSubmit()}
+                  className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                    isSubmitting ? 'bg-sky-300' : 'bg-sky-500'
+                  }`}>
+                  <MaterialCommunityIcons name="car-arrow-right" size={18} color="white" />
+                  <Text className="text-base font-bold text-white">
+                    {isSubmitting ? 'Memproses...' : 'Kembalikan Kendaraan'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          )}
+        </Formik>
+      )}
     </KeyboardAvoidingView>
   );
 }

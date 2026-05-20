@@ -1,9 +1,8 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik, FormikValues } from 'formik';
-import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
@@ -20,12 +20,11 @@ import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
-import secureApi from '@/services/service';
-import { colors } from '@/constants/colors';
+import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
-import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 
 type propsService = {
   id: string;
@@ -36,6 +35,13 @@ type propsService = {
   lokasi: string;
 };
 
+const validationSchema = yup.object().shape({
+  nominal: yup.number().typeError('Harus angka').required('Biaya pemeliharaan wajib diisi'),
+  tanggal: yup.string().required('Tanggal wajib diisi'),
+  keterangan: yup.string().required('Keterangan wajib diisi'),
+  fileUpload: yup.string().required('Foto bukti wajib diisi'),
+});
+
 const fetchData = async (service_id: string, kendaraan_id: string) => {
   const response = await secureApi.get(`/service/data_aktif_admin`, {
     params: {
@@ -43,22 +49,12 @@ const fetchData = async (service_id: string, kendaraan_id: string) => {
       kendaraan_id,
     },
   });
-
   return response.data;
 };
 
-const validationSchema = yup.object().shape({
-  nominal: yup.number().required('Uang wajib isi'),
-  tanggal: yup.string().required('Tanggal wajib isi'),
-  keterangan: yup.string().required('Keterangan wajib isi'),
-  fileUpload: yup.string().required('File image wajib diisi (required)'),
-});
-
-export default function PengembalianServiceScreen() {
+export default function PengembalianServiceManualScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
-
-  const [modalImageVisible, setModalImageVisible] = useState(false);
-  const [imgBase64, setImgBase64] = useState<Base64URLString>();
+  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const { data, isLoading, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
@@ -71,22 +67,22 @@ export default function PengembalianServiceScreen() {
     ]);
   }
 
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
   const postSubmitData = async (values: FormikValues) => {
-    setLoading(true);
-
     const coordinate = await reLocation.getCoordinate();
-
-    if (!coordinate?.lat && coordinate?.long) {
-      Alert.alert('Peringatan!', 'Error device location', [{ text: 'Tutup', onPress: () => null }]);
+    if (!coordinate?.lat || !coordinate?.long) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lokasi tidak terdeteksi',
+        text2: 'Aktifkan GPS dan coba lagi.',
+      });
       return;
     }
 
+    setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('latitude', coordinate?.lat?.toString() || '');
-      formData.append('longitude', coordinate?.long.toString() || '');
+      formData.append('latitude', coordinate.lat.toString());
+      formData.append('longitude', coordinate.long.toString());
       formData.append('service_id', service_id.toString());
       formData.append('kendaraan_id', kendaraan_id.toString());
       formData.append('nominal', values.nominal);
@@ -98,11 +94,7 @@ export default function PengembalianServiceScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // return;
-
       await secureApi.postForm('/service/update_admin', formData);
-
-      // await SecureStore.deleteItemAsync('DataAktif');
       router.dismissTo('(tabs-admin)/pemiliharaan');
     } catch (error: unknown) {
       HandleError(error);
@@ -113,89 +105,121 @@ export default function PengembalianServiceScreen() {
 
   return (
     <KeyboardAvoidingView
-      className=" bg-slate-300"
-      style={{ flex: 1 }}
+      className="flex-1 bg-slate-100"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
-        <View className="m-4 rounded-lg bg-white p-4">
-          {isLoading || isError ? (
-            <SkeletonList loop={5} />
-          ) : (
-            <Formik
-              initialValues={{ nominal: '', keterangan: '', tanggal: '', fileUpload: '' }}
-              validationSchema={validationSchema}
-              onSubmit={async (values) => postSubmitData(values)}>
-              {({ handleChange, handleSubmit, setFieldValue, values, touched, errors }) => (
-                <>
-                  <View className="mb-3 items-center gap-4 py-2">
-                    <View className="flex-row items-center text-sm text-gray-500">
-                      <View className="flex-grow border-t border-gray-300" />
-                      <Text className="mx-2 text-lg text-brand">
-                        Proses Pengembalian pemeliharaan Kendaraan
-                      </Text>
-                      <View className="flex-grow border-t border-gray-300" />
-                    </View>
-                    <View>
-                      <Text className="text-center text-5xl font-bold">{data?.name}</Text>
-                      <Text className="mt-3 text-center font-medium">{data?.no_polisi}</Text>
-                    </View>
-                  </View>
-                  <View className="mb-4 w-full border border-b-2" />
-                  <Text className="mb-3 text-center">
-                    Silahkan foto struk atau bon belanja pemeliharaan kendaraan
-                  </Text>
-
-                  <CustomNumberInput
-                    className="bg-gray-100"
-                    placeholder="Masukan nominal"
-                    label="Biaya Pemeliharaan"
-                    value={values.nominal}
-                    error={touched.nominal ? errors.nominal : undefined}
-                    onFormattedValue={handleChange('nominal')}
-                  />
-                  <InputDate
-                    label="Waktu Pengembalian"
-                    onChangeDate={(e) => setFieldValue('tanggal', e)}
-                    onResetDate={() => setFieldValue('tanggal', '')}
-                    value={values.tanggal}
-                    error={touched.tanggal ? errors.tanggal : undefined}
-                  />
-                  <InputFile
-                    label="Upload file"
-                    onChangeFile={(e) => setFieldValue('fileUpload', e)}
-                    placeholder="Chose file"
-                    error={touched.fileUpload ? errors.fileUpload : undefined}
-                  />
-
-                  <InputArea
-                    className="bg-gray-50"
-                    label="Keterangan"
-                    placeholder="Keterangan pengembalian (opsional)"
-                    value={values.keterangan}
-                    onChangeText={handleChange('keterangan')}
-                    error={touched.keterangan ? errors.keterangan : undefined}
-                  />
-                  <TouchableOpacity
-                    className={`my-2 flex-row items-center justify-center gap-2 rounded-lg p-3 ${colors.secondary}`}
-                    onPress={() => handleSubmit()}>
-                    <Text className="font-bold text-white">Pemeliharaan Selesai</Text>
-                    <MaterialCommunityIcons name="car" size={22} color="white" />
-                  </TouchableOpacity>
-                </>
-              )}
-            </Formik>
-          )}
+      {isLoading ? (
+        <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
+          <SkeletonList loop={5} />
         </View>
-      </ScrollView>
-      {modalImageVisible && (
-        <ModalPreviewImage
-          title="Gambar Spidometer"
-          visible={modalImageVisible}
-          imgUrl={imgBase64 || ''}
-          onPress={() => setModalImageVisible(false)}
-        />
+      ) : (
+        <Formik
+          initialValues={{ nominal: '', keterangan: '', tanggal: '', fileUpload: '' }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => await postSubmitData(values)}>
+          {({
+            handleChange,
+            handleSubmit,
+            setFieldValue,
+            values,
+            touched,
+            errors,
+            isSubmitting,
+          }) => (
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              <VehicleHeaderCard
+                variant="pemeliharaan"
+                label="Selesai Pemeliharaan (Admin)"
+                name={data?.name}
+                noPolisi={data?.no_polisi}
+                subtitle={data?.jenis_kerusakan}
+              />
+
+              {data?.lokasi || data?.keterangan ? (
+                <View className="mx-4 mb-3 rounded-xl bg-white p-3 shadow-sm">
+                  {data?.lokasi ? (
+                    <View className="mb-1 flex-row items-start gap-2">
+                      <Feather name="map-pin" size={12} color="#64748b" />
+                      <Text className="flex-1 text-xs text-gray-600">{data.lokasi}</Text>
+                    </View>
+                  ) : null}
+                  {data?.keterangan ? (
+                    <View className="flex-row items-start gap-2">
+                      <Feather name="message-square" size={12} color="#64748b" />
+                      <Text className="flex-1 text-xs text-gray-600">{data.keterangan}</Text>
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
+
+              <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
+                <View className="rounded-full bg-amber-100 p-1.5">
+                  <Feather name="shield" size={14} color="#d97706" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
+                  <Text className="mt-0.5 text-[11px] text-amber-600/80">
+                    Selesaikan pemeliharaan secara manual jika driver tidak dapat menyelesaikan
+                    sendiri.
+                  </Text>
+                </View>
+              </View>
+
+              <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                  <MaterialCommunityIcons name="receipt" size={16} color="#205781" />
+                  <Text className="text-base font-bold text-gray-800">Detail Penyelesaian</Text>
+                </View>
+
+                <CustomNumberInput
+                  className="bg-gray-50"
+                  placeholder="Masukan nominal"
+                  label="Biaya Pemeliharaan (Rp)"
+                  value={values.nominal}
+                  error={touched.nominal ? errors.nominal : undefined}
+                  onFormattedValue={handleChange('nominal')}
+                />
+                <InputDate
+                  label="Tanggal Penyelesaian"
+                  onChangeDate={(e) => setFieldValue('tanggal', e)}
+                  onResetDate={() => setFieldValue('tanggal', '')}
+                  value={values.tanggal}
+                  error={touched.tanggal ? errors.tanggal : undefined}
+                />
+                <InputFile
+                  label="Upload Foto Bukti / Struk"
+                  onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                  placeholder="Pilih file dari galeri"
+                  error={touched.fileUpload ? errors.fileUpload : undefined}
+                />
+                <InputArea
+                  className="bg-gray-50"
+                  label="Keterangan"
+                  placeholder="Catatan tambahan tentang pemeliharaan"
+                  value={values.keterangan}
+                  onChangeText={handleChange('keterangan')}
+                  error={touched.keterangan ? errors.keterangan : undefined}
+                />
+
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  disabled={isSubmitting}
+                  onPress={() => handleSubmit()}
+                  className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                    isSubmitting ? 'bg-amber-300' : 'bg-amber-500'
+                  }`}>
+                  <MaterialCommunityIcons name="check-circle" size={18} color="white" />
+                  <Text className="text-base font-bold text-white">
+                    {isSubmitting ? 'Memproses...' : 'Selesaikan Pemeliharaan'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          )}
+        </Formik>
       )}
     </KeyboardAvoidingView>
   );

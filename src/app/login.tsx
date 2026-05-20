@@ -30,16 +30,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
-import ButtonCostum from '@/components/forms/ButtonCostum';
 import Input from '@/components/forms/Input';
 import { useAuthStore } from '@/stores/authStore';
-
 
 import { LoginData } from '@/types/types';
 import ViewError from '@/components/feedback/ViewError';
 import useOnceEffect from '@/hooks/useOnceEffect';
-
-import { colors } from '@/constants/colors';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username harus diisi'),
@@ -73,9 +69,9 @@ export default function LoginScreen() {
   const handleLogin = async (value: LoginData) => {
     const log = await login(value);
     if (!log) return;
-    if (log.role == 'admin') {
+    if (log.role === 'admin') {
       router.replace('/(protected)/(tabs-admin)/');
-    } else if (log.role == 'driver') {
+    } else if (log.role === 'driver') {
       router.replace('/(protected)/(tabs)/');
     }
   };

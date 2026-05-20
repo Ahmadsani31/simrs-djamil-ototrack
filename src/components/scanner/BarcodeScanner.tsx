@@ -10,7 +10,6 @@ import {
   Dimensions,
   Platform,
   Linking,
-  Pressable,
 } from 'react-native';
 import { Toast } from 'toastify-react-native';
 

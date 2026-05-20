@@ -22,7 +22,6 @@ import ModalCamera from '@/components/modals/ModalCamera';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 
-
 import { colors } from '@/constants/colors';
 import { cn } from '@/utils/constants';
 import HandleError from '@/utils/handleError';

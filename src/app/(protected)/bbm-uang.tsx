@@ -28,7 +28,6 @@ import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 
-
 const fetchData = async (reservasi_id: string) => {
   const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
     params: {

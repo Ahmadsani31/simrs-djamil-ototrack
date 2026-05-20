@@ -7,7 +7,6 @@ import { FlatList, Text, View, RefreshControl, TextInput, TouchableOpacity } fro
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
-import { colors } from '@/constants/colors';
 import secureApi from '@/services/service';
 import { Kendaraan } from '@/types/types';
 

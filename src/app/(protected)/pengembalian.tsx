@@ -19,7 +19,6 @@ import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
-import Input from '@/components/forms/Input';
 import ModalCamera from '@/components/modals/ModalCamera';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
@@ -30,10 +29,6 @@ import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 import { stopTracking } from '@/utils/locationUtils';
-
-
-
-
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -68,7 +63,7 @@ export default function PengembalianScreen() {
 
   const handleSubmitExit = async (values: FormikValues) => {
     setLoading(true);
-    if (!uri && values.spidometer == '') {
+    if (!uri && values.spidometer === '') {
       Toast.error('Foto spidometer belum di ambil');
       setLoading(false);
       return;

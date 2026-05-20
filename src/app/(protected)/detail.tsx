@@ -7,13 +7,11 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import * as yup from 'yup';
@@ -21,7 +19,6 @@ import * as yup from 'yup';
 import SkeletonList from '@/components/feedback/SkeletonList';
 import ButtonCostum from '@/components/forms/ButtonCostum';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
-import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
 import ModalCamera from '@/components/modals/ModalCamera';
 import { colors } from '@/constants/colors';
@@ -78,7 +75,7 @@ export default function DetailScreen() {
 
   const handleSubmitDetail = async (values: FormikValues) => {
     setLoading(true);
-    if (!uri && values.spidometer == '') {
+    if (!uri && values.spidometer === '') {
       Alert.alert('Peringatan!', 'Foto spidometer belum di ambil', [
         { text: 'Tutup', onPress: () => null },
       ]);

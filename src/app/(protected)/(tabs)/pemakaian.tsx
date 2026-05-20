@@ -10,7 +10,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import SkeletonList from '@/components/feedback/SkeletonList';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import ListDetailSectionSheet from '@/components/sections/ListDetailSectionSheet';
-import { colors } from '@/constants/colors';
 import { useDatePicker } from '@/hooks/useDatePicker';
 import secureApi from '@/services/service';
 

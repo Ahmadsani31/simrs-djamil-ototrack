@@ -10,7 +10,7 @@ export default function TabsLayout() {
 
   const insets = useSafeAreaInsets();
 
-  if (user?.role != 'driver') {
+  if (user?.role !== 'driver') {
     return <Redirect href="(protected)/(tabs-admin)" />;
   }
 

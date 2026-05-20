@@ -1,4 +1,4 @@
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -6,7 +6,6 @@ import { Formik, FormikValues } from 'formik';
 import { useState } from 'react';
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
@@ -22,7 +20,6 @@ import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
-import ModalCamera from '@/components/modals/ModalCamera';
 import secureApi from '@/services/service';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';

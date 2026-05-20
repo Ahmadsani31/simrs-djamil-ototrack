@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 
 export default function Loader() {
   return (

@@ -1,4 +1,3 @@
-import { Picker } from '@react-native-picker/picker';
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik, FormikValues } from 'formik';

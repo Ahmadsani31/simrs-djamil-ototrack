@@ -10,7 +10,6 @@ import { Toast } from 'toastify-react-native';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
-import { colors } from '@/constants/colors';
 import { useDatePicker } from '@/hooks/useDatePicker';
 import secureApi from '@/services/service';
 

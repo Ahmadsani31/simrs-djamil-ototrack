@@ -120,7 +120,7 @@ export default function PemiliharaanNestedScreen() {
       return;
     }
 
-    if (note == null || note == '') {
+    if (note === null || note === '') {
       Toast.show({
         type: 'error',
         text1: 'Warning!',

@@ -20,7 +20,6 @@ import InputArea from '@/components/forms/InputArea';
 import { colors } from '@/constants/colors';
 import secureApi from '@/services/service';
 
-
 import { useLoadingStore } from '@/stores/loadingStore';
 import { dataDetail } from '@/types/types';
 import InputDate from '@/components/forms/InputDate';

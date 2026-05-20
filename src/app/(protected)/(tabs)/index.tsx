@@ -8,7 +8,6 @@ import { Toast } from 'toastify-react-native';
 import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
 import PageDaily from '@/components/sections/PageDaily';
 import PageHome from '@/components/sections/PageHome';
-import { colors } from '@/constants/colors';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
@@ -80,9 +79,9 @@ export default function IndexScreen() {
     try {
       const res = await secureApi.get(`reservasi/qrcode`, { params: { uniqued_id: data } });
       if (res.status === true) {
-        if (jenisAksi == 'daily') {
+        if (jenisAksi === 'daily') {
           router.push({ pathname: '/(protected)/detail', params: { uuid: data } });
-        } else if (jenisAksi == 'service') {
+        } else if (jenisAksi === 'service') {
           router.push({ pathname: '/(protected)/service', params: { uuid: data } });
         } else {
           Toast.show({ type: 'error', text1: 'Perhatian', text2: 'QRCode tidak valid' });

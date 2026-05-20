@@ -2,7 +2,6 @@ import DateTimePicker from '@expo/ui/datetimepicker';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 
-
 import { useInfiniteQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 
@@ -15,7 +14,6 @@ import SkeletonList from '@/components/feedback/SkeletonList';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 
 import ListDetailServiceSheet from '@/components/sections/ListDetailServiceSheet';
-import { colors } from '@/constants/colors';
 import { useDatePicker } from '@/hooks/useDatePicker';
 import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';

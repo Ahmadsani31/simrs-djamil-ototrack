@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/authStore';
 export default function TabsAdminLayout() {
   const user = useAuthStore((state) => state.user);
   const insets = useSafeAreaInsets();
-  if (user?.role != 'admin') {
+  if (user?.role !== 'admin') {
     return <Redirect href="(protected)/(tabs)" />;
   }
   return (

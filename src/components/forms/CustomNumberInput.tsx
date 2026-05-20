@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View, StyleSheet, TextInputProps, Text } from 'react-native';
+import { TextInput, View, TextInputProps, Text } from 'react-native';
 
 type Props = TextInputProps & {
   onFormattedValue?: (rawValue: string) => void;

@@ -13,7 +13,6 @@ import {
 
 import LoadingIndikator from '@/components/feedback/LoadingIndikator';
 import ButtonCostum from '@/components/forms/ButtonCostum';
-import { useAuthStore } from '@/stores/authStore';
 
 const { width } = Dimensions.get('window');
 const CAMERA_RATIO = 4 / 3;

@@ -1,5 +1,5 @@
 import { AntDesign } from '@expo/vector-icons';
-import { TextInput, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 interface ErrorProps {
   plaintext: string;
 }

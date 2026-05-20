@@ -1,6 +1,4 @@
-import { type ClassValue, clsx } from 'clsx';
 import * as Application from 'expo-application';
-import { twMerge } from 'tailwind-merge';
 
 const ApplicationSchame = Application.applicationId;
 // Google OAuth Constants
@@ -15,6 +13,3 @@ export const API_URL =
   process.env.EXPO_PUBLIC_API_URL ?? 'https://backoffice.rsdjamil.co.id/pencatatan-kendaraan/api';
 export const URL_PLAY_STORE = 'https://play.google.com/store/apps/details?id=' + ApplicationSchame;
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}

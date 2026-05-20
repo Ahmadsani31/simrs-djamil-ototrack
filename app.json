@@ -4,11 +4,6 @@
     "slug": "simrs-djamil-ototrack",
     "version": "1.1.4",
     "scheme": "ototrack-djamil",
-    "web": {
-      "favicon": "./assets/icon/adaptive-icon.png",
-      "output": "server",
-      "bundler": "metro"
-    },
     "experiments": {
       "tsconfigPaths": true
     },
@@ -77,8 +72,7 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ],
-      "expo-web-browser"
+      ]
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",

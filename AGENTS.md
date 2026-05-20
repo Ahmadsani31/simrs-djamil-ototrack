@@ -28,7 +28,7 @@ Repo-specific notes for OpenCode. The README is a leftover starter-template desc
 ## Dependency hygiene
 
 - To remove a package, **edit `package.json` manually** and run `npm install`. Avoid `npm uninstall <pkg>`: in this repo it has been observed to rewrite unrelated `expo*` versions during full resolution and leave the lockfile in an unbuildable state.
-- `expo doctor` exclusions live under `expo.doctor.reactNativeDirectoryCheck.exclude` in `package.json`. Currently excludes `react-native-element-dropdown`, `uri-scheme`, `clsx` (last one flagged unmaintained but stable; not worth swapping).
+- `expo doctor` exclusions live under `expo.doctor.reactNativeDirectoryCheck.exclude` in `package.json`. Currently excludes only `uri-scheme`.
 - Never add `expo-modules-core` directly — `expo-doctor` will flag it. Types are exported transitively via `expo`.
 
 ## SDK 55 gotchas (post-upgrade from SDK 53)

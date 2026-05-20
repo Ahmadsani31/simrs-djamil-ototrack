@@ -1,26 +1,11 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  BackHandler,
-  RefreshControl,
-} from 'react-native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, FlatList, Pressable, TouchableOpacity, RefreshControl } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
 
 import dayjs from 'dayjs';
 import secureApi from '@/services/service';
-import {
-  Entypo,
-  FontAwesome,
-  FontAwesome6,
-  Fontisto,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from '@/components/feedback/SkeletonList';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { colors } from '@/constants/colors';
@@ -54,49 +39,40 @@ const fetchData = async ({
   pageParam?: number;
   queryKey: (string | { date: string | undefined })[];
 }) => {
-  // queryKey is an array: [string, { date: Date | undefined }]
   const [_key, params] = queryKey;
   const date = (params as { date?: string }).date;
   try {
     const response = await secureApi.get(`service/list`, {
-      params: {
-        limit: LIMIT,
-        offset: pageParam,
-        tanggal: date,
-      },
+      params: { limit: LIMIT, offset: pageParam, tanggal: date },
     });
     return {
       data: response.data,
       nextOffset: response.data.length < LIMIT ? null : pageParam + LIMIT,
     };
-  } catch (error) {
-    return {
-      data: [],
-      nextOffset: null,
-    };
+  } catch {
+    return { data: [], nextOffset: null };
   }
 };
-export default function IndexScreen() {
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const [rawData, setRawData] = useState<rawData[]>();
+export default function IndexScreen() {
+  const insets = useSafeAreaInsets();
+  const setLoading = useLoadingStore((state) => state.setLoading);
+  const [activeServices, setActiveServices] = useState<rawData[]>();
 
   useFocusEffect(
     useCallback(() => {
       refetch();
-      fetchDataAktif();
+      fetchActiveServices();
     }, [])
   );
 
-  const fetchDataAktif = async () => {
+  const fetchActiveServices = async () => {
     setLoading(true);
     try {
       const response = await secureApi.get(`service/aktif`);
-      // console.log('response', response);
-      setRawData(response.data);
-    } catch (error: any) {
-      // console.log('response', error.response.data);
-      setRawData(undefined);
+      setActiveServices(response.data);
+    } catch {
+      setActiveServices(undefined);
     } finally {
       setLoading(false);
     }
@@ -107,18 +83,7 @@ export default function IndexScreen() {
     overshootClamping: true,
     stiffness: 500,
   });
-
   const snapPoints = useMemo(() => ['100%'], []);
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imgBase64, setImgBase64] = useState<Base64URLString>();
-
-  const handleModalImageShow = async (uri: any) => {
-    // console.log('show image modal');
-    setImgBase64(uri);
-    setModalVisible(true);
-  };
-  // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const [rawService, setRawService] = useState([]);
@@ -129,6 +94,8 @@ export default function IndexScreen() {
 
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [previewImg, setPreviewImg] = useState('');
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({
@@ -138,200 +105,241 @@ export default function IndexScreen() {
       initialPageParam: 0,
     });
 
-  const showMode = (currentMode: 'date' | 'time' | 'datetime') => {
-    datePicker.openWithCallback(currentMode, (selectedDate) => {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      setDateInput(formattedDate);
-      setDate(selectedDate);
+  const datePicker = useDatePicker({ initialValue: date ?? new Date(), maximumDate: new Date() });
+
+  const showDatePicker = () => {
+    datePicker.openWithCallback('date', (selected) => {
+      setDateInput(selected.toISOString().split('T')[0]);
+      setDate(selected);
     });
   };
 
-  const datePicker = useDatePicker({ initialValue: date ?? new Date(), maximumDate: new Date() });
-
-  const handleResetTanggal = () => {
+  const clearDate = () => {
     setDateInput('');
-    setDate(new Date());
+    setDate(undefined);
     refetch();
   };
 
-  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
-  // console.log('flatData pemakaiana', flatData);
+  const showImage = (uri: string) => {
+    setPreviewImg(uri);
+    setModalVisible(true);
+  };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View className="flex-1 bg-slate-300">
-        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
-        <View className="px-4">
-          <View className="mb-4 ">
-            <Text className="text-center text-white">
-              Semua list pemeliharaan kendaraan Operasional RS Djamil
+  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
+
+  // Active maintenance cards (shown at top when present)
+  const renderActiveCard = (itx: rawData, i: number) => (
+    <TouchableOpacity
+      key={i}
+      onPress={() =>
+        router.push({
+          pathname: '/(pemiliharaan)/pemiliharaan-nested',
+          params: { service_id: itx.id },
+        })
+      }
+      className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm"
+      activeOpacity={0.8}>
+      <View className="flex-row items-center justify-between bg-amber-100 px-4 py-2.5">
+        <View className="flex-row items-center gap-1.5">
+          <View className="h-2 w-2 rounded-full bg-amber-500" />
+          <Text className="text-xs font-medium text-gray-600">
+            {dayjs(itx.created_at).format('ddd, DD MMM YYYY HH:mm')}
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={16} color="#94a3b8" />
+      </View>
+      <View className="p-4">
+        <View className="flex-row items-start justify-between">
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-gray-800">{itx.kendaraan}</Text>
+            <Text className="text-xs text-gray-400">{itx.no_polisi}</Text>
+          </View>
+          <View className="rounded-lg bg-amber-50 px-3 py-1.5">
+            <Text className="text-xs font-semibold text-amber-700">{itx.jenis_kerusakan}</Text>
+          </View>
+        </View>
+        <View className="mt-2 rounded-lg bg-slate-50 p-2.5">
+          <Text className="text-xs text-gray-500">{itx.keterangan}</Text>
+          <Text className="mt-1 text-[11px] text-gray-400">Lokasi: {itx.lokasi}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  // History list items
+  const renderHistoryItem = ({ item }: { item: any }) => {
+    const isDone = !!item.keterangan_out;
+    return (
+      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+        <View
+          className={`flex-row items-center justify-between px-4 py-2.5 ${isDone ? 'bg-emerald-100' : 'bg-amber-100'}`}>
+          <View className="flex-row items-center gap-1.5">
+            <View
+              className={`h-2 w-2 rounded-full ${isDone ? 'bg-emerald-500' : 'bg-amber-500'}`}
+            />
+            <Text className="text-xs font-medium text-gray-600">
+              {dayjs(item.created_at).format('ddd, DD MMM YYYY HH:mm')}
             </Text>
           </View>
-          {rawData && rawData.length > 0 ? (
-            rawData.map((itx, i) => (
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: '/(pemiliharaan)/pemiliharaan-nested',
-                    params: {
-                      service_id: itx?.id,
-                    },
-                  })
-                }
-                key={i}>
-                <View className="my-2 rounded-lg bg-white p-4">
-                  <View className="mb-2 flex-row items-center justify-between gap-3 border-b-2">
-                    <Text>{dayjs(itx.created_at).format('dddd ,DD MMMM YYYY | HH:mm')}</Text>
-                    <View className="flex-row items-center gap-2">
-                      <Text className="text-xs">Klik untuk detail</Text>
-                      <FontAwesome6 name="square-arrow-up-right" size={24} color="black" />
-                    </View>
-                  </View>
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-1">
-                      <Text className="text-2xl font-bold">{itx?.kendaraan}</Text>
-                      <Text className="mb-2 text-xl font-medium">{itx?.no_polisi}</Text>
-                    </View>
-                    <View className="rounded-lg bg-amber-200 p-2 text-center">
-                      <Text className="text-xs">Pemeliharaan :</Text>
-                      <Text className="text-xl font-bold">{itx?.jenis_kerusakan}</Text>
-                    </View>
-                  </View>
+          <TouchableOpacity
+            onPress={() => handleSnapPressDetail(item.images)}
+            className="flex-row items-center gap-1 rounded-full bg-gray-700 px-3 py-1">
+            <Text className="text-xs font-medium text-white">Detail</Text>
+            <Feather name="eye" size={11} color="white" />
+          </TouchableOpacity>
+        </View>
 
-                  <View className=" rounded-lg bg-gray-200 p-1 px-3">
-                    <Text className="text-center font-medium">{itx?.keterangan}</Text>
-                    <Text className="text-center font-bold">Lokasi :</Text>
-                    <Text className="text-center font-medium">{itx?.lokasi}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <>
-              <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={() => showMode('date')}>
-                <Fontisto
-                  className="absolute left-6 top-5 z-10"
-                  name="date"
-                  size={24}
-                  color={'black'}
-                />
-                <TextInput
-                  className="rounded-md border border-gray-300 bg-gray-100 py-4 ps-14"
-                  placeholder="Select Date"
-                  editable={false}
-                  value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
-                />
-                {dateInput && (
-                  <TouchableOpacity onPress={handleResetTanggal} className="absolute right-3 top-5">
-                    <Entypo name="circle-with-cross" size={28} color="black" />
-                  </TouchableOpacity>
-                )}
-              </Pressable>
-              <FlatList
-                data={flatData}
-                keyExtractor={(item, index) => index.toString()}
-                refreshControl={
-                  <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
-                }
-                // stickyHeaderIndices={[0]}
-                contentContainerStyle={{ paddingBottom: 120 }}
-                renderItem={({ item }) => (
-                  <>
-                    <View className="flex-row items-center justify-between rounded-t-lg bg-[#F2E5BF] px-4">
-                      <Text className={` text-black`}>
-                        {dayjs(item.created_at).format('dddd ,DD MMMM YYYY | HH:ss')}
-                      </Text>
-                      <TouchableOpacity
-                        className={`my-2 flex-row items-center justify-center gap-2 rounded-lg px-3 py-1 ${colors.secondary}`}
-                        onPress={() => handleSnapPressDetail(item.images)}>
-                        <Text className="text-white">Detail</Text>
-                        <MaterialCommunityIcons
-                          name="arrow-top-right-bold-box"
-                          size={18}
-                          color="white"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <View className="mb-2 rounded-b-lg bg-white p-4 shadow">
-                      <View style={{ flex: 1 }} className="flex flex-row">
-                        <View className="flex-1">
-                          <Text className="text-wrap text-xl font-bold text-black">
-                            {item.kendaraan}
-                          </Text>
-                          <Text className="text-secondary text-sm">{item.no_polisi}</Text>
-                        </View>
-                        <View className="mt-2 justify-center rounded-lg bg-blue-200 px-4">
-                          <Text className="text-center font-medium">
-                            Biaya : Rp. {item.nominal}
-                          </Text>
-                        </View>
-                      </View>
+        <View className="p-4">
+          <View className="mb-3 flex-row items-start justify-between">
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-800">{item.kendaraan}</Text>
+              <View className="mt-0.5 flex-row items-center gap-1">
+                <MaterialCommunityIcons name="card-text-outline" size={13} color="#94a3b8" />
+                <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
+              </View>
+            </View>
+            <View className="rounded-lg bg-blue-50 px-3 py-1.5">
+              <Text className="text-xs text-gray-400">Biaya</Text>
+              <Text className="text-sm font-bold text-blue-600">
+                Rp {Number(item.nominal || 0).toLocaleString('id-ID')}
+              </Text>
+            </View>
+          </View>
 
-                      <View className="mb-3 mt-2 rounded-lg">
-                        <View className="w-full flex-1 flex-row items-start gap-5">
-                          <Pressable
-                            onPress={() => handleModalImageShow(item.image)}
-                            className="items-center justify-center">
-                            <Image
-                              source={{ uri: item.image }}
-                              style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 5 }}
-                              contentFit="contain"
-                            />
-                            <Text className="absolute rounded-lg bg-black/50 p-1 text-center text-xs text-white">
-                              Ketuk untuk melihat
-                            </Text>
-                          </Pressable>
-                          <View className="flex-1 gap-2">
-                            <View className=" rounded-md bg-slate-200 p-2">
-                              <Text className="text-lg font-bold">{item.jenis_kerusakan}</Text>
-                              <Text className="text-wrap">{item.keterangan}</Text>
-                            </View>
-                            <View className=" rounded-md bg-slate-200 p-2">
-                              <Text className="text-lg font-bold">Spidometer</Text>
-                              <Text className="text-wrap">{item.spidometer} Km</Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                      <View className="mt-2 flex-1 rounded-lg bg-slate-200 p-1">
-                        <Text className="text-center text-lg font-bold">Keterangan</Text>
-                        <Text className="text-center font-medium">{item.keterangan_out}</Text>
-                      </View>
-                    </View>
-                  </>
-                )}
-                onEndReached={() => {
-                  if (hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                  }
-                }}
-                onEndReachedThreshold={0.5}
-                ListEmptyComponent={
-                  <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-                    <Text>Tidak ada proses pemeliharaan kendaraan</Text>
-                  </View>
-                }
-                ListFooterComponent={
-                  isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null
-                }
+          <View className="flex-row gap-3">
+            <Pressable
+              onPress={() => item.image && showImage(item.image)}
+              className="overflow-hidden rounded-xl">
+              <Image
+                source={{ uri: item.image }}
+                style={{ width: 80, height: 100, borderRadius: 12 }}
+                contentFit="cover"
               />
-            </>
+              <View className="absolute bottom-0 left-0 right-0 bg-black/40 py-0.5">
+                <Text className="text-center text-[9px] text-white">Lihat</Text>
+              </View>
+            </Pressable>
+
+            <View className="flex-1 gap-2">
+              <View className="rounded-lg bg-slate-50 p-2.5">
+                <Text className="text-xs font-semibold text-gray-700">{item.jenis_kerusakan}</Text>
+                <Text className="mt-0.5 text-xs text-gray-500" numberOfLines={2}>
+                  {item.keterangan}
+                </Text>
+              </View>
+              <View className="flex-row gap-2">
+                <View className="flex-1 rounded-lg bg-slate-50 p-2">
+                  <Text className="text-[10px] text-gray-400">Spidometer</Text>
+                  <Text className="text-xs font-semibold text-gray-700">{item.spidometer} Km</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {isDone && (
+            <View className="mt-3 rounded-lg bg-emerald-50 p-2.5">
+              <Text className="text-xs font-semibold text-emerald-700">Keterangan</Text>
+              <Text className="mt-0.5 text-xs text-gray-600">{item.keterangan_out}</Text>
+            </View>
           )}
         </View>
       </View>
-      <View className="absolute bottom-1 right-1 z-10">
-        <TouchableOpacity
-          className="flex-row items-center gap-2 rounded-lg bg-brand px-2 py-1"
-          onPress={fetchDataAktif}>
-          <Text className="text-white">Refresh</Text>
-          <FontAwesome name="refresh" size={14} color="white" />
-        </TouchableOpacity>
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <View className="flex-1 bg-slate-200">
+        {/* Header */}
+        <View className="bg-brand px-4 pb-14" style={{ paddingTop: insets.top + 12 }}>
+          <View className="flex-row items-center gap-2">
+            <MaterialCommunityIcons name="car-wrench" size={20} color="white" />
+            <Text className="text-lg font-bold text-white">Pemeliharaan</Text>
+          </View>
+          <Text className="mt-0.5 text-sm text-white/60">Riwayat pemeliharaan kendaraan</Text>
+        </View>
+
+        {/* Active services OR date filter + history list */}
+        {activeServices && activeServices.length > 0 ? (
+          <FlatList
+            data={activeServices}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item, index }) => renderActiveCard(item, index)}
+            contentContainerStyle={{ paddingBottom: 80, paddingTop: 8 }}
+            className="-mt-7"
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <View className="mx-4 mb-3">
+                <View className="rounded-xl bg-amber-50 p-3">
+                  <Text className="text-center text-sm font-medium text-amber-700">
+                    {activeServices.length} kendaraan sedang dalam pemeliharaan
+                  </Text>
+                </View>
+              </View>
+            }
+          />
+        ) : (
+          <>
+            {/* Date filter */}
+            <Pressable
+              onPress={showDatePicker}
+              className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
+              <Feather name="calendar" size={18} color="#94a3b8" />
+              <Text
+                className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
+                {dateInput
+                  ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
+                  : 'Filter berdasarkan tanggal...'}
+              </Text>
+              {dateInput ? (
+                <TouchableOpacity onPress={clearDate} hitSlop={8}>
+                  <Feather name="x-circle" size={18} color="#94a3b8" />
+                </TouchableOpacity>
+              ) : (
+                <Feather name="chevron-down" size={18} color="#94a3b8" />
+              )}
+            </Pressable>
+
+            <FlatList
+              data={flatData}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderHistoryItem}
+              refreshControl={
+                <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
+              }
+              contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => {
+                if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+              }}
+              onEndReachedThreshold={0.5}
+              ListEmptyComponent={
+                isLoading ? null : (
+                  <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
+                    <MaterialCommunityIcons name="wrench-outline" size={48} color="#cbd5e1" />
+                    <Text className="mt-3 text-center text-gray-400">
+                      Belum ada data pemeliharaan
+                    </Text>
+                  </View>
+                )
+              }
+              ListFooterComponent={
+                isLoading || isFetchingNextPage ? (
+                  <View className="mx-4">
+                    <SkeletonList loop={3} />
+                  </View>
+                ) : null
+              }
+            />
+          </>
+        )}
       </View>
+
       {modalVisible && (
         <ModalPreviewImage
-          title="Gambar Pemeliharaan"
+          title="Foto Pemeliharaan"
           visible={modalVisible}
-          imgUrl={imgBase64 || ''}
+          imgUrl={previewImg}
           onPress={() => setModalVisible(false)}
         />
       )}
@@ -344,6 +352,7 @@ export default function IndexScreen() {
         animationConfigs={animationConfigs}>
         <ListDetailServiceSheet items={rawService} />
       </BottomSheet>
+
       {datePicker.visible && (
         <DateTimePicker
           value={datePicker.value}

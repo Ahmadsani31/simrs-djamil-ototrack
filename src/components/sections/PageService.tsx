@@ -1,19 +1,7 @@
-import { View, Text, TouchableOpacity, Image as ImageLocal, ScrollView, Alert } from 'react-native';
-import React, { useState } from 'react';
-import { Image } from 'expo-image';
-import { Link, router } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import secureApi from '@/services/service';
-import { AntDesign, Entypo, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
-import { ModalRN } from '@/components/modals/ModalRN';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import { colors } from '@/constants/colors';
-import ModalCamera from '@/components/modals/ModalCamera';
-import InputArea from '@/components/forms/InputArea';
-import { reLocation } from '@/hooks/locationRequired';
-import { Toast } from 'toastify-react-native';
-import PageServiceListImage from '@/components/sections/PageServiceListImage';
-import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import { View, Text, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { router } from 'expo-router';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type rawData = {
   item: {
@@ -30,47 +18,12 @@ type rawData = {
   }[];
 };
 
-type propsUseQuery = {
-  id: number;
-  keterangan: string;
-  file_image: string;
-};
-
-const fetchDataLog = async (service_id: number) => {
-  try {
-    const response = await secureApi.get(`/service/list_images`, {
-      params: {
-        service_id: service_id,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    return [];
-  }
-};
-
 const PageService = ({ item }: rawData) => {
-  // console.log('PageService item:', item);
-
-  const [loading, setLoading] = useState(false);
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
-  const [dialogCamera, setDialogCamera] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [note, setNote] = useState('');
-
-  const [previewImage, setPreviewImage] = useState(false);
-  const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
-
-  const handleDialogBBM = () => {
-    setModalVisible(false);
-    setImgUrl(null);
-    setNote('');
-  };
-
   return (
-    <>
+    <View className="gap-3">
       {item.map((itx, i) => (
         <TouchableOpacity
+          key={i}
           onPress={() =>
             router.push({
               pathname: '/(pemiliharaan)/pemiliharaan-nested',
@@ -80,30 +33,49 @@ const PageService = ({ item }: rawData) => {
               },
             })
           }
-          key={i}>
-          <View className="my-2 rounded-lg bg-white p-4">
-            <View className="flex-row items-center justify-end gap-3">
-              <Text>Klik untuk detail</Text>
-              <FontAwesome6 name="square-arrow-up-right" size={24} color="black" />
+          className="overflow-hidden rounded-2xl bg-white shadow-sm"
+          activeOpacity={0.8}>
+          {/* Header bar */}
+          <View className="flex-row items-center justify-between bg-amber-100 px-4 py-2.5">
+            <View className="flex-row items-center gap-1.5">
+              <View className="h-2 w-2 rounded-full bg-amber-500" />
+              <Text className="text-xs font-medium text-gray-600">Pemeliharaan Aktif</Text>
             </View>
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-4xl font-bold">{itx?.kendaraan}</Text>
-                <Text className="mb-2 text-xl font-medium">{itx?.no_polisi}</Text>
+            <Feather name="chevron-right" size={16} color="#94a3b8" />
+          </View>
+
+          <View className="p-4">
+            {/* Vehicle + jenis kerusakan */}
+            <View className="mb-3 flex-row items-start justify-between">
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
+                  {itx?.kendaraan}
+                </Text>
+                <View className="mt-0.5 flex-row items-center gap-1">
+                  <MaterialCommunityIcons name="card-text-outline" size={13} color="#94a3b8" />
+                  <Text className="text-xs text-gray-400">{itx?.no_polisi}</Text>
+                </View>
               </View>
-              <View className="rounded-lg bg-amber-500 p-2 text-center">
-                <Text className=" text-xl font-bold text-white">{itx?.jenis_kerusakan}</Text>
+              <View className="rounded-lg bg-amber-50 px-3 py-1.5">
+                <Text className="text-[10px] text-amber-500">Jenis</Text>
+                <Text className="text-xs font-bold text-amber-700">{itx?.jenis_kerusakan}</Text>
               </View>
             </View>
 
-            <View className=" rounded-lg bg-gray-200 p-1 px-3">
-              <Text className="text-center font-medium">{itx?.keterangan}</Text>
-              <Text className="text-center font-medium">{itx?.lokasi}</Text>
+            {/* Description */}
+            <View className="rounded-lg bg-slate-50 p-2.5">
+              <Text className="text-xs text-gray-600">{itx?.keterangan}</Text>
+              {itx?.lokasi && (
+                <View className="mt-1 flex-row items-center gap-1">
+                  <Feather name="map-pin" size={11} color="#94a3b8" />
+                  <Text className="text-[11px] text-gray-400">{itx?.lokasi}</Text>
+                </View>
+              )}
             </View>
           </View>
         </TouchableOpacity>
       ))}
-    </>
+    </View>
   );
 };
 

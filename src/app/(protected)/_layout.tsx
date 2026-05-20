@@ -5,6 +5,7 @@ import { router, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { Alert, BackHandler, Image, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { colors } from '@/constants/colors';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
@@ -76,7 +77,8 @@ export default function ProtectedLayout() {
 
   return (
     <PrivateRoute>
-      {loading && <LoadingIndikator />}
+      <BottomSheetModalProvider>
+      {/* {loading && <LoadingIndikator />} */}
       <Stack
         screenOptions={{
           headerTitleAlign: 'center',
@@ -112,6 +114,7 @@ export default function ProtectedLayout() {
           }}
         />
       </Stack>
+      </BottomSheetModalProvider>
     </PrivateRoute>
   );
 }

@@ -1,6 +1,6 @@
-import { Redirect, router, Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { PrivateRoute } from '@/components/layout/PrivateRoute';
-import { Alert, BackHandler, Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -16,66 +16,26 @@ export default function TabsLayout() {
   if (user?.role != 'driver') {
     return <Redirect href={'(protected)/(tabs-admin)'} />;
   }
-  // useEffect(() => {
-  //   const requestLocationPermission = async () => {
-  //     const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-  //     statusTrackingStore.getState().setTrackingStatus(hasStarted);
-  //     console.log('Location background started:', hasStarted);
-  //   };
-  //   requestLocationPermission();
-  // }, []);
 
   return (
     <PrivateRoute>
       <Tabs
-        // tabBar={(props:any) => <CustomNavBar {...props} />}
         screenOptions={{
           animation: 'fade',
-          headerTitleAlign: 'center',
+          headerShown: false,
           tabBarActiveTintColor: 'white',
           tabBarStyle: {
             backgroundColor: colors.brand,
-            // paddingBottom: 10,  // ⬇️ Padding bawah TabBar
-            paddingTop: 10, // ⬆️ Padding atas TabBar
-            // height: 70, // ⬆️ Tinggi TabBar jika padding terlalu besar
-            height: 70 + insets.bottom, // naik sesuai safe area
+            paddingTop: 10,
+            height: 70 + insets.bottom,
             paddingBottom: insets.bottom,
           },
-          headerStyle: {
-            backgroundColor: colors.brand,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitleStyle: {
-            fontWeight: 'bold',
-            color: '#fff',
-          },
-          headerLeft: () => (
-            <View className="mx-4 flex-row items-center rounded-lg bg-white p-1">
-              <Image
-                style={{ width: 53, height: 30 }}
-                source={require('@asset/images/logo/logo-home.png')}
-              />
-            </View>
-          ),
-          headerRight: () => (
-            <View
-              className={`mx-4 p-1  ${trackingStatus ? 'bg-white' : 'bg-gray-500'} flex-row items-center rounded-lg`}>
-              <MaterialIcons
-                name={`${trackingStatus ? 'gps-fixed' : 'gps-off'}`}
-                size={14}
-                color={`${trackingStatus ? 'green' : 'black'}`}
-              />
-            </View>
-          ),
         }}>
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
             tabBarIcon: ({ color }) => <Ionicons name="home-sharp" size={28} color={color} />,
-            headerTitle: () => <Text className="text-xl font-bold text-white">Home</Text>,
           }}
         />
 
@@ -86,9 +46,6 @@ export default function TabsLayout() {
             tabBarIcon: ({ color }) => (
               <Ionicons name="speedometer-sharp" size={28} color={color} />
             ),
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pemakaian Kendaraan</Text>
-            ),
           }}
         />
         <Tabs.Screen
@@ -97,9 +54,6 @@ export default function TabsLayout() {
             title: 'Pemeliharaan',
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="car-cog" size={28} color={color} />
-            ),
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Pemeliharaan Kendaraan</Text>
             ),
           }}
         />
@@ -110,7 +64,6 @@ export default function TabsLayout() {
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="car-side" size={28} color={color} />
             ),
-            headerTitle: () => <Text className="text-xl font-bold text-white">Kendaraan</Text>,
           }}
         />
 
@@ -119,9 +72,6 @@ export default function TabsLayout() {
           options={{
             title: 'Profile',
             tabBarIcon: ({ color }) => <Ionicons name="person-sharp" size={28} color={color} />,
-            headerTitle: () => (
-              <Text className="text-xl font-bold text-white">Profile Information</Text>
-            ),
           }}
         />
       </Tabs>

@@ -1,6 +1,5 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
-import * as Location from 'expo-location';
 import {
   View,
   Modal,
@@ -11,15 +10,9 @@ import {
   AppState,
 } from 'react-native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-// import Marker, { ImageFormat, Position, TextBackgroundType } from 'react-native-image-marker';
 import ButtonCostum from '@/components/forms/ButtonCostum';
 import LoadingIndikator from '@/components/feedback/LoadingIndikator';
-import { Toast } from 'toastify-react-native';
-import dayjs from 'dayjs';
-import { useIsFocused } from '@react-navigation/native';
 import { useAuthStore } from '@/stores/authStore';
-// import {  SaveFormat, useImageManipulator } from 'expo-image-manipulator';
-// import { Asset } from 'expo-asset';
 
 const { width } = Dimensions.get('window');
 const CAMERA_RATIO = 4 / 3;
@@ -38,7 +31,6 @@ interface LocationData {
 }
 
 export default function ModalCamera({ visible, onClose, setUriImage }: InputProps) {
-  const isFocused = useIsFocused();
   const [active, setActive] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -46,17 +38,19 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
   const cameraRef = useRef<CameraView | null>(null);
   const [flashlight, setFlashlight] = useState(false);
 
-  // Aktifkan hanya saat fokus + izin ada
+  // Kamera aktif kalau modal visible + permission granted + app di foreground.
+  // Tidak pakai useIsFocused karena Modal RN render ke layer terpisah dan
+  // navigation context tidak selalu tersedia di sana.
   useEffect(() => {
-    setActive(Boolean(isFocused && permission?.granted));
-  }, [isFocused, permission?.granted]);
+    setActive(Boolean(visible && permission?.granted));
+  }, [visible, permission?.granted]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (s) => {
-      setActive(Boolean(s === 'active' && isFocused && permission?.granted));
+      setActive(Boolean(s === 'active' && visible && permission?.granted));
     });
     return () => sub.remove();
-  }, [isFocused, permission?.granted]);
+  }, [visible, permission?.granted]);
 
   // const [location, setLocation] = useState<LocationData | null>(null);
 

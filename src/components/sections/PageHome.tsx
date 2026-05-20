@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { BarChart } from 'react-native-gifted-charts';
 import { Image } from 'expo-image';
 import secureApi from '@/services/service';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from '@/components/feedback/SkeletonList';
+import { colors } from '@/constants/colors';
 
 type propsBar = {
   value: number;
@@ -24,19 +25,16 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
     setLoading(true);
     try {
       const response = await secureApi.get(`user/chart_kendaraan`);
-      const chart = response.data.map((item: propsBar) => {
-        const newBar = {
-          value: item.value,
-          label: item.label,
-          frontColor: item.frontColor,
-          topLabelComponent: () => <Text>{item.value}</Text>,
-        };
-        return newBar;
-      });
-
+      const chart = response.data.map((item: propsBar) => ({
+        value: item.value,
+        label: item.label,
+        frontColor: item.frontColor,
+        topLabelComponent: () => (
+          <Text className="text-[10px] font-semibold text-gray-600">{item.value}</Text>
+        ),
+      }));
       setBarData(chart);
-    } catch (error: any) {
-      // console.log('response', error.response.data);
+    } catch {
       setBarData([]);
     } finally {
       setLoading(false);
@@ -45,66 +43,84 @@ export default function PageHome({ onPress }: { onPress: (e: string) => void }) 
 
   return (
     <View>
-      <Text className="text-center text-2xl font-bold text-white">Pilih Jenis Penggunaan</Text>
-      <Text className="text-center text-sm text-white">
-        Silahkan pilih jenis penggunaan dan scan qrcode yang ada pada masing-masing kendaraan
-      </Text>
-      <View className="mt-10">
-        <View className="flex-row items-center justify-center gap-4 rounded-lg bg-white p-5">
+      {/* Selection cards */}
+      <View className="rounded-2xl bg-white p-4 shadow-sm">
+        <Text className="mb-1 text-base font-bold text-gray-800">Mulai Pencatatan</Text>
+        <Text className="mb-4 text-xs text-gray-400">
+          Pilih jenis penggunaan, lalu scan QR code kendaraan
+        </Text>
+        <View className="flex-row gap-3">
           <TouchableOpacity
-            className="flex-1 items-center justify-center gap-4 rounded-lg bg-blue-200 p-5 shadow"
-            onPress={() => onPress('daily')}>
-            <Image
-              style={{ width: 100, height: 100 }}
-              source={require('@asset/images/daily-use.png')}
-              contentFit="contain"
-              transition={500}
-            />
-            <Text adjustsFontSizeToFit numberOfLines={1} className="font-bold shadow-black">
-              Aktifitas Harian
-            </Text>
+            className="flex-1 items-center rounded-xl bg-blue-50 p-4"
+            onPress={() => onPress('daily')}
+            activeOpacity={0.8}>
+            <View className="mb-2 rounded-full bg-blue-100 p-3">
+              <Image
+                style={{ width: 56, height: 56 }}
+                source={require('@asset/images/daily-use.png')}
+                contentFit="contain"
+                transition={300}
+              />
+            </View>
+            <Text className="text-sm font-bold text-blue-700">Aktivitas Harian</Text>
+            <Text className="mt-0.5 text-[10px] text-blue-500">Scan untuk memulai</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-1 items-center justify-center gap-4 rounded-lg bg-amber-200 p-5 shadow"
-            onPress={() => onPress('service')}>
-            <Image
-              style={{ width: 100, height: 100 }}
-              source={require('@asset/images/maintenance.png')}
-              contentFit="contain"
-              transition={500}
-            />
-            <Text
-              adjustsFontSizeToFit
-              numberOfLines={1}
-              className="text-center font-bold shadow-black ">
-              Service Kendaraan
-            </Text>
+            className="flex-1 items-center rounded-xl bg-amber-50 p-4"
+            onPress={() => onPress('service')}
+            activeOpacity={0.8}>
+            <View className="mb-2 rounded-full bg-amber-100 p-3">
+              <Image
+                style={{ width: 56, height: 56 }}
+                source={require('@asset/images/maintenance.png')}
+                contentFit="contain"
+                transition={300}
+              />
+            </View>
+            <Text className="text-sm font-bold text-amber-700">Service Kendaraan</Text>
+            <Text className="mt-0.5 text-[10px] text-amber-500">Scan untuk memulai</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <View className="mt-5 gap-2 rounded-md bg-white p-4">
-        <View className="flex-row items-center gap-2">
-          <FontAwesome name="bar-chart" size={18} color="black" />
-          <Text>Kendaraan yang sering digunakan</Text>
+
+      {/* Chart */}
+      <View className="mt-3 rounded-2xl bg-white p-4 shadow-sm">
+        <View className="mb-3 flex-row items-center gap-2">
+          <View className="rounded-full bg-slate-100 p-1.5">
+            <MaterialCommunityIcons name="chart-bar" size={16} color={colors.brand} />
+          </View>
+          <View className="flex-1">
+            <Text className="text-sm font-bold text-gray-800">Kendaraan Sering Digunakan</Text>
+            <Text className="text-[10px] text-gray-400">Statistik pemakaian</Text>
+          </View>
         </View>
 
-        <View className="border-1 my-1 h-px bg-black dark:bg-gray-700"></View>
         {loading ? (
           <SkeletonList loop={2} />
+        ) : barData.length === 0 ? (
+          <View className="items-center py-8">
+            <Feather name="bar-chart-2" size={36} color="#cbd5e1" />
+            <Text className="mt-2 text-xs text-gray-400">Belum ada data</Text>
+          </View>
         ) : (
-          <BarChart
-            showYAxisIndices
-            noOfSections={5}
-            maxValue={100}
-            data={barData}
-            barWidth={40}
-            sideWidth={15}
-            barBorderRadius={4}
-            xAxisThickness={0}
-            spacing={40}
-            initialSpacing={10}
-          />
+          <View className="items-center">
+            <BarChart
+              showYAxisIndices
+              noOfSections={5}
+              maxValue={100}
+              data={barData}
+              barWidth={32}
+              sideWidth={12}
+              barBorderRadius={6}
+              xAxisThickness={0}
+              yAxisThickness={0}
+              spacing={28}
+              initialSpacing={10}
+              yAxisTextStyle={{ color: '#94a3b8', fontSize: 10 }}
+              xAxisLabelTextStyle={{ color: '#64748b', fontSize: 10 }}
+            />
+          </View>
         )}
       </View>
     </View>

@@ -1,19 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  Modal as RNModal,
-  View,
-  StyleSheet,
-  Animated,
-  TouchableWithoutFeedback,
-  Dimensions,
-  Text,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-} from 'react-native';
-
-import { AntDesign, Entypo } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { View, StyleSheet, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 
 interface ModalProps {
   visible: boolean;
@@ -21,64 +12,64 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-const ModalContext = React.createContext<{ onClose: () => void } | undefined>(undefined);
-
-const { height } = Dimensions.get('window');
-
+/**
+ * Drop-in modal menggunakan @gorhom/bottom-sheet BottomSheetModal.
+ *
+ * Render di dalam React tree (bukan native portal seperti RN Modal),
+ * sehingga tidak kehilangan navigation context.
+ *
+ * Butuh <BottomSheetModalProvider> di root layout (sudah ditambahkan).
+ */
 export function ModalRN({ visible, onClose, children }: ModalProps) {
-  const [show, setShow] = useState(visible);
-  const [isReady, setIsReady] = useState(false);
-  const opacity = useRef(new Animated.Value(0)).current;
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['70%', '90%'], []);
 
   useEffect(() => {
     if (visible) {
-      setShow(true);
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }).start(() => setIsReady(true));
+      bottomSheetRef.current?.present();
     } else {
-      setIsReady(false);
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => setShow(false));
+      bottomSheetRef.current?.dismiss();
     }
   }, [visible]);
 
-  if (!show) return null;
+  const handleDismiss = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.6} />
+    ),
+    []
+  );
 
   return (
-    <ModalContext.Provider value={{ onClose }}>
-      <RNModal transparent visible={true} animationType="none">
-        {/* <TouchableWithoutFeedback onPress={onClose}> */}
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-          <Animated.View style={[styles.overlay, { opacity }]}>
-            <TouchableWithoutFeedback>
-              <Animated.View pointerEvents={isReady ? 'auto' : 'none'} style={styles.container}>
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  contentContainerStyle={{ flexGrow: 1 }}>
-                  {isReady ? children : null}
-                </ScrollView>
-              </Animated.View>
-            </TouchableWithoutFeedback>
-          </Animated.View>
-        </KeyboardAvoidingView>
-
-        {/* </TouchableWithoutFeedback> */}
-      </RNModal>
-    </ModalContext.Provider>
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      onDismiss={handleDismiss}
+      backdropComponent={renderBackdrop}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustResize"
+      handleIndicatorStyle={{ backgroundColor: '#cbd5e1', width: 40 }}
+      backgroundStyle={{ borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+      <BottomSheetScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled">
+        {children}
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 }
 
 ModalRN.Header = function Header({ children }: { children: React.ReactNode }) {
-  return <View style={styles.header}>{children}</View>;
+  return (
+    <View style={styles.header}>
+      {children}
+    </View>
+  );
 };
 
 ModalRN.Content = function Content({ children }: { children: React.ReactNode }) {
@@ -90,36 +81,20 @@ ModalRN.Footer = function Footer({ children }: { children: React.ReactNode }) {
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    width: '95%',
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    overflow: 'hidden',
-  },
   header: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#f7f7f7',
-  },
-  content: {
-    paddingTop: 10,
-    paddingEnd: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
+    borderBottomColor: '#f1f5f9',
+    backgroundColor: '#f8fafc',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   footer: {
-    padding: 10,
+    padding: 12,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: '#f1f5f9',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#f8fafc',
   },
 });

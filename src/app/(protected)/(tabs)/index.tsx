@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallback, useState } from 'react';
 import { Link, router, useFocusEffect } from 'expo-router';
 import secureApi from '@/services/service';
@@ -7,12 +8,9 @@ import PageDaily from '@/components/sections/PageDaily';
 import PageHome from '@/components/sections/PageHome';
 import { Toast } from 'toastify-react-native';
 import HandleError from '@/utils/handleError';
-import Feather from '@expo/vector-icons/Feather';
-import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
-// import * as Location from 'expo-location';
-
-// const LOCATION_TASK_NAME = 'background-location-task';
+import { colors } from '@/constants/colors';
 
 type rawData = {
   id: number;
@@ -28,14 +26,13 @@ type rawData = {
 };
 
 export default function IndexScreen() {
+  const insets = useSafeAreaInsets();
   const setLoading = useLoadingStore((state) => state.setLoading);
-
   const [jenisAksi, setJenisAksi] = useState('');
-
-  const [barcodeScanner, SetBarcodeScanner] = useState(false);
-
+  const [barcodeScanner, setBarcodeScanner] = useState(false);
   const [rawData, setRawData] = useState<rawData>();
   const [rawDataService, setRawDataService] = useState<rawData[]>();
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -48,10 +45,8 @@ export default function IndexScreen() {
     setLoading(true);
     try {
       const response = await secureApi.get(`reservasi/aktif`);
-      // console.log('response', response);
       setRawData(response.data);
-    } catch (error: any) {
-      // console.log('response', error.response.data);
+    } catch {
       setRawData(undefined);
     } finally {
       setLoading(false);
@@ -59,57 +54,40 @@ export default function IndexScreen() {
   };
 
   const fetchDataAktif = async () => {
-    setLoading(true);
     try {
       const response = await secureApi.get(`service/aktif`);
-      // console.log('response', response);
       setRawDataService(response.data);
-    } catch (error: any) {
-      // console.log('response', error.response.data);
+    } catch {
       setRawDataService([]);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([fetchData(), fetchDataAktif()]);
+    setRefreshing(false);
   };
 
   const handleOpenModalBarcode = (e: string) => {
     setJenisAksi(e);
-    SetBarcodeScanner(true);
+    setBarcodeScanner(true);
   };
 
   const handleScan = async (data: string) => {
-    // console.log('Scanned data:', data);
     setLoading(true);
-    SetBarcodeScanner(false);
+    setBarcodeScanner(false);
     try {
-      const res = await secureApi.get(`reservasi/qrcode`, {
-        params: {
-          uniqued_id: data,
-        },
-      });
+      const res = await secureApi.get(`reservasi/qrcode`, { params: { uniqued_id: data } });
       if (res.status === true) {
-        // setUuid(data);
         if (jenisAksi == 'daily') {
-          router.push({
-            pathname: '/(protected)/detail',
-            params: { uuid: data },
-          });
+          router.push({ pathname: '/(protected)/detail', params: { uuid: data } });
         } else if (jenisAksi == 'service') {
-          router.push({
-            pathname: '/(protected)/service',
-            params: { uuid: data },
-          });
+          router.push({ pathname: '/(protected)/service', params: { uuid: data } });
         } else {
-          Toast.show({
-            type: 'error',
-            text1: 'Perhatian!!',
-            text2: 'QRCode salah atau tidak terdaftar pada system.',
-          });
+          Toast.show({ type: 'error', text1: 'Perhatian', text2: 'QRCode tidak valid' });
         }
       }
     } catch (error: any) {
-      // console.log('Error fetching data:', error);
-      // toast.info(error.response.data.message);
       HandleError(error);
     } finally {
       setLoading(false);
@@ -117,59 +95,74 @@ export default function IndexScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View className="flex-1 bg-slate-300">
-        <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
+    <View className="flex-1 bg-slate-200">
+      {/* Header */}
+      <View className="bg-brand px-4 pb-10" style={{ paddingTop: insets.top + 12 }}>
+        <View className="flex-row items-center justify-between">
+          <View>
+            <Text className="text-lg font-bold text-white">Dashboard</Text>
+            <Text className="text-xs text-white/60">Pencatatan Kendaraan Operasional</Text>
+          </View>
+          <TouchableOpacity
+            onPress={onRefresh}
+            className="rounded-full bg-white/15 p-2.5"
+            activeOpacity={0.7}>
+            <Feather name="refresh-cw" size={18} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-        <View className="px-4">
-          {(rawDataService?.length ?? 0) > 0 ? (
-            <Link href={'/(pemiliharaan)'} push asChild>
-              <TouchableOpacity className={`rounded-lg border bg-sky-500 p-2`}>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center gap-2">
-                    <Feather name="info" size={24} color="white" />
-                    <View>
-                      <Text className="text-white">Pemeliharaan sedang aktif</Text>
-                      {rawDataService?.length === 1 ? (
-                        <Text className="font-bold text-white">
-                          {rawDataService[0].kendaraan} {rawDataService[0].no_polisi}
-                        </Text>
-                      ) : (rawDataService?.length ?? 0) > 1 ? (
-                        <Text>...Total ada {rawDataService?.length} kendaraan</Text>
-                      ) : null}
-                    </View>
-                  </View>
-                  <FontAwesome6 name="square-arrow-up-right" size={24} color="white" />
+      <ScrollView
+        className="flex-1 -mt-4"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        {/* Active maintenance alert */}
+        {(rawDataService?.length ?? 0) > 0 && (
+          <Link href={'/(pemiliharaan)'} push asChild>
+            <TouchableOpacity
+              className="mx-4 mb-3 flex-row items-center justify-between rounded-2xl bg-sky-500 p-4"
+              activeOpacity={0.8}>
+              <View className="flex-1 flex-row items-center gap-3">
+                <View className="rounded-full bg-white/20 p-2">
+                  <MaterialCommunityIcons name="car-wrench" size={20} color="white" />
                 </View>
-              </TouchableOpacity>
-            </Link>
-          ) : null}
+                <View className="flex-1">
+                  <Text className="text-sm font-bold text-white">Pemeliharaan Aktif</Text>
+                  {rawDataService?.length === 1 ? (
+                    <Text className="text-xs text-white/80">
+                      {rawDataService[0].kendaraan} - {rawDataService[0].no_polisi}
+                    </Text>
+                  ) : (
+                    <Text className="text-xs text-white/80">
+                      {rawDataService?.length} kendaraan sedang dipelihara
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <Feather name="chevron-right" size={20} color="white" />
+            </TouchableOpacity>
+          </Link>
+        )}
 
+        {/* Main content */}
+        <View className="mx-4">
           {rawData ? (
             <PageDaily item={rawData} />
           ) : (
             <PageHome onPress={(e) => handleOpenModalBarcode(e)} />
           )}
         </View>
-      </View>
-      <View className="absolute bottom-1 right-1 z-10">
-        <TouchableOpacity
-          className="flex-row items-center gap-2 rounded-lg bg-brand px-2 py-1"
-          onPress={() => {
-            fetchDataAktif();
-            fetchData();
-          }}>
-          <Text className="text-white">Refresh</Text>
-          <FontAwesome name="refresh" size={14} color="white" />
-        </TouchableOpacity>
-      </View>
-      {barcodeScanner ? (
+      </ScrollView>
+
+      {/* Barcode Scanner */}
+      {barcodeScanner && (
         <BarcodeScannerCamera
           onScan={handleScan}
-          onVisible={() => SetBarcodeScanner(false)}
+          onVisible={() => setBarcodeScanner(false)}
           visible={barcodeScanner}
         />
-      ) : null}
+      )}
     </View>
   );
 }

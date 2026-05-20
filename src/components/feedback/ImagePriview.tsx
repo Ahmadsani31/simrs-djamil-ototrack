@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
-import { StyleSheet, View, Button, SafeAreaView, Image, TouchableHighlight, Text } from 'react-native';
+import { StyleSheet, View, Button, Image, TouchableHighlight, Text } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useDerivedValue,

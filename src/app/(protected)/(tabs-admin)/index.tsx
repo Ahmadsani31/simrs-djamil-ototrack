@@ -1,27 +1,19 @@
 import secureApi from '@/services/service';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  TextInput,
-  Text,
-  View,
-  Pressable,
-  TouchableOpacity,
-  RefreshControl,
-  FlatList,
-  SafeAreaView,
-} from 'react-native';
-import { AntDesign, Entypo, Fontisto, MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useCallback, useState } from 'react';
+import { Text, View, Pressable, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@expo/ui/datetimepicker';
 import { useDatePicker } from '@/hooks/useDatePicker';
 import dayjs from 'dayjs';
 import { colors } from '@/constants/colors';
 import SkeletonList from '@/components/feedback/SkeletonList';
-import { Link, router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { Toast } from 'toastify-react-native';
 
-const LIMIT = 5;
+const LIMIT = 10;
 
 const fetchData = async ({
   pageParam = 0,
@@ -30,36 +22,27 @@ const fetchData = async ({
   pageParam?: number;
   queryKey: (string | { date: string | undefined })[];
 }) => {
-  // queryKey is an array: [string, { date: Date | undefined }]
   const [_key, params] = queryKey;
-
-  // console.log(params);
-
-    const date = (params as { date?: string }).date;
-
+  const date = (params as { date?: string }).date;
   try {
     const response = await secureApi.get(`reservasi/list_admin`, {
-      params: {
-        limit: LIMIT,
-        offset: pageParam,
-        tanggal: date,
-      },
+      params: { limit: LIMIT, offset: pageParam, tanggal: date },
     });
     return {
       data: response.data,
       nextOffset: response.data.length < LIMIT ? null : pageParam + LIMIT,
     };
-  } catch (error) {
-    return {
-      data: [],
-      nextOffset: null,
-    };
+  } catch {
+    return { data: [], nextOffset: null };
   }
 };
 
 export default function IndexScreen() {
+  const insets = useSafeAreaInsets();
   const [date, setDate] = useState<Date>();
   const [dateInput, setDateInput] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [previewImg, setPreviewImg] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -75,175 +58,198 @@ export default function IndexScreen() {
       initialPageParam: 0,
     });
 
-  const showMode = (currentMode: 'date' | 'time' | 'datetime') => {
-    datePicker.openWithCallback(currentMode, (selectedDate) => {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      setDateInput(formattedDate);
-      setDate(selectedDate);
+  const datePicker = useDatePicker({ initialValue: date ?? new Date(), maximumDate: new Date() });
+
+  const showDatePicker = () => {
+    datePicker.openWithCallback('date', (selected) => {
+      setDateInput(selected.toISOString().split('T')[0]);
+      setDate(selected);
     });
   };
 
-  const datePicker = useDatePicker({ initialValue: date ?? new Date(), maximumDate: new Date() });
-
-  const handleResetTanggal = () => {
+  const clearDate = () => {
     setDateInput('');
+    setDate(undefined);
     refetch();
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [imgBase64, setImgBase64] = useState<Base64URLString>();
-
-  const handleModalImageShow = async (uri: any) => {
-    // console.log('show image modal');
-    setImgBase64(uri);
+  const showImage = (uri: string) => {
+    setPreviewImg(uri);
     setModalVisible(true);
   };
 
   const flatData = data?.pages.flatMap((page) => page.data) || [];
-  // console.log(flatData);
+
+  const renderItem = ({ item }: { item: any }) => {
+    const isActive = item.status === 'Dipakai';
+    return (
+      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+        {/* Status bar */}
+        <View
+          className={`flex-row items-center justify-between px-4 py-2.5 ${isActive ? 'bg-amber-100' : 'bg-emerald-100'}`}>
+          <View className="flex-row items-center gap-1.5">
+            <View
+              className={`h-2 w-2 rounded-full ${isActive ? 'bg-amber-500' : 'bg-emerald-500'}`}
+            />
+            <Text className="text-xs font-medium text-gray-600">
+              {dayjs(item.created_at).format('ddd, DD MMM YYYY')}
+            </Text>
+          </View>
+          {isActive && (
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: '/pengembalian_manual',
+                  params: { reservasi_id: item.id, user_id: item.user_id },
+                })
+              }
+              className="flex-row items-center gap-1 rounded-full bg-amber-500 px-3 py-1">
+              <Text className="text-xs font-bold text-white">Pengembalian</Text>
+              <Feather name="arrow-right" size={12} color="white" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Content */}
+        <View className="p-4">
+          {/* User + Vehicle */}
+          <View className="mb-3 flex-row items-start justify-between">
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
+                {item.nameUser}
+              </Text>
+              <Text className="mt-0.5 text-xs text-gray-400">{item.kegiatan}</Text>
+            </View>
+            <View className="items-end rounded-lg bg-slate-100 px-3 py-1.5">
+              <Text className="text-sm font-bold text-gray-800">{item.model}</Text>
+              <Text className="text-xs text-gray-500">{item.no_polisi}</Text>
+            </View>
+          </View>
+
+          {/* Timeline: Dipakai -> Dikembalikan */}
+          <View className="flex-row gap-2">
+            {/* Dipakai */}
+            <Pressable
+              onPress={() => item.spidometer_file_in && showImage(item.spidometer_file_in)}
+              className="flex-1 rounded-xl bg-blue-50 p-3">
+              <View className="mb-1 flex-row items-center gap-1">
+                <Feather name="log-in" size={12} color="#3b82f6" />
+                <Text className="text-xs font-semibold text-blue-600">Dipakai</Text>
+              </View>
+              <Text className="text-xs text-gray-600">
+                {item.reservasi_in ? dayjs(item.reservasi_in).format('DD/MM/YY HH:mm') : '-'}
+              </Text>
+              <Text className="mt-0.5 text-[11px] text-gray-400">{item.spidometer_in} Km</Text>
+            </Pressable>
+
+            {/* Arrow */}
+            <View className="items-center justify-center">
+              <Feather name="arrow-right" size={16} color="#cbd5e1" />
+            </View>
+
+            {/* Dikembalikan */}
+            <Pressable
+              onPress={() =>
+                item.reservasi_out
+                  ? showImage(item.spidometer_file_out)
+                  : Toast.info('Kendaraan masih dipakai', 'center')
+              }
+              className="flex-1 rounded-xl bg-amber-50 p-3">
+              <View className="mb-1 flex-row items-center gap-1">
+                <Feather name="log-out" size={12} color="#f59e0b" />
+                <Text className="text-xs font-semibold text-amber-600">Dikembalikan</Text>
+              </View>
+              <Text className="text-xs text-gray-600">
+                {item.reservasi_out ? dayjs(item.reservasi_out).format('DD/MM/YY HH:mm') : '-'}
+              </Text>
+              <Text className="mt-0.5 text-[11px] text-gray-400">
+                {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-slate-300">
-      <View className="absolute h-44 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
-      <View className="px-4">
-        <View className="mb-4 ">
-          <Text className="text-center text-white">
-            Berikut semua list pemakaian kendaraan Operasional RS Djamil
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <View className="flex-1 bg-slate-200">
+        {/* Header */}
+        <View className="bg-brand px-4 pb-14" style={{ paddingTop: insets.top + 3 * 4 }}>
+          <View className="flex-row items-center gap-2">
+            <MaterialCommunityIcons name="clipboard-list-outline" size={20} color="white" />
+            <Text className="text-lg font-bold text-white">Pemakaian Harian</Text>
+          </View>
+          <Text className="mt-0.5 text-sm text-white/60">
+            Semua pemakaian kendaraan operasional
           </Text>
         </View>
+
+        {/* Date filter (overlaps header) */}
+        <Pressable
+          onPress={showDatePicker}
+          className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
+          <Feather name="calendar" size={18} color="#94a3b8" />
+          <Text className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
+            {dateInput
+              ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
+              : 'Filter berdasarkan tanggal...'}
+          </Text>
+          {dateInput ? (
+            <TouchableOpacity onPress={clearDate} hitSlop={8}>
+              <Feather name="x-circle" size={18} color="#94a3b8" />
+            </TouchableOpacity>
+          ) : (
+            <Feather name="chevron-down" size={18} color="#94a3b8" />
+          )}
+        </Pressable>
+
+        {/* List */}
         <FlatList
           data={flatData}
           keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
           refreshControl={
             <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
           }
-          stickyHeaderIndices={[0]}
-          contentContainerStyle={{ paddingBottom: 80 }}
-          ListHeaderComponent={
-            <Pressable className="mb-2 rounded-lg bg-white p-2" onPress={() => showMode('date')}>
-              <Fontisto
-                className="absolute left-6 top-5 z-10"
-                name="date"
-                size={24}
-                color={'black'}
-              />
-              <TextInput
-                className="rounded-md border border-gray-300 bg-gray-100 py-4 ps-14"
-                placeholder="Select Date"
-                editable={false}
-                value={dateInput ? dayjs(dateInput).format('dddd ,DD MMMM YYYY') : ''}
-              />
-              {dateInput && (
-                <TouchableOpacity onPress={handleResetTanggal} className="absolute right-3 top-5">
-                  <Entypo name="circle-with-cross" size={28} color="black" />
-                </TouchableOpacity>
-              )}
-            </Pressable>
-          }
-          renderItem={({ item }) => (
-            <>
-              <View
-                className={`flex-row items-center ${item.status == 'Dipakai' ? ' bg-[#F2E5BF]' : 'bg-teal-300'} justify-between rounded-t-lg px-4`}>
-                <Text className={`p-2 text-black`}>
-                  {dayjs(item.created_at).format('dddd ,DD MMMM YYYY')}
-                </Text>
-                {item.status == 'Dipakai' ? (
-                  <TouchableOpacity
-                    onPress={() =>
-                      router.push({
-                        pathname: '/pengembalian_manual',
-                        params: {
-                          reservasi_id: item?.id,
-                          user_id: item?.user_id,
-                        },
-                      })
-                    }
-                    className={`my-2 rounded-md ${colors.primary}`}>
-                    <View className=" flex-row items-center justify-center px-2 py-1">
-                      <Text className="font-bold text-white">Pengembalian</Text>
-                      <MaterialCommunityIcons
-                        name="arrow-top-right-bold-box"
-                        size={24}
-                        color="black"
-                      />
-                    </View>
-                  </TouchableOpacity>
-                ) : null}
-              </View>
-              <View className="mb-2 gap-2 rounded-b-lg bg-white p-4 shadow">
-                <View className="flex-row items-center justify-between gap-2">
-                  <Text className={`text-center text-xl font-bold text-black`}>
-                    {item.nameUser}
-                  </Text>
-                  <View>
-                    <Text className={`text-wrap text-lg font-bold text-black`}>{item.model}</Text>
-                    <Text className="text-secondary text-sm">{item.no_polisi}</Text>
-                  </View>
-                </View>
-                <View className="rounded-md bg-slate-100 p-3">
-                  <Text className="text-center font-medium">{item.kegiatan}</Text>
-                </View>
-                <View className="border-1 my-1 h-px bg-gray-200 dark:bg-gray-700"></View>
-
-                <View className="flex-row items-center justify-between">
-                  <Pressable onPress={() => handleModalImageShow(item.spidometer_file_in)}>
-                    <View className="w-48 items-center rounded-md bg-blue-200 p-2">
-                      <Text className={`text-lg font-bold`}>Dipakai</Text>
-                      <Text className="text-secondary text-center font-medium">
-                        {item.reservasi_in
-                          ? dayjs(item.reservasi_in).format('dddd ,DD MMMM YYYY | HH:mm')
-                          : ''}
-                      </Text>
-                      <Text className="text-secondary text-sm ">{item.spidometer_in} Km</Text>
-                    </View>
-                  </Pressable>
-                  <Pressable
-                    onPress={() =>
-                      item.reservasi_out
-                        ? handleModalImageShow(item.spidometer_file_out)
-                        : Toast.info(
-                            'Image tidak tersedia, kereana kendaraan masih terpakai',
-                            'center'
-                          )
-                    }>
-                    <View className="w-48 items-center rounded-md bg-amber-200 p-2">
-                      <Text className={`text-lg font-bold `}>Dikembalikan</Text>
-                      <Text className="text-secondary text-center font-medium">
-                        {item.reservasi_out
-                          ? dayjs(item.reservasi_out).format('dddd ,DD MMMM YYYY | HH:mm')
-                          : '-'}
-                      </Text>
-                      <Text className="text-secondary text-sm">
-                        {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
-                      </Text>
-                    </View>
-                  </Pressable>
-                </View>
-              </View>
-            </>
-          )}
+          contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
+          showsVerticalScrollIndicator={false}
           onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) {
-              fetchNextPage();
-            }
+            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.5}
           ListEmptyComponent={
-            <View className="flex-1 items-center justify-center rounded-lg bg-white p-5">
-              <Text>Belum ada pemakaian kendaraan</Text>
-            </View>
+            isLoading ? null : (
+              <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
+                <MaterialCommunityIcons name="car-off" size={48} color="#cbd5e1" />
+                <Text className="mt-3 text-center text-gray-400">
+                  Belum ada pemakaian kendaraan
+                </Text>
+              </View>
+            )
           }
-          ListFooterComponent={isLoading || isFetchingNextPage ? <SkeletonList loop={5} /> : null}
+          ListFooterComponent={
+            isLoading || isFetchingNextPage ? (
+              <View className="mx-4">
+                <SkeletonList loop={3} />
+              </View>
+            ) : null
+          }
         />
       </View>
+
+      {/* Image Preview Modal */}
       {modalVisible && (
         <ModalPreviewImage
-          title="Gambar Pemeliharaan"
+          title="Foto Spidometer"
           visible={modalVisible}
-          imgUrl={imgBase64 || ''}
+          imgUrl={previewImg}
           onPress={() => setModalVisible(false)}
         />
       )}
+
+      {/* Date Picker Dialog */}
       {datePicker.visible && (
         <DateTimePicker
           value={datePicker.value}

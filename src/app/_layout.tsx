@@ -155,7 +155,7 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="inverted" animated={true} />
+          <StatusBar style="auto" />
           <Stack
             screenOptions={{
               headerShown: false,

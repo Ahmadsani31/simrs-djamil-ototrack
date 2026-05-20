@@ -1,15 +1,23 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import {
+  Linking,
+  Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 
 import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
 import PageDaily from '@/components/sections/PageDaily';
 import PageHome from '@/components/sections/PageHome';
+import { useTrackingHealth } from '@/hooks/useTrackingHealth';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
 
 type rawData = {
@@ -27,7 +35,7 @@ type rawData = {
 
 export default function IndexScreen() {
   const insets = useSafeAreaInsets();
-  const setLoading = useLoadingStore((state) => state.setLoading);
+  const trackingHealth = useTrackingHealth();
   const [jenisAksi, setJenisAksi] = useState('');
   const [barcodeScanner, setBarcodeScanner] = useState(false);
   const [rawData, setRawData] = useState<rawData>();
@@ -42,14 +50,11 @@ export default function IndexScreen() {
   );
 
   const fetchData = async () => {
-    setLoading(true);
     try {
       const response = await secureApi.get(`reservasi/aktif`);
       setRawData(response.data);
     } catch {
       setRawData(undefined);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -74,7 +79,6 @@ export default function IndexScreen() {
   };
 
   const handleScan = async (data: string) => {
-    setLoading(true);
     setBarcodeScanner(false);
     try {
       const res = await secureApi.get(`reservasi/qrcode`, { params: { uniqued_id: data } });
@@ -89,8 +93,14 @@ export default function IndexScreen() {
       }
     } catch (error: unknown) {
       HandleError(error);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const openLocationSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
     }
   };
 
@@ -117,6 +127,25 @@ export default function IndexScreen() {
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        {/* Tracking permission warning */}
+        {trackingHealth.needsAttention ? (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={openLocationSettings}
+            className="mx-4 mb-3 flex-row items-center gap-3 rounded-2xl bg-red-500 p-4">
+            <View className="rounded-full bg-white/20 p-2">
+              <MaterialCommunityIcons name="map-marker-off" size={20} color="white" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-bold text-white">Tracking Terhenti</Text>
+              <Text className="text-xs text-white/80">
+                Izin lokasi dicabut. Ketuk untuk mengaktifkan kembali di pengaturan.
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="white" />
+          </TouchableOpacity>
+        ) : null}
+
         {/* Active maintenance alert */}
         {(rawDataService?.length ?? 0) > 0 && (
           <Link href="/(pemiliharaan)" push asChild>

@@ -24,7 +24,6 @@ import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
 
 type propsService = {
@@ -58,7 +57,6 @@ const fetchData = async (service_id: string) => {
 
 export default function PengembalianServiceScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [cameraVisible, setCameraVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -84,8 +82,6 @@ export default function PengembalianServiceScreen() {
       });
       return;
     }
-
-    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());
@@ -105,7 +101,6 @@ export default function PengembalianServiceScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

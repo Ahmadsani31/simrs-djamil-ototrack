@@ -25,7 +25,6 @@ import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
@@ -51,7 +50,6 @@ const fetchData = async (uuid: string) => {
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [cameraVisible, setCameraVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -88,8 +86,6 @@ export default function DetailScreen() {
       });
       return;
     }
-
-    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());
@@ -110,7 +106,6 @@ export default function DetailScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

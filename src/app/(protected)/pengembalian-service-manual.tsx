@@ -23,7 +23,6 @@ import InputFile from '@/components/forms/InputFile';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
 
 type propsService = {
@@ -54,7 +53,6 @@ const fetchData = async (service_id: string, kendaraan_id: string) => {
 
 export default function PengembalianServiceManualScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const { data, isLoading, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
@@ -77,8 +75,6 @@ export default function PengembalianServiceManualScreen() {
       });
       return;
     }
-
-    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());
@@ -99,7 +95,6 @@ export default function PengembalianServiceManualScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

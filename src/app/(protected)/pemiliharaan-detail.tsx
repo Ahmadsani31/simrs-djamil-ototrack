@@ -25,7 +25,6 @@ import InputArea from '@/components/forms/InputArea';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 
@@ -62,7 +61,6 @@ const JENIS_KERUSAKAN = [
 
 export default function PemiliharaanDetailScreen() {
   const { uuid } = useLocalSearchParams();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [pickerVisible, setPickerVisible] = useState(false);
 
@@ -104,8 +102,6 @@ export default function PemiliharaanDetailScreen() {
       });
       return;
     }
-
-    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());
@@ -121,7 +117,6 @@ export default function PemiliharaanDetailScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

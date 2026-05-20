@@ -14,28 +14,27 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (!data) return;
 
   const { locations } = data as { locations: LocationObject[] };
-  const latest = locations[0];
-  if (!latest) return;
+  if (!locations?.length) return;
 
-  const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } =
-    latest.coords;
-  // Convert speed from m/s to km/h
-  const kmh = speed ? (speed * 3.6).toFixed(1) : '0.0';
+  // OS sometimes batches updates while the app is backgrounded/dozing.
+  // Persist *every* location in the batch so we don't lose route detail.
+  for (const loc of locations) {
+    const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } =
+      loc.coords;
+    // Convert speed from m/s to km/h. Native value can be -1 / null when unknown.
+    const kmh = speed && speed > 0 ? (speed * 3.6).toFixed(1) : '0.0';
 
-  const saveCoords = {
-    latitude,
-    longitude,
-    accuracy,
-    altitude,
-    altitudeAccuracy,
-    heading,
-    speed: kmh,
-    timestamp: Date.now(),
-  };
-
-  // Akses Zustand store secara manual (di luar React tree).
-  useLocationStore.getState().addToBatchCoordinate(saveCoords);
-  useLocationStore.getState().addToCoordinate(saveCoords);
+    useLocationStore.getState().addToBatchCoordinate({
+      latitude,
+      longitude,
+      accuracy,
+      altitude,
+      altitudeAccuracy,
+      heading,
+      speed: kmh,
+      timestamp: loc.timestamp ?? Date.now(),
+    });
+  }
 });
 
 export default LOCATION_TASK_NAME;

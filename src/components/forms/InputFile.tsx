@@ -1,12 +1,11 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Text, View, TouchableOpacity } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
-import { useLoadingStore } from '@/stores/loadingStore';
 import { logger } from '@/utils/logger';
 
 interface InputProps {
@@ -17,27 +16,21 @@ interface InputProps {
 }
 
 export default function InputFile({ label, onChangeFile, placeholder, error }: InputProps) {
-  const setLoading = useLoadingStore((state) => state.setLoading);
-
   const [fileName, setFileName] = useState<string | null>('');
+  const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      // allowsEditing: true,
-      // aspect: [3, 4],
       quality: 1,
     });
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
       setFileName(result.assets[0].fileName ?? '');
-      // onChangeFile(result.assets[0].uri);
 
       try {
         setLoading(true);
-        // 2. Mengompres gambar yang dipilih
         logger.log('Mulai kompresi...');
         const context = ImageManipulator.manipulate(imageUri);
         context.resize({ width: 1600 });
@@ -52,13 +45,13 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
         logger.log('Compressed size (bytes):', compressedSize);
 
         onChangeFile(compressedImage?.uri);
-      } catch (error) {
-        logger.error('Proses gagal:', error);
+      } catch (err) {
+        logger.error('Proses gagal:', err);
         Toast.show({
           position: 'center',
           type: 'error',
           text1: 'Perhatian!',
-          text2: 'Terjadi kesalahan saat memproses gambar, Silahkan ambil ulang',
+          text2: 'Terjadi kesalahan saat memproses gambar, silahkan ambil ulang',
           backgroundColor: '#000',
           textColor: '#fff',
           visibilityTime: 5000,
@@ -71,14 +64,34 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 font-bold text-gray-700">{label}</Text>
+      {label ? <Text className="mb-1 text-sm font-semibold text-gray-700">{label}</Text> : null}
       <TouchableOpacity
-        className={`flex-row items-center gap-2 rounded-lg border ${error ? 'border-red-500' : 'border-gray-500'} bg-slate-200 p-3`}
-        onPress={pickImage}>
-        <MaterialCommunityIcons name="file" size={20} />
-        <Text className="font-bold">{fileName ? fileName : placeholder}</Text>
+        activeOpacity={0.7}
+        disabled={loading}
+        onPress={pickImage}
+        className={`flex-row items-center gap-2 rounded-xl border bg-slate-200 p-3 ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}>
+        {loading ? (
+          <>
+            <ActivityIndicator size="small" color="#205781" />
+            <Text className="font-medium text-gray-600">Memproses gambar...</Text>
+          </>
+        ) : (
+          <>
+            <MaterialCommunityIcons
+              name={fileName ? 'file-check-outline' : 'file-upload-outline'}
+              size={20}
+              color={fileName ? '#10b981' : '#64748b'}
+            />
+            <Text className="flex-1 font-medium text-gray-700" numberOfLines={1}>
+              {fileName ? fileName : placeholder}
+            </Text>
+            {fileName ? <Feather name="check-circle" size={14} color="#10b981" /> : null}
+          </>
+        )}
       </TouchableOpacity>
-      {error && <Text className="mt-1 text-xs text-red-500">{error}</Text>}
+      {error ? <Text className="mt-1 text-xs text-red-500">{error}</Text> : null}
     </View>
   );
 }

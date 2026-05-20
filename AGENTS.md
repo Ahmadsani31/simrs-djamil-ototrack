@@ -71,7 +71,11 @@ Repo-specific notes for OpenCode. The README is a leftover starter-template desc
 
 - Task name `background-location-task` is exported as `LOCATION_TASK_NAME` from `src/utils/backgroundLocationTask.ts`. Import it from there; do not duplicate the literal.
 - The TaskManager task is defined at module top-level in `utils/backgroundLocationTask.ts`. It must be imported before any `Location.startLocationUpdatesAsync` call, which is why `_layout.tsx` imports it for side effects.
-- `useLocationStore` persists `coords` to AsyncStorage under key `tracking-data` (zustand `persist` middleware). `partialize` only emits `{ coords }`; actions are restored from the store initializer on rehydrate.
+- `useLocationStore` persists `coords` to AsyncStorage under key `tracking-data` (zustand `persist` middleware). `partialize` only emits `{ coords }`; actions are restored from the store initializer on rehydrate. There is no `coord` (single) field — only the array.
+- Background task loops over **every** entry in `locations[]` (OS batches updates while dozing). Don't change to `locations[0]` only — coords will be lost.
+- Sampling tuned for vehicle tracking + battery: `Accuracy.High`, `timeInterval: 5000` (5s), `distanceInterval: 10` (10m). Don't crank to `Accuracy.Highest` + 1s — drains battery and floods AsyncStorage.
+- `useTrackingHealth` (`src/hooks/useTrackingHealth.ts`) probes task status + permission state on screen focus. Driver home tab uses it to show a "Tracking Terhenti" banner if user revokes location permission mid-trip.
+- Trip flow: `detail.tsx` calls `clearCoordinates()` + `stopTracking()` before `startTracking()` on a new pemakaian; `pengembalian.tsx` reads coords via `getStoredCoords()` (lib/secureStorage), POSTs them, then `clearCoordinates()` + `stopTracking()`.
 
 ## Components layout
 

@@ -17,7 +17,6 @@ import PageServiceListImage from '@/components/sections/PageServiceListImage';
 import { colors } from '@/constants/colors';
 import secureApi from '@/services/service';
 import { reLocation } from '@/hooks/locationRequired';
-import { useLoadingStore } from '@/stores/loadingStore';
 import HandleError from '@/utils/handleError';
 
 type rawData = {
@@ -52,9 +51,9 @@ const fetchDataLog = async (service_id: number) => {
 
 export default function PemiliharaanNestedScreen() {
   const insets = useSafeAreaInsets();
-  const setLoading = useLoadingStore((state) => state.setLoading);
   const { service_id } = useLocalSearchParams();
 
+  const [loadingPage, setLoadingPage] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [dialogCamera, setDialogCamera] = useState(false);
@@ -66,7 +65,7 @@ export default function PemiliharaanNestedScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setLoadingPage(true);
       try {
         const response = await secureApi.get(`/service/data_aktif`, {
           params: {
@@ -78,7 +77,7 @@ export default function PemiliharaanNestedScreen() {
       } catch {
         // ignore — error sudah di-handle global lewat secureApi interceptor
       } finally {
-        setLoading(false);
+        setLoadingPage(false);
       }
     };
     fetchData();

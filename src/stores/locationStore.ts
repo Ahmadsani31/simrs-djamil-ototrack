@@ -1,4 +1,3 @@
-// store/locationStore.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -16,24 +15,27 @@ type Coordinate = {
 
 type LocationState = {
   coords: Coordinate[];
-  coord: Coordinate | null;
   addToBatchCoordinate: (coord: Coordinate) => void;
-  addToCoordinate: (coord: Coordinate) => void;
   clearCoordinates: () => void;
 };
 
+/**
+ * Persisted store of GPS coordinates collected while a vehicle trip is active.
+ *
+ * Coordinates are produced by the background TaskManager
+ * (see `utils/backgroundLocationTask.ts`) and consumed at the end of a trip
+ * via `getStoredCoords()` in `lib/secureStorage.ts`, which reads the AsyncStorage
+ * key `tracking-data` directly. The store value here is the same data, just
+ * surfaced for components that want a live React-aware view.
+ */
 export const useLocationStore = create<LocationState>()(
   persist(
     (set) => ({
       coords: [],
-      coord: null,
       addToBatchCoordinate: (coord) => {
         set((state) => ({
           coords: [...state.coords, coord],
         }));
-      },
-      addToCoordinate: (coordinate) => {
-        set({ coord: coordinate });
       },
       clearCoordinates: () =>
         set(() => ({
@@ -41,10 +43,10 @@ export const useLocationStore = create<LocationState>()(
         })),
     }),
     {
-      name: 'tracking-data', // Key di AsyncStorage
+      name: 'tracking-data',
       storage: createJSONStorage(() => AsyncStorage),
-      // Hanya `coords` yang dipersist. Action functions otomatis
-      // dipertahankan dari initializer saat rehydrate.
+      // Only persist the array. Action functions are restored from the
+      // initializer on rehydrate (Zustand handles this automatically).
       partialize: (state) => ({ coords: state.coords }),
     }
   )

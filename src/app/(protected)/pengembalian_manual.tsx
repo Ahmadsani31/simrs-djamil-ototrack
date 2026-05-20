@@ -21,7 +21,6 @@ import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 
@@ -51,7 +50,6 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
@@ -65,7 +63,6 @@ export default function PengembalianManualScreen() {
   }
 
   const handlePengembalian = async (values: FormValues) => {
-    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('id', reservasi_id.toString());
@@ -84,7 +81,6 @@ export default function PengembalianManualScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

@@ -25,7 +25,6 @@ import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
 import { getStoredCoords } from '@/lib/secureStorage';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
@@ -53,7 +52,6 @@ const fetchData = async (reservasi_id: string) => {
 export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
-  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [cameraVisible, setCameraVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -80,8 +78,6 @@ export default function PengembalianScreen() {
       });
       return;
     }
-
-    setLoading(true);
     try {
       const asyncCoords = await getStoredCoords();
 
@@ -105,7 +101,6 @@ export default function PengembalianScreen() {
     } catch (error: unknown) {
       HandleError(error);
     } finally {
-      setLoading(false);
     }
   };
 

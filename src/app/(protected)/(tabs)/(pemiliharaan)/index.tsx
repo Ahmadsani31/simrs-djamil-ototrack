@@ -16,7 +16,6 @@ import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import ListDetailServiceSheet from '@/components/sections/ListDetailServiceSheet';
 import { useDatePicker } from '@/hooks/useDatePicker';
 import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
 
 type rawData = {
   id: number;
@@ -57,7 +56,6 @@ const fetchData = async ({
 
 export default function IndexScreen() {
   const insets = useSafeAreaInsets();
-  const setLoading = useLoadingStore((state) => state.setLoading);
   const [activeServices, setActiveServices] = useState<rawData[]>();
 
   useFocusEffect(
@@ -68,14 +66,11 @@ export default function IndexScreen() {
   );
 
   const fetchActiveServices = async () => {
-    setLoading(true);
     try {
       const response = await secureApi.get(`service/aktif`);
       setActiveServices(response.data);
     } catch {
       setActiveServices(undefined);
-    } finally {
-      setLoading(false);
     }
   };
 

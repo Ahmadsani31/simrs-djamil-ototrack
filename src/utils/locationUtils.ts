@@ -1,40 +1,45 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+import { Alert } from 'react-native';
 
 import { colors } from '@/constants/colors';
-import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import { LOCATION_TASK_NAME } from '@/utils/backgroundLocationTask';
 
 export async function startTracking() {
   const { status } = await Location.requestForegroundPermissionsAsync();
   const bgStatus = await Location.requestBackgroundPermissionsAsync();
   if (status !== 'granted' || bgStatus.status !== 'granted') {
-    alert('Location permission not granted');
+    Alert.alert(
+      'Izin lokasi diperlukan',
+      'Aplikasi membutuhkan akses lokasi (foreground & background) untuk merekam rute pemakaian kendaraan. Aktifkan izin di pengaturan.'
+    );
     return;
   }
 
   const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
   if (!isRunning) {
-    //location akan di ambil setiap 30 detik dan jarak 10 meter
+    /**
+     * Sampling rate balance: cukup detail untuk merekam rute kendaraan
+     * tapi hemat baterai. 5 detik / 10 meter cukup untuk kecepatan kendaraan
+     * normal di kota; jika kendaraan diam, distanceInterval mencegah kirim
+     * koordinat duplikat.
+     *
+     * `Location.Accuracy.High` (~10m) cukup baik dan jauh lebih hemat dari
+     * `Highest` yang memaksa GPS full power.
+     */
     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-      accuracy: Location.Accuracy.Highest, // ubah ke akurasi tertinggi
-      timeInterval: 1000, // update setiap 1 detik
-      distanceInterval: 0, // update sekecil apapun gerakan
-      deferredUpdatesDistance: 0, // kirim langsung, jangan tunggu
-      deferredUpdatesTimeout: 1000, // maksimum delay 1 detik
-      pausesUpdatesAutomatically: false, // terus update walau idle
+      accuracy: Location.Accuracy.High,
+      timeInterval: 5000,
+      distanceInterval: 10,
+      pausesUpdatesAutomatically: false,
       showsBackgroundLocationIndicator: true,
       foregroundService: {
         notificationTitle: 'Oto RS-Djamil',
         notificationBody: 'Aplikasi sedang memantau lokasi Anda dalam pemakaian kendaraan',
         notificationColor: colors.brand,
-        killServiceOnDestroy: false, // jangan matikan service saat aplikasi ditutup
-
-        // Optional: Add a custom icon for the notification
-        // notificationIcon: 'path/to/your/icon.png',
+        killServiceOnDestroy: false,
       },
     });
-    statusTrackingStore.getState().setTrackingStatus(true);
   }
 }
 
@@ -43,7 +48,6 @@ export async function stopTracking() {
   if (isRunning) {
     await AsyncStorage.removeItem('tracking-data');
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-    statusTrackingStore.getState().setTrackingStatus(false);
   }
 }
 

@@ -46,7 +46,7 @@ const fetchData = async (reservasi_id: string) => {
 export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
-  const { data, isLoading, error, refetch, isError } = useQuery<dataDetail>({
+  const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
   });

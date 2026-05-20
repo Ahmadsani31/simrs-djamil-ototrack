@@ -16,18 +16,11 @@ import ButtonCostum from '@/components/forms/ButtonCostum';
 
 const { width } = Dimensions.get('window');
 const CAMERA_RATIO = 4 / 3;
-const CAMERA_HEIGHT = width * CAMERA_RATIO;
 
 interface InputProps {
   visible: boolean;
   onClose: () => void;
   setUriImage: (text: string | null) => void;
-}
-
-interface LocationData {
-  latitude: number;
-  longitude: number;
-  address: string;
 }
 
 export default function ModalCamera({ visible, onClose, setUriImage }: InputProps) {

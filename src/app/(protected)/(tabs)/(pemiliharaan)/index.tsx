@@ -40,7 +40,7 @@ const fetchData = async ({
   pageParam?: number;
   queryKey: (string | { date: string | undefined })[];
 }) => {
-  const [_key, params] = queryKey;
+  const [, params] = queryKey;
   const date = (params as { date?: string }).date;
   try {
     const response = await secureApi.get(`service/list`, {

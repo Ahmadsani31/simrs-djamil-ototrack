@@ -61,7 +61,7 @@ export default function PengembalianServiceScreen() {
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
-  const { data, isLoading, error, isError } = useQuery<propsService>({
+  const { data, isLoading, isError } = useQuery<propsService>({
     queryKey: ['pengembalian', service_id],
     queryFn: () => fetchData(service_id.toString()),
   });

@@ -15,7 +15,7 @@ import { Toast } from 'toastify-react-native';
 
 import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
 
@@ -47,10 +47,9 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
     onScan(data);
   };
 
-  const [isReady, setIsReady] = useState(false);
-
   const handleReady = useCallback(() => {
-    setIsReady(true);
+    // Camera ready event — wired to CameraView's onCameraReady prop.
+    // No state needed since UI doesn't react to ready state.
   }, []);
 
   const handleMountError = useCallback((e: { message?: string }) => {
@@ -62,8 +61,6 @@ export default function BarcodeScanner({ onScan }: { onScan: (data: string) => v
       backgroundColor: '#000',
       textColor: '#fff',
     });
-    setIsReady(false);
-    // (opsional) kirim log ke error tracker di sini
   }, []);
 
   const openAppSettings = () => {

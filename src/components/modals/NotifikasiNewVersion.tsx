@@ -3,7 +3,7 @@ import Foundation from '@expo/vector-icons/Foundation';
 import axios from 'axios';
 import * as Application from 'expo-application';
 import React, { useEffect, useState } from 'react';
-import { Linking, Modal, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Linking, Modal, Text, TouchableHighlight, View } from 'react-native';
 import semver from 'semver';
 
 import { URL_PLAY_STORE, API_URL } from '@/utils/constants';
@@ -69,4 +69,4 @@ export default function NotifikasiNewVersion() {
   );
 }
 
-const styles = StyleSheet.create({});
+

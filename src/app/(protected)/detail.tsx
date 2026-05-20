@@ -58,7 +58,7 @@ export default function DetailScreen() {
     await stopTracking();
   };
 
-  const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
+  const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
     queryFn: () => fetchData(uuid.toString()),
   });

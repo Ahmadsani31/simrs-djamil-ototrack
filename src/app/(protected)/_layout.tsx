@@ -5,10 +5,8 @@ import { router, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { Alert, BackHandler, Image, Text, TouchableOpacity, View } from 'react-native';
 
-import LoadingIndikator from '@/components/feedback/LoadingIndikator';
 import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { colors } from '@/constants/colors';
-import { useLoadingStore } from '@/stores/loadingStore';
 
 const BrandHeaderLeft = () => (
   <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
@@ -49,8 +47,6 @@ const brandHeaderBackLeft = (onBack: () => void): NativeStackNavigationOptions =
 });
 
 export default function ProtectedLayout() {
-  const loading = useLoadingStore((state) => state.loading);
-
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => backHandler.remove();
@@ -79,7 +75,6 @@ export default function ProtectedLayout() {
   return (
     <PrivateRoute>
       <BottomSheetModalProvider>
-        {/* {loading && <LoadingIndikator />} */}
         <Stack
           screenOptions={{
             headerTitleAlign: 'center',

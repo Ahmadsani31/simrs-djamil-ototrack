@@ -44,7 +44,7 @@ export default function ServiceScreen() {
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
+  const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
     queryFn: () => fetchData(uuid.toString()),
   });
@@ -93,9 +93,8 @@ export default function ServiceScreen() {
     formData.append('kendaraan_id', data?.id || '');
 
     try {
-      const response = await secureApi.postForm('/service/store', formData);
+      await secureApi.postForm('/service/store', formData);
 
-      // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       router.dismissTo('/(protected)/(tabs)/(pemiliharaan)');
     } catch (error: unknown) {
       HandleError(error);

@@ -33,10 +33,6 @@ function AccordionItem({ isExpanded, children, viewKey, style, duration = 500 }:
   );
 }
 
-function Item() {
-  return <View style={styles.box} />;
-}
-
 export default function ImagePriview({ uriImage, index }: any) {
   const open = useSharedValue(false);
   const [nameIcon, setNameIcon] = useState(true);

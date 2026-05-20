@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik, FormikValues } from 'formik';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   BackHandler,
@@ -44,7 +44,7 @@ export default function PemiliharaanDetailScreen() {
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
-  const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
+  const { data, isLoading, isError } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
     queryFn: () => fetchData(uuid.toString()),
   });
@@ -93,9 +93,8 @@ export default function PemiliharaanDetailScreen() {
     formData.append('kendaraan_id', data?.id || '');
 
     try {
-      const response = await secureApi.postForm('/service/store', formData);
+      await secureApi.postForm('/service/store', formData);
 
-      // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
       router.dismissTo('/(protected)/(tabs)/pemiliharaan');
     } catch (error: unknown) {
       HandleError(error);

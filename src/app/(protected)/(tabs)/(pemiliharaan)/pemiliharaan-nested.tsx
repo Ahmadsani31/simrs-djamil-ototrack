@@ -37,15 +37,6 @@ type propsUseQuery = {
   file_image: string;
 };
 
-type propsService = {
-  id: string;
-  name: string;
-  no_polisi: string;
-  keterangan: string;
-  jenis_kerusakan: string;
-  lokasi: string;
-};
-
 const fetchDataLog = async (service_id: number) => {
   try {
     const response = await secureApi.get(`/service/list_images`, {
@@ -54,7 +45,7 @@ const fetchDataLog = async (service_id: number) => {
       },
     });
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 };
@@ -72,7 +63,6 @@ export default function PemiliharaanNestedScreen() {
   const [row, setRow] = useState<rawData>();
   const [previewImage, setPreviewImage] = useState(false);
   const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
-  const [pageError, setPageError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,8 +75,8 @@ export default function PemiliharaanNestedScreen() {
         });
 
         setRow(response.data);
-      } catch (error) {
-        setPageError(true);
+      } catch {
+        // ignore — error sudah di-handle global lewat secureApi interceptor
       } finally {
         setLoading(false);
       }
@@ -167,8 +157,6 @@ export default function PemiliharaanNestedScreen() {
   const {
     data: fetch_service,
     isLoading,
-    isError,
-    error,
     refetch,
   } = useQuery<propsUseQuery[]>({
     queryKey: ['fetch_service', row?.id],

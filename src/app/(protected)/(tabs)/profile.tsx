@@ -7,14 +7,13 @@ import {
 } from '@expo/vector-icons';
 import {
   BottomSheetModal,
-  BottomSheetBackdrop,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { useFormik } from 'formik';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -76,7 +75,6 @@ export default function Profile() {
 
   // Bottom sheet for password change
   const sheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['60%'], []);
 
   const openSheet = useCallback(() => {
     sheetRef.current?.present();
@@ -85,19 +83,6 @@ export default function Profile() {
   const closeSheet = useCallback(() => {
     sheetRef.current?.dismiss();
   }, []);
-
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        opacity={0.6}
-        pressBehavior="close"
-      />
-    ),
-    []
-  );
 
   const formik = useFormik({
     initialValues: { password: '', password_confirmation: '' },
@@ -132,11 +117,6 @@ export default function Profile() {
       }
     },
   });
-
-  const handleSheetDismiss = useCallback(() => {
-    formik.resetForm();
-    setShowPassword(false);
-  }, [formik]);
 
   const handleLogout = () => {
     Alert.alert('Konfirmasi', 'Apakah Anda yakin ingin keluar?', [

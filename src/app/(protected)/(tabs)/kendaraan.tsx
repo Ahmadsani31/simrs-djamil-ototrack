@@ -54,7 +54,7 @@ export default function KendaraanScreen() {
     return { bg: 'bg-amber-100', text: 'text-amber-700' };
   };
 
-  const renderItem = ({ item }: { item: Kendaraan }) => {
+  const renderItem = useCallback(({ item }: { item: Kendaraan }) => {
     const badge = kondisiBadge(item.kondisi);
     return (
       <View className="mx-4 mb-3 flex-row items-center rounded-2xl bg-white p-3 shadow-sm">
@@ -79,7 +79,7 @@ export default function KendaraanScreen() {
         </View>
       </View>
     );
-  };
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -122,6 +122,10 @@ export default function KendaraanScreen() {
           }
           contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
           showsVerticalScrollIndicator={false}
+          removeClippedSubviews
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={11}
           ListEmptyComponent={
             isLoading ? (
               <View className="mx-4">

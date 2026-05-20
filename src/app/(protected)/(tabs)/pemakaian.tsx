@@ -82,92 +82,95 @@ export default function PemakaianScreen() {
     refetch();
   };
 
-  const showImage = (uri: string) => {
+  const showImage = useCallback((uri: string) => {
     setPreviewImg(uri);
     setModalVisible(true);
-  };
+  }, []);
 
-  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
+  const flatData = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
-      {/* Header bar */}
-      <View className="flex-row items-center justify-between bg-brand px-4 py-2.5">
-        <Text className="text-xs font-medium text-white">
-          {dayjs(item.created_at).format('ddd, DD MMM YYYY')}
-        </Text>
-        {item.bbm && (
-          <TouchableOpacity
-            onPress={() => handleSnapPressDetail(item.id)}
-            className="flex-row items-center gap-1 rounded-full bg-gray-700 px-3 py-1">
-            <MaterialCommunityIcons name="gas-station" size={13} color="white" />
-            <Text className="text-xs font-medium text-white">BBM</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View className="p-4">
-        {/* Vehicle + Activity */}
-        <View className="mb-3 flex-row items-start justify-between">
-          <View className="flex-1">
-            <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
-              {item.model}
-            </Text>
-            <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
-          </View>
-          <View className="rounded-lg bg-slate-100 px-3 py-1.5">
-            <Text className="text-xs font-medium text-gray-600" numberOfLines={1}>
-              {item.kegiatan}
-            </Text>
-          </View>
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+        {/* Header bar */}
+        <View className="flex-row items-center justify-between bg-brand px-4 py-2.5">
+          <Text className="text-xs font-medium text-white">
+            {dayjs(item.created_at).format('ddd, DD MMM YYYY')}
+          </Text>
+          {item.bbm && (
+            <TouchableOpacity
+              onPress={() => handleSnapPressDetail(item.id)}
+              className="flex-row items-center gap-1 rounded-full bg-gray-700 px-3 py-1">
+              <MaterialCommunityIcons name="gas-station" size={13} color="white" />
+              <Text className="text-xs font-medium text-white">BBM</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Stats row */}
-        <View className="mb-3 flex-row gap-2">
-          <View className="flex-1 rounded-xl bg-slate-50 p-2.5">
-            <Text className="text-[10px] text-gray-400">Total Perjalanan</Text>
-            <Text className="text-sm font-bold text-gray-800">{item.total_spidometer} Km</Text>
-          </View>
-          <View className="flex-1 rounded-xl bg-slate-50 p-2.5">
-            <Text className="text-[10px] text-gray-400">Lama Perjalanan</Text>
-            <Text className="text-sm font-bold text-gray-800">{item.selisih_waktu} Menit</Text>
-          </View>
-        </View>
-
-        {/* Timeline: Pergi -> Pulang */}
-        <View className="flex-row gap-2">
-          <Pressable
-            onPress={() => showImage(item.spidometer_file_in)}
-            className="flex-1 rounded-xl bg-blue-100 p-3">
-            <View className="mb-1 flex-row items-center gap-1">
-              <Feather name="log-in" size={12} color="#3b82f6" />
-              <Text className="text-xs font-semibold text-blue-600">Pergi</Text>
+        <View className="p-4">
+          {/* Vehicle + Activity */}
+          <View className="mb-3 flex-row items-start justify-between">
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
+                {item.model}
+              </Text>
+              <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
             </View>
-            <Text className="text-xs text-gray-600">
-              {item.reservasi_in ? dayjs(item.reservasi_in).format('DD/MM/YY HH:mm') : '-'}
-            </Text>
-            <Text className="mt-0.5 text-[11px] text-gray-400">{item.spidometer_in} Km</Text>
-          </Pressable>
-          <View className="items-center justify-center">
-            <Feather name="arrow-right" size={16} color="#cbd5e1" />
-          </View>
-          <Pressable
-            onPress={() => showImage(item.spidometer_file_out)}
-            className="flex-1 rounded-xl bg-amber-100 p-3">
-            <View className="mb-1 flex-row items-center gap-1">
-              <Feather name="log-out" size={12} color="#f59e0b" />
-              <Text className="text-xs font-semibold text-amber-600">Pulang</Text>
+            <View className="rounded-lg bg-slate-100 px-3 py-1.5">
+              <Text className="text-xs font-medium text-gray-600" numberOfLines={1}>
+                {item.kegiatan}
+              </Text>
             </View>
-            <Text className="text-xs text-gray-600">
-              {item.reservasi_out ? dayjs(item.reservasi_out).format('DD/MM/YY HH:mm') : '-'}
-            </Text>
-            <Text className="mt-0.5 text-[11px] text-gray-400">
-              {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
-            </Text>
-          </Pressable>
+          </View>
+
+          {/* Stats row */}
+          <View className="mb-3 flex-row gap-2">
+            <View className="flex-1 rounded-xl bg-slate-50 p-2.5">
+              <Text className="text-[10px] text-gray-400">Total Perjalanan</Text>
+              <Text className="text-sm font-bold text-gray-800">{item.total_spidometer} Km</Text>
+            </View>
+            <View className="flex-1 rounded-xl bg-slate-50 p-2.5">
+              <Text className="text-[10px] text-gray-400">Lama Perjalanan</Text>
+              <Text className="text-sm font-bold text-gray-800">{item.selisih_waktu} Menit</Text>
+            </View>
+          </View>
+
+          {/* Timeline: Pergi -> Pulang */}
+          <View className="flex-row gap-2">
+            <Pressable
+              onPress={() => showImage(item.spidometer_file_in)}
+              className="flex-1 rounded-xl bg-blue-100 p-3">
+              <View className="mb-1 flex-row items-center gap-1">
+                <Feather name="log-in" size={12} color="#3b82f6" />
+                <Text className="text-xs font-semibold text-blue-600">Pergi</Text>
+              </View>
+              <Text className="text-xs text-gray-600">
+                {item.reservasi_in ? dayjs(item.reservasi_in).format('DD/MM/YY HH:mm') : '-'}
+              </Text>
+              <Text className="mt-0.5 text-[11px] text-gray-400">{item.spidometer_in} Km</Text>
+            </Pressable>
+            <View className="items-center justify-center">
+              <Feather name="arrow-right" size={16} color="#cbd5e1" />
+            </View>
+            <Pressable
+              onPress={() => showImage(item.spidometer_file_out)}
+              className="flex-1 rounded-xl bg-amber-100 p-3">
+              <View className="mb-1 flex-row items-center gap-1">
+                <Feather name="log-out" size={12} color="#f59e0b" />
+                <Text className="text-xs font-semibold text-amber-600">Pulang</Text>
+              </View>
+              <Text className="text-xs text-gray-600">
+                {item.reservasi_out ? dayjs(item.reservasi_out).format('DD/MM/YY HH:mm') : '-'}
+              </Text>
+              <Text className="mt-0.5 text-[11px] text-gray-400">
+                {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-    </View>
+    ),
+    [handleSnapPressDetail, showImage]
   );
 
   return (
@@ -214,6 +217,10 @@ export default function PemakaianScreen() {
             if (hasNextPage && !isFetchingNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={7}
           ListEmptyComponent={
             isLoading ? null : (
               <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">

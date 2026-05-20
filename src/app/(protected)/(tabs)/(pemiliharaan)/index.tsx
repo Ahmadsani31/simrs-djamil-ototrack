@@ -121,49 +121,52 @@ export default function IndexScreen() {
     setModalVisible(true);
   };
 
-  const flatData = data?.pages.flatMap((page) => page.data) ?? [];
+  const flatData = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
 
   // Active maintenance cards (shown at top when present)
-  const renderActiveCard = (itx: rawData, i: number) => (
-    <TouchableOpacity
-      key={i}
-      onPress={() =>
-        router.push({
-          pathname: '/(pemiliharaan)/pemiliharaan-nested',
-          params: { service_id: itx.id },
-        })
-      }
-      className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm"
-      activeOpacity={0.8}>
-      <View className="flex-row items-center justify-between bg-amber-100 px-4 py-2.5">
-        <View className="flex-row items-center gap-1.5">
-          <View className="h-2 w-2 rounded-full bg-amber-500" />
-          <Text className="text-xs font-medium text-gray-600">
-            {dayjs(itx.created_at).format('ddd, DD MMM YYYY HH:mm')}
-          </Text>
-        </View>
-        <Feather name="chevron-right" size={16} color="#94a3b8" />
-      </View>
-      <View className="p-4">
-        <View className="flex-row items-start justify-between">
-          <View className="flex-1">
-            <Text className="text-lg font-bold text-gray-800">{itx.kendaraan}</Text>
-            <Text className="text-xs text-gray-400">{itx.no_polisi}</Text>
+  const renderActiveCard = useCallback(
+    (itx: rawData, i: number) => (
+      <TouchableOpacity
+        key={i}
+        onPress={() =>
+          router.push({
+            pathname: '/(pemiliharaan)/pemiliharaan-nested',
+            params: { service_id: itx.id },
+          })
+        }
+        className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm"
+        activeOpacity={0.8}>
+        <View className="flex-row items-center justify-between bg-amber-100 px-4 py-2.5">
+          <View className="flex-row items-center gap-1.5">
+            <View className="h-2 w-2 rounded-full bg-amber-500" />
+            <Text className="text-xs font-medium text-gray-600">
+              {dayjs(itx.created_at).format('ddd, DD MMM YYYY HH:mm')}
+            </Text>
           </View>
-          <View className="rounded-lg bg-amber-50 px-3 py-1.5">
-            <Text className="text-xs font-semibold text-amber-700">{itx.jenis_kerusakan}</Text>
+          <Feather name="chevron-right" size={16} color="#94a3b8" />
+        </View>
+        <View className="p-4">
+          <View className="flex-row items-start justify-between">
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-800">{itx.kendaraan}</Text>
+              <Text className="text-xs text-gray-400">{itx.no_polisi}</Text>
+            </View>
+            <View className="rounded-lg bg-amber-50 px-3 py-1.5">
+              <Text className="text-xs font-semibold text-amber-700">{itx.jenis_kerusakan}</Text>
+            </View>
+          </View>
+          <View className="mt-2 rounded-lg bg-slate-50 p-2.5">
+            <Text className="text-xs text-gray-500">{itx.keterangan}</Text>
+            <Text className="mt-1 text-[11px] text-gray-400">Lokasi: {itx.lokasi}</Text>
           </View>
         </View>
-        <View className="mt-2 rounded-lg bg-slate-50 p-2.5">
-          <Text className="text-xs text-gray-500">{itx.keterangan}</Text>
-          <Text className="mt-1 text-[11px] text-gray-400">Lokasi: {itx.lokasi}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    ),
+    []
   );
 
   // History list items
-  const renderHistoryItem = ({ item }: { item: any }) => {
+  const renderHistoryItem = useCallback(({ item }: { item: any }) => {
     const isDone = !!item.keterangan_out;
     return (
       <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
@@ -241,7 +244,7 @@ export default function IndexScreen() {
         </View>
       </View>
     );
-  };
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -264,6 +267,10 @@ export default function IndexScreen() {
             contentContainerStyle={{ paddingBottom: 80, paddingTop: 8 }}
             className="-mt-7"
             showsVerticalScrollIndicator={false}
+            removeClippedSubviews
+            initialNumToRender={4}
+            maxToRenderPerBatch={4}
+            windowSize={5}
             ListHeaderComponent={
               <View className="mx-4 mb-3">
                 <View className="rounded-xl bg-amber-50 p-3">
@@ -309,6 +316,10 @@ export default function IndexScreen() {
                 if (hasNextPage && !isFetchingNextPage) fetchNextPage();
               }}
               onEndReachedThreshold={0.5}
+              removeClippedSubviews
+              initialNumToRender={6}
+              maxToRenderPerBatch={6}
+              windowSize={7}
               ListEmptyComponent={
                 isLoading ? null : (
                   <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">

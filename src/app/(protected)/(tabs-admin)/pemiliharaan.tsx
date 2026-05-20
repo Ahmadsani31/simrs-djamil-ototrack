@@ -91,120 +91,127 @@ export default function PemiliharaanScreen() {
     refetch();
   };
 
-  const showImage = (uri: string) => {
+  const showImage = useCallback((uri: string) => {
     setPreviewImg(uri);
     setModalVisible(true);
-  };
+  }, []);
 
-  const flatData = data?.pages.flatMap((page: any) => page.data) || [];
+  const flatData = useMemo(() => data?.pages.flatMap((page: any) => page.data) ?? [], [data]);
 
-  const renderItem = ({ item }: { item: any }) => {
-    const isDone = !!item.date_out;
-    return (
-      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
-        {/* Status bar */}
-        <View
-          className={`flex-row items-center justify-between px-4 py-2.5 ${isDone ? 'bg-emerald-100' : 'bg-amber-100'}`}>
-          <View className="flex-row items-center gap-1.5">
-            <View
-              className={`h-2 w-2 rounded-full ${isDone ? 'bg-emerald-500' : 'bg-amber-500'}`}
-            />
-            <Text className="text-xs font-medium text-gray-600">
-              {dayjs(item.created_at).format('ddd, DD MMM YYYY HH:mm')}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => handleSnapPressDetail(item.images)}
-            className="flex-row items-center gap-1 rounded-full bg-gray-700 px-3 py-1">
-            <Text className="text-xs font-medium text-white">Detail</Text>
-            <Feather name="eye" size={11} color="white" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Content */}
-        <View className="p-4">
-          {/* Vehicle + Cost */}
-          <View className="mb-3 flex-row items-start justify-between">
-            <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
-                {item.kendaraan}
-              </Text>
-              <View className="mt-0.5 flex-row items-center gap-1">
-                <MaterialCommunityIcons name="card-text-outline" size={13} color="#94a3b8" />
-                <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
-              </View>
-            </View>
-            <View className="rounded-lg bg-blue-50 px-3 py-1.5">
-              <Text className="text-xs text-gray-400">Biaya</Text>
-              <Text className="text-sm font-bold text-blue-600">
-                Rp {Number(item.nominal || 0).toLocaleString('id-ID')}
-              </Text>
-            </View>
-          </View>
-
-          {/* Image + Info */}
-          <View className="flex-row gap-3">
-            <Pressable
-              onPress={() => item.image && showImage(item.image)}
-              className="overflow-hidden rounded-xl">
-              <Image
-                source={{ uri: item.image }}
-                style={{ width: 80, height: 100, borderRadius: 12 }}
-                contentFit="cover"
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => {
+      const isDone = !!item.date_out;
+      return (
+        <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+          {/* Status bar */}
+          <View
+            className={`flex-row items-center justify-between px-4 py-2.5 ${isDone ? 'bg-emerald-100' : 'bg-amber-100'}`}>
+            <View className="flex-row items-center gap-1.5">
+              <View
+                className={`h-2 w-2 rounded-full ${isDone ? 'bg-emerald-500' : 'bg-amber-500'}`}
               />
-              <View className="absolute bottom-0 left-0 right-0 bg-black/40 py-0.5">
-                <Text className="text-center text-[9px] text-white">Lihat</Text>
-              </View>
-            </Pressable>
+              <Text className="text-xs font-medium text-gray-600">
+                {dayjs(item.created_at).format('ddd, DD MMM YYYY HH:mm')}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => handleSnapPressDetail(item.images)}
+              className="flex-row items-center gap-1 rounded-full bg-gray-700 px-3 py-1">
+              <Text className="text-xs font-medium text-white">Detail</Text>
+              <Feather name="eye" size={11} color="white" />
+            </TouchableOpacity>
+          </View>
 
-            <View className="flex-1 gap-2">
-              <View className="rounded-lg bg-slate-50 p-2.5">
-                <Text className="text-xs font-semibold text-gray-700">{item.jenis_kerusakan}</Text>
-                <Text className="mt-0.5 text-xs text-gray-500" numberOfLines={2}>
-                  {item.keterangan}
+          {/* Content */}
+          <View className="p-4">
+            {/* Vehicle + Cost */}
+            <View className="mb-3 flex-row items-start justify-between">
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
+                  {item.kendaraan}
+                </Text>
+                <View className="mt-0.5 flex-row items-center gap-1">
+                  <MaterialCommunityIcons name="card-text-outline" size={13} color="#94a3b8" />
+                  <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
+                </View>
+              </View>
+              <View className="rounded-lg bg-blue-50 px-3 py-1.5">
+                <Text className="text-xs text-gray-400">Biaya</Text>
+                <Text className="text-sm font-bold text-blue-600">
+                  Rp {Number(item.nominal || 0).toLocaleString('id-ID')}
                 </Text>
               </View>
-              <View className="flex-row gap-2">
-                <View className="flex-1 rounded-lg bg-slate-50 p-2">
-                  <Text className="text-[10px] text-gray-400">Spidometer</Text>
-                  <Text className="text-xs font-semibold text-gray-700">{item.spidometer} Km</Text>
+            </View>
+
+            {/* Image + Info */}
+            <View className="flex-row gap-3">
+              <Pressable
+                onPress={() => item.image && showImage(item.image)}
+                className="overflow-hidden rounded-xl">
+                <Image
+                  source={{ uri: item.image }}
+                  style={{ width: 80, height: 100, borderRadius: 12 }}
+                  contentFit="cover"
+                />
+                <View className="absolute bottom-0 left-0 right-0 bg-black/40 py-0.5">
+                  <Text className="text-center text-[9px] text-white">Lihat</Text>
                 </View>
-                <View className="flex-1 rounded-lg bg-slate-50 p-2">
-                  <Text className="text-[10px] text-gray-400">Lokasi</Text>
-                  <Text className="text-xs font-semibold text-gray-700" numberOfLines={1}>
-                    {item.lokasi || '-'}
+              </Pressable>
+
+              <View className="flex-1 gap-2">
+                <View className="rounded-lg bg-slate-50 p-2.5">
+                  <Text className="text-xs font-semibold text-gray-700">
+                    {item.jenis_kerusakan}
                   </Text>
+                  <Text className="mt-0.5 text-xs text-gray-500" numberOfLines={2}>
+                    {item.keterangan}
+                  </Text>
+                </View>
+                <View className="flex-row gap-2">
+                  <View className="flex-1 rounded-lg bg-slate-50 p-2">
+                    <Text className="text-[10px] text-gray-400">Spidometer</Text>
+                    <Text className="text-xs font-semibold text-gray-700">
+                      {item.spidometer} Km
+                    </Text>
+                  </View>
+                  <View className="flex-1 rounded-lg bg-slate-50 p-2">
+                    <Text className="text-[10px] text-gray-400">Lokasi</Text>
+                    <Text className="text-xs font-semibold text-gray-700" numberOfLines={1}>
+                      {item.lokasi || '-'}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
 
-          {/* Footer action / keterangan */}
-          {isDone ? (
-            <View className="mt-3 rounded-lg bg-emerald-50 p-2.5">
-              <Text className="text-xs font-semibold text-emerald-700">
-                Keterangan Pengembalian
-              </Text>
-              <Text className="mt-0.5 text-xs text-gray-600">{item.keterangan_out || '-'}</Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: '/pengembalian-service-manual',
-                  params: { service_id: item.id, kendaraan_id: item.kendaraan_id },
-                })
-              }
-              className="mt-3 flex-row items-center justify-center gap-2 rounded-xl bg-amber-500 py-2.5"
-              activeOpacity={0.8}>
-              <MaterialCommunityIcons name="garage-variant" size={16} color="white" />
-              <Text className="text-sm font-bold text-white">Proses Pengembalian</Text>
-            </TouchableOpacity>
-          )}
+            {/* Footer action / keterangan */}
+            {isDone ? (
+              <View className="mt-3 rounded-lg bg-emerald-50 p-2.5">
+                <Text className="text-xs font-semibold text-emerald-700">
+                  Keterangan Pengembalian
+                </Text>
+                <Text className="mt-0.5 text-xs text-gray-600">{item.keterangan_out || '-'}</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: '/pengembalian-service-manual',
+                    params: { service_id: item.id, kendaraan_id: item.kendaraan_id },
+                  })
+                }
+                className="mt-3 flex-row items-center justify-center gap-2 rounded-xl bg-amber-500 py-2.5"
+                activeOpacity={0.8}>
+                <MaterialCommunityIcons name="garage-variant" size={16} color="white" />
+                <Text className="text-sm font-bold text-white">Proses Pengembalian</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-    );
-  };
+      );
+    },
+    [showImage]
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -253,6 +260,10 @@ export default function PemiliharaanScreen() {
             if (hasNextPage && !isFetchingNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={7}
           ListEmptyComponent={
             isLoading ? null : (
               <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">

@@ -3,7 +3,7 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Text, View, Pressable, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
@@ -73,104 +73,107 @@ export default function IndexScreen() {
     refetch();
   };
 
-  const showImage = (uri: string) => {
+  const showImage = useCallback((uri: string) => {
     setPreviewImg(uri);
     setModalVisible(true);
-  };
+  }, []);
 
-  const flatData = data?.pages.flatMap((page) => page.data) || [];
+  const flatData = useMemo(() => data?.pages.flatMap((page) => page.data) ?? [], [data]);
 
-  const renderItem = ({ item }: { item: any }) => {
-    const isActive = item.status === 'Dipakai';
-    return (
-      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
-        {/* Status bar */}
-        <View
-          className={`flex-row items-center justify-between px-4 py-2.5 ${isActive ? 'bg-amber-100' : 'bg-emerald-100'}`}>
-          <View className="flex-row items-center gap-1.5">
-            <View
-              className={`h-2 w-2 rounded-full ${isActive ? 'bg-amber-500' : 'bg-emerald-500'}`}
-            />
-            <Text className="text-xs font-medium text-gray-600">
-              {dayjs(item.created_at).format('ddd, DD MMM YYYY')}
-            </Text>
-          </View>
-          {isActive && (
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: '/pengembalian_manual',
-                  params: { reservasi_id: item.id, user_id: item.user_id },
-                })
-              }
-              className="flex-row items-center gap-1 rounded-full bg-amber-500 px-3 py-1">
-              <Text className="text-xs font-bold text-white">Pengembalian</Text>
-              <Feather name="arrow-right" size={12} color="white" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Content */}
-        <View className="p-4">
-          {/* User + Vehicle */}
-          <View className="mb-3 flex-row items-start justify-between">
-            <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
-                {item.nameUser}
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => {
+      const isActive = item.status === 'Dipakai';
+      return (
+        <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+          {/* Status bar */}
+          <View
+            className={`flex-row items-center justify-between px-4 py-2.5 ${isActive ? 'bg-amber-100' : 'bg-emerald-100'}`}>
+            <View className="flex-row items-center gap-1.5">
+              <View
+                className={`h-2 w-2 rounded-full ${isActive ? 'bg-amber-500' : 'bg-emerald-500'}`}
+              />
+              <Text className="text-xs font-medium text-gray-600">
+                {dayjs(item.created_at).format('ddd, DD MMM YYYY')}
               </Text>
-              <Text className="mt-0.5 text-xs text-gray-400">{item.kegiatan}</Text>
             </View>
-            <View className="items-end rounded-lg bg-slate-100 px-3 py-1.5">
-              <Text className="text-sm font-bold text-gray-800">{item.model}</Text>
-              <Text className="text-xs text-gray-500">{item.no_polisi}</Text>
-            </View>
+            {isActive && (
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: '/pengembalian_manual',
+                    params: { reservasi_id: item.id, user_id: item.user_id },
+                  })
+                }
+                className="flex-row items-center gap-1 rounded-full bg-amber-500 px-3 py-1">
+                <Text className="text-xs font-bold text-white">Pengembalian</Text>
+                <Feather name="arrow-right" size={12} color="white" />
+              </TouchableOpacity>
+            )}
           </View>
 
-          {/* Timeline: Dipakai -> Dikembalikan */}
-          <View className="flex-row gap-2">
-            {/* Dipakai */}
-            <Pressable
-              onPress={() => item.spidometer_file_in && showImage(item.spidometer_file_in)}
-              className="flex-1 rounded-xl bg-blue-50 p-3">
-              <View className="mb-1 flex-row items-center gap-1">
-                <Feather name="log-in" size={12} color="#3b82f6" />
-                <Text className="text-xs font-semibold text-blue-600">Dipakai</Text>
+          {/* Content */}
+          <View className="p-4">
+            {/* User + Vehicle */}
+            <View className="mb-3 flex-row items-start justify-between">
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-800" numberOfLines={1}>
+                  {item.nameUser}
+                </Text>
+                <Text className="mt-0.5 text-xs text-gray-400">{item.kegiatan}</Text>
               </View>
-              <Text className="text-xs text-gray-600">
-                {item.reservasi_in ? dayjs(item.reservasi_in).format('DD/MM/YY HH:mm') : '-'}
-              </Text>
-              <Text className="mt-0.5 text-[11px] text-gray-400">{item.spidometer_in} Km</Text>
-            </Pressable>
-
-            {/* Arrow */}
-            <View className="items-center justify-center">
-              <Feather name="arrow-right" size={16} color="#cbd5e1" />
+              <View className="items-end rounded-lg bg-slate-100 px-3 py-1.5">
+                <Text className="text-sm font-bold text-gray-800">{item.model}</Text>
+                <Text className="text-xs text-gray-500">{item.no_polisi}</Text>
+              </View>
             </View>
 
-            {/* Dikembalikan */}
-            <Pressable
-              onPress={() =>
-                item.reservasi_out
-                  ? showImage(item.spidometer_file_out)
-                  : Toast.info('Kendaraan masih dipakai', 'center')
-              }
-              className="flex-1 rounded-xl bg-amber-50 p-3">
-              <View className="mb-1 flex-row items-center gap-1">
-                <Feather name="log-out" size={12} color="#f59e0b" />
-                <Text className="text-xs font-semibold text-amber-600">Dikembalikan</Text>
+            {/* Timeline: Dipakai -> Dikembalikan */}
+            <View className="flex-row gap-2">
+              {/* Dipakai */}
+              <Pressable
+                onPress={() => item.spidometer_file_in && showImage(item.spidometer_file_in)}
+                className="flex-1 rounded-xl bg-blue-50 p-3">
+                <View className="mb-1 flex-row items-center gap-1">
+                  <Feather name="log-in" size={12} color="#3b82f6" />
+                  <Text className="text-xs font-semibold text-blue-600">Dipakai</Text>
+                </View>
+                <Text className="text-xs text-gray-600">
+                  {item.reservasi_in ? dayjs(item.reservasi_in).format('DD/MM/YY HH:mm') : '-'}
+                </Text>
+                <Text className="mt-0.5 text-[11px] text-gray-400">{item.spidometer_in} Km</Text>
+              </Pressable>
+
+              {/* Arrow */}
+              <View className="items-center justify-center">
+                <Feather name="arrow-right" size={16} color="#cbd5e1" />
               </View>
-              <Text className="text-xs text-gray-600">
-                {item.reservasi_out ? dayjs(item.reservasi_out).format('DD/MM/YY HH:mm') : '-'}
-              </Text>
-              <Text className="mt-0.5 text-[11px] text-gray-400">
-                {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
-              </Text>
-            </Pressable>
+
+              {/* Dikembalikan */}
+              <Pressable
+                onPress={() =>
+                  item.reservasi_out
+                    ? showImage(item.spidometer_file_out)
+                    : Toast.info('Kendaraan masih dipakai', 'center')
+                }
+                className="flex-1 rounded-xl bg-amber-50 p-3">
+                <View className="mb-1 flex-row items-center gap-1">
+                  <Feather name="log-out" size={12} color="#f59e0b" />
+                  <Text className="text-xs font-semibold text-amber-600">Dikembalikan</Text>
+                </View>
+                <Text className="text-xs text-gray-600">
+                  {item.reservasi_out ? dayjs(item.reservasi_out).format('DD/MM/YY HH:mm') : '-'}
+                </Text>
+                <Text className="mt-0.5 text-[11px] text-gray-400">
+                  {item.spidometer_out ? `${item.spidometer_out} Km` : '-'}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
-    );
-  };
+      );
+    },
+    [showImage]
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -219,6 +222,10 @@ export default function IndexScreen() {
             if (hasNextPage && !isFetchingNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.5}
+          removeClippedSubviews
+          initialNumToRender={6}
+          maxToRenderPerBatch={6}
+          windowSize={7}
           ListEmptyComponent={
             isLoading ? null : (
               <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">

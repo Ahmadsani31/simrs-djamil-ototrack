@@ -1,3 +1,4 @@
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -9,9 +10,9 @@ import {
   Dimensions,
   AppState,
 } from 'react-native';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import ButtonCostum from '@/components/forms/ButtonCostum';
+
 import LoadingIndikator from '@/components/feedback/LoadingIndikator';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import { useAuthStore } from '@/stores/authStore';
 
 const { width } = Dimensions.get('window');
@@ -62,7 +63,6 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
     setLoading(true);
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6, shutterSound: false });
     // await manipulatorImage(photo?.uri ?? null);
-    // console.log(photo);
 
     setUriImage(photo?.uri ?? null);
     setLoading(false);
@@ -96,7 +96,6 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
   //       });
   //     }
   //   } catch (error) {
-  //     console.error('Error getting location:', error);
   //   }
   // };
 
@@ -137,7 +136,6 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
   //       saveFormat: ImageFormat.jpg,
   //     };
   //     const path = await Marker.markText(options);
-  //     console.log('path', path);
   //     setUriImage('file:' + path);
   //   } catch (error) {
   //     Toast.show({
@@ -159,8 +157,8 @@ export default function ModalCamera({ visible, onClose, setUriImage }: InputProp
               {active ? (
                 <CameraView
                   style={styles.camera}
-                  mirror={true}
-                  ratio={'4:3'}
+                  mirror
+                  ratio="4:3"
                   facing="back"
                   autofocus="on"
                   enableTorch={flashlight}

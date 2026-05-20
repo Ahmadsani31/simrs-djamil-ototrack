@@ -1,5 +1,6 @@
 // lib/secureStorage.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { logger } from '@/utils/logger';
 
 export const getStoredCoords = async () => {
@@ -16,4 +17,3 @@ export const getStoredCoords = async () => {
     return [];
   }
 };
-

@@ -1,9 +1,9 @@
+import axios, { AxiosRequestConfig } from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/utils/constants';
 import { logger } from '@/utils/logger';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
-// Ganti dengan base URL API kamu
 
 // Inisialisasi instance axios
 const api = axios.create({
@@ -15,8 +15,6 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync('token');
-    // console.log('token api interceptors ', token);
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,54 +23,61 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Global Error Handling
+// Global error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // const message = error.response?.data?.message || '';
     // Cek error token expired
-    // console.log('error ',error.response);
-    // console.log('message from error service ',message);
-
     if (error.response?.status === 401) {
       logger.log('Token expired, logging out...');
       const { logout } = useAuthStore.getState();
       logout();
     }
-
-    // console.log('error api interceptors ', error);
-    // console.log('error api interceptors message ', message);
-
-    // Lanjutkan error
     return Promise.reject(error);
   }
 );
 
-// ✅ Method umum
+// Method umum. Default generic `any` agar backward-compatible dengan caller
+// existing yang men-destructure `response.data` dari envelope `{ data, message }`.
+// Untuk kode baru, pass `<ResponseType>` agar mendapat typing penuh.
 const secureApi = {
-  get: async (url: string, config = {}) => {
-    const response = await api.get(url, config);
+  get: async <TResponse = any>(
+    url: string,
+    config: AxiosRequestConfig = {}
+  ): Promise<TResponse> => {
+    const response = await api.get<TResponse>(url, config);
     return response.data;
   },
 
-  post: async (url: string, data: any, config = {}) => {
-    const response = await api.post(url, data, config);
+  post: async <TResponse = any, TData = unknown>(
+    url: string,
+    data: TData,
+    config: AxiosRequestConfig = {}
+  ): Promise<TResponse> => {
+    const response = await api.post<TResponse>(url, data, config);
     return response.data;
   },
 
-  put: async (url: string, data: any, config = {}) => {
-    const response = await api.put(url, data, config);
+  put: async <TResponse = any, TData = unknown>(
+    url: string,
+    data: TData,
+    config: AxiosRequestConfig = {}
+  ): Promise<TResponse> => {
+    const response = await api.put<TResponse>(url, data, config);
     return response.data;
   },
 
-  del: async (url: string, config = {}) => {
-    const response = await api.delete(url, config);
+  del: async <TResponse = any>(
+    url: string,
+    config: AxiosRequestConfig = {}
+  ): Promise<TResponse> => {
+    const response = await api.delete<TResponse>(url, config);
     return response.data;
   },
 
-  // ✅ Khusus untuk form-data (upload file, blob, dsb)
-  postForm: async (url: string, formData: FormData) => {
-    const response = await api.post(url, formData, {
+  // Khusus untuk form-data (upload file, blob, dsb)
+  postForm: async <TResponse = any>(url: string, formData: FormData): Promise<TResponse> => {
+    const response = await api.post<TResponse>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -80,13 +85,16 @@ const secureApi = {
     return response.data;
   },
 
-  // ✅ Khusus untuk x-www-form-urlencoded
-  postFormUrlEncoded: async (url: string, data: Record<string, any>) => {
+  // Khusus untuk x-www-form-urlencoded
+  postFormUrlEncoded: async <TResponse = any>(
+    url: string,
+    data: Record<string, string | number | boolean>
+  ): Promise<TResponse> => {
     const params = new URLSearchParams();
     for (const key in data) {
-      params.append(key, data[key]);
+      params.append(key, String(data[key]));
     }
-    const response = await api.post(url, params, {
+    const response = await api.post<TResponse>(url, params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },

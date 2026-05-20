@@ -1,7 +1,8 @@
-import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+
 import FadeInView from '@/components/feedback/FadeInView';
 import Skeleton from '@/components/feedback/Skeleton';
 
@@ -20,7 +21,7 @@ const blurhash =
 export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: propsImage) {
   const [loading, setLoading] = useState(true);
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onPress}>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onPress}>
       <View className="flex-1  items-center justify-end bg-black/25">
         {imgUrl && (
           <View className="rounded-t-2xl bg-white">
@@ -31,7 +32,7 @@ export default function ModalPreviewImage({ visible, title, imgUrl, onPress }: p
               <Text className="ms-2 font-bold text-black">Tutup</Text>
             </TouchableOpacity>
             {/* <Text className="mt-2 rounded-md text-center text-xl font-bold">{title}</Text> */}
-            <View style={{ width: width, padding: 15 }}>
+            <View style={{ width, padding: 15 }}>
               {loading && (
                 <FadeInView className="flex-row items-center justify-center space-x-4 p-4">
                   <View className="flex-row items-center justify-between gap-5">

@@ -1,14 +1,15 @@
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Text, View, RefreshControl, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
-import secureApi from '@/services/service';
+
 import SkeletonList from '@/components/feedback/SkeletonList';
-import { useQuery } from '@tanstack/react-query';
-import { Kendaraan } from '@/types/types';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useCallback, useMemo, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
 import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
+import { Kendaraan } from '@/types/types';
 
 const fetchData = async () => {
   try {
@@ -102,7 +103,7 @@ export default function KendaraanScreen() {
         </View>
 
         {/* Search bar (overlaps header) */}
-        <View className="-mt-7 mx-4 mb-3 flex-row items-center rounded-xl bg-white px-3 py-2 shadow-sm">
+        <View className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-2 shadow-sm">
           <Feather name="search" size={18} color="#94a3b8" />
           <TextInput
             className="ml-2 flex-1 text-sm text-gray-800"

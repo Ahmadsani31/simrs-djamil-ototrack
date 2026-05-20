@@ -1,5 +1,6 @@
-import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native';
+
 import SkeletonList from '@/components/feedback/SkeletonList';
 
 type propsUseQuery = {

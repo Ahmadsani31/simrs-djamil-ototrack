@@ -1,21 +1,24 @@
-import { View, Text, TouchableOpacity, Image as ImageLocal, ScrollView, Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { Image } from 'expo-image';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { AntDesign } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
-import secureApi from '@/services/service';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-import { ModalRN } from '@/components/modals/ModalRN';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import { colors } from '@/constants/colors';
-import ModalCamera from '@/components/modals/ModalCamera';
-import InputArea from '@/components/forms/InputArea';
-import { reLocation } from '@/hooks/locationRequired';
-import { Toast } from 'toastify-react-native';
-import PageServiceListImage from '@/components/sections/PageServiceListImage';
-import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
-import { useLoadingStore } from '@/stores/loadingStore';
 import dayjs from 'dayjs';
+import { Image } from 'expo-image';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image as ImageLocal, ScrollView, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
+
+import ButtonCostum from '@/components/forms/ButtonCostum';
+import InputArea from '@/components/forms/InputArea';
+import ModalCamera from '@/components/modals/ModalCamera';
+import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import { ModalRN } from '@/components/modals/ModalRN';
+import PageServiceListImage from '@/components/sections/PageServiceListImage';
+import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
+import { reLocation } from '@/hooks/locationRequired';
+import { useLoadingStore } from '@/stores/loadingStore';
+import HandleError from '@/utils/handleError';
 
 type rawData = {
   id: number;
@@ -47,7 +50,7 @@ const fetchDataLog = async (service_id: number) => {
   try {
     const response = await secureApi.get(`/service/list_images`, {
       params: {
-        service_id: service_id,
+        service_id,
       },
     });
     return response.data;
@@ -57,8 +60,8 @@ const fetchDataLog = async (service_id: number) => {
 };
 
 export default function PemiliharaanNestedScreen() {
+  const insets = useSafeAreaInsets();
   const setLoading = useLoadingStore((state) => state.setLoading);
-  // console.log('PageService item:', item);
   const { service_id } = useLocalSearchParams();
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -77,7 +80,7 @@ export default function PemiliharaanNestedScreen() {
       try {
         const response = await secureApi.get(`/service/data_aktif`, {
           params: {
-            service_id: service_id,
+            service_id,
           },
         });
 
@@ -140,25 +143,12 @@ export default function PemiliharaanNestedScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
-      // return;
       await secureApi.postForm('/service/image_store', formData);
-      // console.log('response save ', JSON.stringify(response));
 
       handleDialogBBM();
       refetch();
-    } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Warning!',
-        text2: JSON.stringify(error.response.data.message) || 'Terjadi kesalahan.',
-        useModal: true,
-      });
-
-      // console.log('response checkpoint', JSON.stringify(error.response.data));
-      // Alert.alert('Warning!', error.response.data.message, [
-      //   { text: 'Tutup', onPress: () => null },
-      // ]);
+    } catch (error: unknown) {
+      HandleError(error);
     } finally {
       setLoadingSubmit(false);
     }
@@ -186,7 +176,7 @@ export default function PemiliharaanNestedScreen() {
   });
 
   return (
-    <View className="flex-1 gap-4 bg-slate-300 p-4">
+    <View className="flex-1 gap-4 bg-slate-300 px-4 pb-4" style={{ paddingTop: insets.top + 16 }}>
       <TouchableOpacity onPress={() => router.push('/')}>
         <View className="flex-row items-center justify-center gap-2 rounded-lg bg-stone-800 p-2">
           <AntDesign name="left" size={24} color="white" />
@@ -333,7 +323,7 @@ export default function PemiliharaanNestedScreen() {
       )}
       {previewImage && (
         <ModalPreviewImage
-          title={'Preview Image'}
+          title="Preview Image"
           imgUrl={imgPreviewUrl || ''}
           visible={previewImage}
           onPress={() => handleCloseImage()}

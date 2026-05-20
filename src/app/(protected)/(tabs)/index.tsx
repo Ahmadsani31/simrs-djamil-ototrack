@@ -1,16 +1,17 @@
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Link, router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCallback, useState } from 'react';
-import { Link, router, useFocusEffect } from 'expo-router';
-import secureApi from '@/services/service';
-import { useLoadingStore } from '@/stores/loadingStore';
+import { Toast } from 'toastify-react-native';
+
+import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
 import PageDaily from '@/components/sections/PageDaily';
 import PageHome from '@/components/sections/PageHome';
-import { Toast } from 'toastify-react-native';
-import HandleError from '@/utils/handleError';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
 import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
+import { useLoadingStore } from '@/stores/loadingStore';
+import HandleError from '@/utils/handleError';
 
 type rawData = {
   id: number;
@@ -87,7 +88,7 @@ export default function IndexScreen() {
           Toast.show({ type: 'error', text1: 'Perhatian', text2: 'QRCode tidak valid' });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -113,13 +114,13 @@ export default function IndexScreen() {
       </View>
 
       <ScrollView
-        className="flex-1 -mt-4"
+        className="-mt-4 flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Active maintenance alert */}
         {(rawDataService?.length ?? 0) > 0 && (
-          <Link href={'/(pemiliharaan)'} push asChild>
+          <Link href="/(pemiliharaan)" push asChild>
             <TouchableOpacity
               className="mx-4 mb-3 flex-row items-center justify-between rounded-2xl bg-sky-500 p-4"
               activeOpacity={0.8}>

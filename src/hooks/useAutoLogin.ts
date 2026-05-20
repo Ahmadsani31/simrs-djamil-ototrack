@@ -1,8 +1,10 @@
+import * as Location from 'expo-location';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+
 import { useAuthStore } from '../stores/authStore';
 // import { SplashScreen } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Location from 'expo-location';
+
 import { LOCATION_TASK_NAME } from '@/utils/backgroundLocationTask';
 
 export const useAutoLogin = () => {

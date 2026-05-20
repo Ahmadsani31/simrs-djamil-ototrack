@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+
 import FadeInView from '@/components/feedback/FadeInView';
 import Skeleton from '@/components/feedback/Skeleton';
 

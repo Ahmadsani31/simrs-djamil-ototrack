@@ -1,8 +1,8 @@
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import dayjs from 'dayjs';
 import { Image } from 'expo-image';
 import { ListRenderItemInfo, Text, View } from 'react-native';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type itemsProps = {
   id: number;

@@ -1,13 +1,14 @@
-import LoadingIndikator from '@/components/feedback/LoadingIndikator';
-import { PrivateRoute } from '@/components/layout/PrivateRoute';
-import { useLoadingStore } from '@/stores/loadingStore';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { router, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { Alert, BackHandler, Image, Text, TouchableOpacity, View } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
+import LoadingIndikator from '@/components/feedback/LoadingIndikator';
+import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { colors } from '@/constants/colors';
-import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { useLoadingStore } from '@/stores/loadingStore';
 
 const BrandHeaderLeft = () => (
   <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
@@ -78,42 +79,42 @@ export default function ProtectedLayout() {
   return (
     <PrivateRoute>
       <BottomSheetModalProvider>
-      {/* {loading && <LoadingIndikator />} */}
-      <Stack
-        screenOptions={{
-          headerTitleAlign: 'center',
-          headerShown: false,
-          headerStyle: {
-            backgroundColor: colors.brand,
-          },
-        }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-        {/* Screens dengan logo kiri + back kanan */}
-        <Stack.Screen name="detail" options={brandHeader(backAction)} />
-        <Stack.Screen name="service" options={brandHeader(backAction)} />
-        <Stack.Screen name="pengembalian" options={brandHeader(backAction)} />
-        <Stack.Screen name="pengembalian_manual" options={brandHeader(backAction)} />
-
-        {/* Screens dengan back kiri + logo kanan */}
-        <Stack.Screen name="bbm-voucher" options={brandHeaderBackLeft(backAction)} />
-        <Stack.Screen name="bbm-uang" options={brandHeaderBackLeft(backAction)} />
-        <Stack.Screen name="pengembalian-service" options={brandHeaderBackLeft(backAction)} />
-        <Stack.Screen
-          name="pengembalian-service-manual"
-          options={brandHeaderBackLeft(backAction)}
-        />
-
-        {/* Modal */}
-        <Stack.Screen
-          name="pemiliharaan-detail"
-          options={{
-            ...brandHeaderBackLeft(backAction),
-            presentation: 'modal',
+        {/* {loading && <LoadingIndikator />} */}
+        <Stack
+          screenOptions={{
+            headerTitleAlign: 'center',
             headerShown: false,
-          }}
-        />
-      </Stack>
+            headerStyle: {
+              backgroundColor: colors.brand,
+            },
+          }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+          {/* Screens dengan logo kiri + back kanan */}
+          <Stack.Screen name="detail" options={brandHeader(backAction)} />
+          <Stack.Screen name="service" options={brandHeader(backAction)} />
+          <Stack.Screen name="pengembalian" options={brandHeader(backAction)} />
+          <Stack.Screen name="pengembalian_manual" options={brandHeader(backAction)} />
+
+          {/* Screens dengan back kiri + logo kanan */}
+          <Stack.Screen name="bbm-voucher" options={brandHeaderBackLeft(backAction)} />
+          <Stack.Screen name="bbm-uang" options={brandHeaderBackLeft(backAction)} />
+          <Stack.Screen name="pengembalian-service" options={brandHeaderBackLeft(backAction)} />
+          <Stack.Screen
+            name="pengembalian-service-manual"
+            options={brandHeaderBackLeft(backAction)}
+          />
+
+          {/* Modal */}
+          <Stack.Screen
+            name="pemiliharaan-detail"
+            options={{
+              ...brandHeaderBackLeft(backAction),
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
+        </Stack>
       </BottomSheetModalProvider>
     </PrivateRoute>
   );

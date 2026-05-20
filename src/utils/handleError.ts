@@ -1,44 +1,61 @@
+import axios from 'axios';
 import { Toast } from 'toastify-react-native';
 
-const HandleError = (error: any) => {
-  if (error.response && error.response.data) {
-    let msg = error.response.data.message || 'Terjadi kesalahan.';
-    // Jika message adalah object (misalnya { spidometer: "..." })
+/**
+ * Centralised error handler. Selalu menerima `unknown` (bukan `any`) supaya
+ * caller dipaksa lewat type-guard.
+ *
+ * Skema toast:
+ * - Axios response error -> "Perhatian!" + pesan dari `error.response.data.message`
+ *   (bisa string atau object `{field: msg}` yang akan digabung jadi multi-line)
+ * - Axios request error (timeout / no connection) -> "Network Error!"
+ * - Selain itu -> "Opps!" + `Error.message` atau pesan generik.
+ */
+const HandleError = (error: unknown) => {
+  const baseToast = {
+    position: 'center' as const,
+    type: 'error' as const,
+    backgroundColor: '#000',
+    textColor: '#fff',
+    visibilityTime: 5000,
+  };
 
-    if (typeof msg === 'object' && msg !== null) {
-      // Gabungkan semua pesan menjadi satu string
-      msg = Object.values(msg).join('\n');
+  if (axios.isAxiosError(error)) {
+    if (error.response?.data) {
+      const raw = (error.response.data as { message?: unknown }).message;
+      let msg = 'Terjadi kesalahan.';
+      if (typeof raw === 'string') {
+        msg = raw;
+      } else if (raw && typeof raw === 'object') {
+        // Backend kadang kirim message sebagai map field-error: { spidometer: '...' }
+        msg = Object.values(raw as Record<string, string>).join('\n');
+      }
+
+      Toast.show({
+        ...baseToast,
+        text1: 'Perhatian!',
+        text2: msg,
+      });
+      return;
     }
 
-    Toast.show({
-      position: 'center',
-      type: 'error',
-      text1: 'Perhatian!',
-      text2: msg,
-      backgroundColor: '#000',
-      textColor: '#fff',
-      visibilityTime: 5000,
-    });
-  } else if (error.request) {
-    Toast.show({
-      position: 'center',
-      type: 'error',
-      text1: 'Network Error!',
-      text2:
-        'Tidak bisa terhubung ke server. Cek koneksi kamu. pastikan kamu berada dalam jangkauan internet.',
-      backgroundColor: '#000',
-      textColor: '#fff',
-    });
-  } else {
-    Toast.show({
-      position: 'center',
-      type: 'error',
-      text1: 'Opps!',
-      text2: error.message,
-      backgroundColor: '#000',
-      textColor: '#fff',
-    });
+    if (error.request) {
+      Toast.show({
+        ...baseToast,
+        text1: 'Network Error!',
+        text2:
+          'Tidak bisa terhubung ke server. Cek koneksi kamu, pastikan kamu berada dalam jangkauan internet.',
+      });
+      return;
+    }
   }
+
+  const fallback = error instanceof Error ? error.message : 'Terjadi kesalahan.';
+  Toast.show({
+    ...baseToast,
+    text1: 'Opps!',
+    text2: fallback,
+  });
 };
 
 export default HandleError;

@@ -1,7 +1,7 @@
-import { Text, View, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
 
 interface InputProps {
   label?: string;
@@ -15,14 +15,12 @@ export default function InputFileCamera({ label, onChangeFile, placeholder, erro
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       // allowsEditing: true,
       // aspect: [3, 4],
       quality: 1,
     });
-
-    // console.log(result.assets[0].fileName);
 
     if (!result.canceled) {
       setFileName(result.assets[0].fileName ?? '');

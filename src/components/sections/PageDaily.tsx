@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
-import { useState } from 'react';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
+
 import PageDailyListCheckpoint from '@/components/sections/PageDailyListCheckpoint';
 
 type rawData = {
@@ -103,9 +104,7 @@ const PageDaily = ({ item }: rawData) => {
                 <MaterialCommunityIcons name="gas-station" size={20} color="white" />
                 <Text className="text-base font-bold text-white">Pengisian BBM</Text>
               </View>
-              <Text className="text-xs text-white/70">
-                Pilih metode pembayaran pengisian BBM
-              </Text>
+              <Text className="text-xs text-white/70">Pilih metode pembayaran pengisian BBM</Text>
             </View>
 
             <View className="p-5">

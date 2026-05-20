@@ -1,7 +1,7 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import React from 'react';
-import { router } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 type rawData = {
   item: {

@@ -1,24 +1,28 @@
-import { router, Slot, Stack } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useAutoLogin } from '../hooks/useAutoLogin';
-import { StatusBar } from 'expo-status-bar';
-import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { router, Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { Alert, BackHandler } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import ToastManager from 'toastify-react-native';
+
+import { useAutoLogin } from '../hooks/useAutoLogin';
+
 import '../../global.css';
 import Loader from '@/components/feedback/Loader';
-import { useEffect, useState } from 'react';
-import { Alert, BackHandler, Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import ToastManager from 'toastify-react-native';
+
 import '@/utils/backgroundLocationTask';
-import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
-import { logger } from '@/utils/logger';
 import NotifikasiNewVersion from '@/components/modals/NotifikasiNewVersion';
 import NotifikasiNewVersionMinor from '@/components/modals/NotifikasiNewVersionMinor';
+import { APPEL_CLIENT_ID, GOOGLE_CLIENT_ID } from '@/utils/constants';
+import { logger } from '@/utils/logger';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -111,7 +115,6 @@ export default function RootLayout() {
         ],
         { cancelable: false }
       );
-      return;
     }
   }
 
@@ -146,10 +149,6 @@ export default function RootLayout() {
   if (isLoading || !isReady) {
     return <Loader />;
   }
-
-  // if (!isReady) {
-  //   return <RequiredPermission />
-  // }
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,18 +1,18 @@
+import DateTimePicker from '@expo/ui/datetimepicker';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import BottomSheet, { useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
-import ListDetailSectionSheet from '@/components/sections/ListDetailSectionSheet';
 
-import dayjs from 'dayjs';
-import secureApi from '@/services/service';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import SkeletonList from '@/components/feedback/SkeletonList';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import ListDetailSectionSheet from '@/components/sections/ListDetailSectionSheet';
 import { colors } from '@/constants/colors';
-import DateTimePicker from '@expo/ui/datetimepicker';
 import { useDatePicker } from '@/hooks/useDatePicker';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import secureApi from '@/services/service';
 
 const LIMIT = 10;
 
@@ -59,10 +59,6 @@ export default function PemakaianScreen() {
   const [dateInput, setDateInput] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [previewImg, setPreviewImg] = useState('');
-
-  useEffect(() => {
-    refetch();
-  }, []);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching, isLoading } =
     useInfiniteQuery({

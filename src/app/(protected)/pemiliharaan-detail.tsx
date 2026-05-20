@@ -1,3 +1,8 @@
+import { Picker } from '@react-native-picker/picker';
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Formik, FormikValues } from 'formik';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   BackHandler,
@@ -8,24 +13,20 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
+import * as yup from 'yup';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
+import ButtonCostum from '@/components/forms/ButtonCostum';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
-import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/feedback/SkeletonList';
 import { dataDetail } from '@/types/types';
-import { Picker } from '@react-native-picker/picker';
-import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import HandleError from '@/utils/handleError';
-import { Dropdown } from 'react-native-element-dropdown';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -43,10 +44,6 @@ export default function PemiliharaanDetailScreen() {
   const { uuid } = useLocalSearchParams();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
-
-  useEffect(() => {
-    refetch();
-  }, [uuid]);
 
   const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
@@ -97,16 +94,11 @@ export default function PemiliharaanDetailScreen() {
     formData.append('kendaraan_id', data?.id || '');
 
     try {
-      // console.log('formData', formData);
       const response = await secureApi.postForm('/service/store', formData);
 
-      // console.log('response ', JSON.stringify(response));
-
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
-      // console.log(response.message);
       router.dismissTo('/(protected)/(tabs)/pemiliharaan');
-    } catch (error: any) {
-      // console.log(error.response.data);
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);

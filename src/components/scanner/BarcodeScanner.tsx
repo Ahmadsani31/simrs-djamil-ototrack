@@ -1,3 +1,5 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
@@ -10,11 +12,10 @@ import {
   Linking,
   Pressable,
 } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Toast } from 'toastify-react-native';
+
 import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
-import { Toast } from 'toastify-react-native';
 const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;

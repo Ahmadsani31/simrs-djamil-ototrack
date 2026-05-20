@@ -1,3 +1,14 @@
+import { Feather } from '@expo/vector-icons';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  isSuccessResponse,
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import Constants from 'expo-constants';
+import { router } from 'expo-router';
+import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   View,
@@ -8,16 +19,6 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { useAuthStore } from '@/stores/authStore';
-import * as yup from 'yup';
-import { Formik } from 'formik';
-import Input from '@/components/forms/Input';
-import { Feather } from '@expo/vector-icons';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import { LoginData } from '@/types/types';
-import ViewError from '@/components/feedback/ViewError';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -25,16 +26,19 @@ import Animated, {
   withDelay,
   FadeInDown,
 } from 'react-native-reanimated';
-import useOnceEffect from '@/hooks/useOnceEffect';
-import Constants from 'expo-constants';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  isSuccessResponse,
-  isErrorWithCode,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
+import * as yup from 'yup';
+
+import ButtonCostum from '@/components/forms/ButtonCostum';
+import Input from '@/components/forms/Input';
+import { useAuthStore } from '@/stores/authStore';
+
+
+import { LoginData } from '@/types/types';
+import ViewError from '@/components/feedback/ViewError';
+import useOnceEffect from '@/hooks/useOnceEffect';
+
 import { colors } from '@/constants/colors';
 
 const validationSchema = yup.object().shape({
@@ -92,7 +96,7 @@ export default function LoginScreen() {
       } else {
         await GoogleSignin.signOut();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
@@ -158,7 +162,9 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           {/* Logo */}
-          <Animated.View entering={FadeInDown.delay(100).duration(500)} className="mb-6 items-center">
+          <Animated.View
+            entering={FadeInDown.delay(100).duration(500)}
+            className="mb-6 items-center">
             <View className="rounded-2xl bg-white/90 px-6 py-3 shadow-sm">
               <Image
                 style={{ width: 220, height: 70 }}

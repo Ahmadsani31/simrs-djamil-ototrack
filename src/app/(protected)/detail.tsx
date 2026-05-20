@@ -1,3 +1,9 @@
+import { AntDesign } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { Formik, FormikValues } from 'formik';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
@@ -10,29 +16,22 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import * as yup from 'yup';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
+import ButtonCostum from '@/components/forms/ButtonCostum';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import { AntDesign } from '@expo/vector-icons';
 import ModalCamera from '@/components/modals/ModalCamera';
-import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
-import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/feedback/SkeletonList';
-import * as SecureStore from 'expo-secure-store';
-
-import { startTracking, stopTracking } from '@/utils/locationUtils';
+import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
-import CustomNumberInput from '@/components/forms/CustomNumberInput';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLocationStore } from '@/stores/locationStore';
+import { startTracking, stopTracking } from '@/utils/locationUtils';
 
 const validationSchema = yup.object().shape({
   kegiatan: yup.string().required('Kegiatan harus diisi'),
@@ -45,14 +44,15 @@ const fetchData = async (uuid: string) => {
 };
 
 export default function DetailScreen() {
-  const insets = useSafeAreaInsets();
   const { uuid } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
+  // Saat masuk halaman pemakaian baru: bersihkan tracking lama (route koordinat
+  // sebelumnya) supaya pemakaian baru dimulai dari state bersih. Refetch tidak
+  // diperlukan: react-query otomatis fetch karena `uuid` ada di queryKey.
   useEffect(() => {
-    refetch();
     resetTracking();
   }, [uuid]);
 
@@ -98,24 +98,18 @@ export default function DetailScreen() {
     formData.append('spidometer', values.spidometer);
     formData.append('kendaraan_id', data?.id || '');
     formData.append('fileImage', {
-      uri: uri,
+      uri,
       name: 'spidometer-capture.jpg',
       type: 'image/jpeg',
     } as any);
 
     try {
-      // console.log('formData', formData);
-
       const response = await secureApi.postForm('/reservasi/save_detail', formData);
       await startTracking();
 
-      // console.log('response ', JSON.stringify(response));
-
       await SecureStore.setItemAsync('DataAktif', JSON.stringify(response.data));
-      // console.log(response.message);
       router.dismissTo('/(protected)/(tabs)');
-    } catch (error: any) {
-      // console.log(error.response.data);
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -134,7 +128,7 @@ export default function DetailScreen() {
       className="bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
 

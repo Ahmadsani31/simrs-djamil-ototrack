@@ -1,13 +1,14 @@
-import { Checkpoint, CheckpointBBM } from '@/types/types';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetSectionList } from '@gorhom/bottom-sheet';
+import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+import { Image } from 'expo-image';
 import React from 'react';
 import { Text, View, Pressable, SectionListRenderItemInfo } from 'react-native';
+
 import SkeletonList from '@/components/feedback/SkeletonList';
-import { useQuery } from '@tanstack/react-query';
 import secureApi from '@/services/service';
-import { Image } from 'expo-image';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Checkpoint, CheckpointBBM } from '@/types/types';
 
 interface itemsProps {
   reservasiID: string;
@@ -62,9 +63,7 @@ export default function ListDetailSectionSheet({ reservasiID, onPressImage }: it
                   <View
                     className={`h-2 w-2 rounded-full ${isVoucher ? 'bg-amber-500' : 'bg-emerald-500'}`}
                   />
-                  <Text className="text-xs font-medium text-gray-600">
-                    Pengisian #{index + 1}
-                  </Text>
+                  <Text className="text-xs font-medium text-gray-600">Pengisian #{index + 1}</Text>
                 </View>
                 <Text className="text-[11px] font-semibold text-gray-700">
                   {isVoucher

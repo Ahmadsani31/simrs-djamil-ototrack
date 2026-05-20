@@ -1,3 +1,9 @@
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Formik } from 'formik';
+import { useState } from 'react';
 import {
   Alert,
   Image,
@@ -8,24 +14,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import ModalCamera from '@/components/modals/ModalCamera';
-import secureApi from '@/services/service';
-import { Formik } from 'formik';
-import * as yup from 'yup';
-import { colors } from '@/constants/colors';
-import { reLocation } from '@/hooks/locationRequired';
-import { useLoadingStore } from '@/stores/loadingStore';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/feedback/SkeletonList';
 import { Toast } from 'toastify-react-native';
+import * as yup from 'yup';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
-import HandleError from '@/utils/handleError';
+import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '@/constants/colors';
+import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
+import { useLoadingStore } from '@/stores/loadingStore';
+import HandleError from '@/utils/handleError';
 
 type propsService = {
   id: string;
@@ -39,10 +40,9 @@ type propsService = {
 const fetchData = async (service_id: string) => {
   const response = await secureApi.get(`/service/data_aktif`, {
     params: {
-      service_id: service_id,
+      service_id,
     },
   });
-  // console.log(`fetchData response`, response.data);
 
   return response.data;
 };
@@ -58,7 +58,6 @@ type propsSubmit = {
 
 export default function PengembalianServiceScreen() {
   const { service_id, kendaraan_id } = useLocalSearchParams();
-  const insets = useSafeAreaInsets();
   const [modalImageVisible, setModalImageVisible] = useState(false);
   const [imgBase64, setImgBase64] = useState<Base64URLString>();
 
@@ -80,8 +79,6 @@ export default function PengembalianServiceScreen() {
   const [uri, setUri] = useState<string | null>(null);
 
   const postSubmitData = async (values: propsSubmit) => {
-    // console.log(values);
-
     setLoading(true);
 
     if (!uri) {
@@ -106,22 +103,18 @@ export default function PengembalianServiceScreen() {
       formData.append('nominal', values.nominal);
       formData.append('keterangan', values.keterangan);
       formData.append('fileImage', {
-        uri: uri,
+        uri,
         name: 'bon-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
       // return;
 
       await secureApi.postForm('/service/update', formData);
-      // console.log('response ', JSON.stringify(response.data));
 
       // await SecureStore.deleteItemAsync('DataAktif');
-      // console.log(response.message);
       router.replace('(tabs)/(pemiliharaan)');
-    } catch (error: any) {
-      // console.log(error.response);
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -133,7 +126,7 @@ export default function PengembalianServiceScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
@@ -179,9 +172,9 @@ export default function PengembalianServiceScreen() {
                     </Text>
                     {!uri ? (
                       <TouchableOpacity
-                        className={`flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2`}
+                        className="flex-row items-center gap-2 rounded-lg border border-gray-500 bg-slate-100 px-3 py-2"
                         onPress={() => setModalVisible(true)}>
-                        <AntDesign name="camera" size={24} color={'black'} />
+                        <AntDesign name="camera" size={24} color="black" />
                         <Text className="font-bold">Klik untuk ambil gambar</Text>
                       </TouchableOpacity>
                     ) : (
@@ -192,7 +185,7 @@ export default function PengembalianServiceScreen() {
                             setImgBase64(uri);
                             setModalImageVisible(true);
                           }}>
-                          <Image source={{ uri: uri }} className="size-10 rounded-lg" />
+                          <Image source={{ uri }} className="size-10 rounded-lg" />
                           <View>
                             <Text className="font-bold">foto-struk-bon-pemeliharaan.jpg</Text>
                             <Text className="text-start text-xs">klik disini untuk lihat.</Text>

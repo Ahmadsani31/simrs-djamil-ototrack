@@ -1,11 +1,12 @@
-import { Linking, Modal, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
-import Foundation from '@expo/vector-icons/Foundation';
-import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
-import * as Application from 'expo-application';
-import semver from 'semver';
-import { URL_PLAY_STORE, API_URL } from '@/utils/constants';
+import Foundation from '@expo/vector-icons/Foundation';
 import axios from 'axios';
+import * as Application from 'expo-application';
+import React, { useEffect, useState } from 'react';
+import { Linking, Modal, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import semver from 'semver';
+
+import { URL_PLAY_STORE, API_URL } from '@/utils/constants';
 import { logger } from '@/utils/logger';
 
 export default function NotifikasiNewVersion() {
@@ -37,12 +38,12 @@ export default function NotifikasiNewVersion() {
   }
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
+    <Modal animationType="slide" transparent visible={visible}>
       <View className="flex-1 items-center justify-end bg-black/50">
         <View className="w-full rounded-t-lg bg-white">
           <View className="rounded-t-lg bg-[#4F959D] p-5">
             <View className="flex-row gap-2">
-              <Foundation name="alert" size={24} color={'#ff9966'} />
+              <Foundation name="alert" size={24} color="#ff9966" />
               <Text className="text-xl font-bold text-white">Wajib Update</Text>
             </View>
           </View>

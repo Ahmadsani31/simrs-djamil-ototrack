@@ -1,7 +1,8 @@
-import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+
 import { colors } from '@/constants/colors';
+import { statusTrackingStore } from '@/stores/statusTrackingStore';
 import { LOCATION_TASK_NAME } from '@/utils/backgroundLocationTask';
 
 export async function startTracking() {
@@ -34,7 +35,6 @@ export async function startTracking() {
       },
     });
     statusTrackingStore.getState().setTrackingStatus(true);
-    // console.log('Location tracking started');
   }
 }
 

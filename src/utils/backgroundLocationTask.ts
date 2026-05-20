@@ -1,5 +1,6 @@
-import * as TaskManager from 'expo-task-manager';
 import { LocationObject } from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
+
 import { useLocationStore } from '@/stores/locationStore';
 
 export const LOCATION_TASK_NAME = 'background-location-task';
@@ -38,4 +39,3 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 });
 
 export default LOCATION_TASK_NAME;
-

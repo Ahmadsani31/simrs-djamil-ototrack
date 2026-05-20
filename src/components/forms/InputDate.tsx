@@ -1,7 +1,8 @@
-import { TextInput, Text, View, Pressable, TouchableOpacity } from 'react-native';
-import { Entypo, Fontisto } from '@expo/vector-icons';
 import DateTimePicker from '@expo/ui/datetimepicker';
+import { Entypo, Fontisto } from '@expo/vector-icons';
 import dayjs from 'dayjs';
+import { TextInput, Text, View, Pressable, TouchableOpacity } from 'react-native';
+
 import { useDatePicker } from '@/hooks/useDatePicker';
 
 interface InputProps {
@@ -23,7 +24,7 @@ export default function InputDate({ label, value, onChangeDate, onResetDate, err
       <Pressable
         className="rounded-lg bg-white"
         onPress={() => picker.openWithCallback('date', onChangeDate)}>
-        <Fontisto className="absolute left-4 top-2.5 z-10" name="date" size={24} color={'black'} />
+        <Fontisto className="absolute left-4 top-2.5 z-10" name="date" size={24} color="black" />
         <TextInput
           className={`border ${error ? 'border-red-500' : 'border-gray-500'} rounded-lg bg-gray-100 py-3 ps-14`}
           placeholder="Select Date"

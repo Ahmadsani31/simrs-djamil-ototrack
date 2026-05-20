@@ -1,11 +1,11 @@
-import { Text, View, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
-
+import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { Toast } from 'toastify-react-native';
+
 import { useLoadingStore } from '@/stores/loadingStore';
 import { logger } from '@/utils/logger';
 
@@ -23,7 +23,7 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       // allowsEditing: true,
       // aspect: [3, 4],

@@ -1,3 +1,9 @@
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { Formik, FormikValues } from 'formik';
+import { useState } from 'react';
 import {
   Alert,
   Image,
@@ -8,30 +14,26 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import Input from '@/components/forms/Input';
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import ModalCamera from '@/components/modals/ModalCamera';
-import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
+import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
+import Input from '@/components/forms/Input';
+import ModalCamera from '@/components/modals/ModalCamera';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
+import { getStoredCoords } from '@/lib/secureStorage';
+import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-
+import { useLocationStore } from '@/stores/locationStore';
+import { dataDetail } from '@/types/types';
+import HandleError from '@/utils/handleError';
 import { stopTracking } from '@/utils/locationUtils';
 
-import { useLocationStore } from '@/stores/locationStore';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/feedback/SkeletonList';
-import { dataDetail } from '@/types/types';
-import * as SecureStore from 'expo-secure-store';
-import { getStoredCoords } from '@/lib/secureStorage';
-import { Toast } from 'toastify-react-native';
-import HandleError from '@/utils/handleError';
-import CustomNumberInput from '@/components/forms/CustomNumberInput';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
+
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer harus diisi'),
@@ -40,7 +42,7 @@ const validationSchema = yup.object().shape({
 const fetchData = async (reservasi_id: string) => {
   const response = await secureApi.get(`/reservasi/cek_data_aktif`, {
     params: {
-      reservasi_id: reservasi_id,
+      reservasi_id,
     },
   });
   return response.data;
@@ -49,7 +51,6 @@ const fetchData = async (reservasi_id: string) => {
 export default function PengembalianScreen() {
   const { reservasi_id } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
-  const insets = useSafeAreaInsets();
   const { data, isLoading, error, refetch, isError } = useQuery<dataDetail>({
     queryKey: ['pengembalian', reservasi_id],
     queryFn: () => fetchData(reservasi_id.toString()),
@@ -57,10 +58,6 @@ export default function PengembalianScreen() {
   const setLoading = useLoadingStore((state) => state.setLoading);
   const [modalVisible, setModalVisible] = useState(false);
   const [uri, setUri] = useState<string | null>(null);
-
-  useEffect(() => {
-    refetch();
-  }, []);
 
   if (isError) {
     Alert.alert('Peringatan!', 'Data tidak valid atau kendaraan tidak aktif!', [
@@ -94,22 +91,18 @@ export default function PengembalianScreen() {
       formData.append('reservasi_id', reservasi_id.toString());
       formData.append('coordinates', JSON.stringify(asyncCoords));
       formData.append('fileImage', {
-        uri: uri,
+        uri,
         name: 'spidometer-capture.jpg',
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', formData);
-
       await secureApi.postForm('/reservasi/return_kendaraan', formData);
       clearCoordinates();
       await stopTracking();
-      // console.log('response ', JSON.stringify(response.data));
 
       await SecureStore.deleteItemAsync('DataAktif');
-      // console.log(response.message);
       router.dismissTo('/(protected)/(tabs)');
-    } catch (error: any) {
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -121,7 +114,7 @@ export default function PengembalianScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">

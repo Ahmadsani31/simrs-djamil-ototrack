@@ -1,7 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import Skeleton from '@/components/feedback/Skeleton';
+
 import FadeInView from '@/components/feedback/FadeInView';
+import Skeleton from '@/components/feedback/Skeleton';
 
 export default function SkeletonItem() {
   return (

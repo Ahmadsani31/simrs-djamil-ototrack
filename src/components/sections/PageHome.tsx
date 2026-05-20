@@ -1,11 +1,12 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { BarChart } from 'react-native-gifted-charts';
-import { Image } from 'expo-image';
-import secureApi from '@/services/service';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { BarChart } from 'react-native-gifted-charts';
+
 import SkeletonList from '@/components/feedback/SkeletonList';
 import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
 
 type propsBar = {
   value: number;

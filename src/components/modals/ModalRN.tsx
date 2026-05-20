@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, StyleSheet, Text, KeyboardAvoidingView, Platform } from 'react-native';
 import BottomSheet, {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
 
 interface ModalProps {
   visible: boolean;
@@ -65,11 +65,7 @@ export function ModalRN({ visible, onClose, children }: ModalProps) {
 }
 
 ModalRN.Header = function Header({ children }: { children: React.ReactNode }) {
-  return (
-    <View style={styles.header}>
-      {children}
-    </View>
-  );
+  return <View style={styles.header}>{children}</View>;
 };
 
 ModalRN.Content = function Content({ children }: { children: React.ReactNode }) {

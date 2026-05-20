@@ -20,17 +20,16 @@ export default function ButtonCostum({
 
   return (
     <View className="my-2">
-    <TouchableOpacity
-      className={`${classname} py-3 px-4 rounded-lg items-center justify-center`}
-      onPress={onPress}
-      disabled={loading}
-    >
-      {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? 'white' : 'gray'} />
-      ) : (
-        <Text className={`${textColor} font-bold`}>{title}</Text>
-      )}
-    </TouchableOpacity>
+      <TouchableOpacity
+        className={`${classname} items-center justify-center rounded-lg px-4 py-3`}
+        onPress={onPress}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color={variant === 'primary' ? 'white' : 'gray'} />
+        ) : (
+          <Text className={`${textColor} font-bold`}>{title}</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }

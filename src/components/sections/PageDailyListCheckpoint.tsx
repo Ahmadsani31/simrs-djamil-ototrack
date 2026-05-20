@@ -1,10 +1,11 @@
-import secureApi from '@/services/service';
-import { useQuery } from '@tanstack/react-query';
-import { View, Text, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
+
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
+import secureApi from '@/services/service';
 import { logger } from '@/utils/logger';
 
 interface propsBbm {
@@ -43,10 +44,6 @@ export default function PageDailyCheckpoint({ id }: { id: number }) {
     queryFn: async () => await fetchDataLog(id),
     enabled: !!id,
   });
-
-  useEffect(() => {
-    if (id) refetch();
-  }, [id]);
 
   const [titleModal, setTitleModal] = useState('');
   const [modalVisible, setModalVisible] = useState(false);

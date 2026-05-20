@@ -1,4 +1,21 @@
 import {
+  AntDesign,
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from '@expo/vector-icons';
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetTextInput,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import Constants from 'expo-constants';
+import { Image } from 'expo-image';
+import { useFormik } from 'formik';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
   View,
   Text,
   TouchableOpacity,
@@ -8,31 +25,15 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '@/stores/authStore';
-import Constants from 'expo-constants';
-import { Image } from 'expo-image';
-import {
-  AntDesign,
-  Feather,
-  FontAwesome5,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from '@expo/vector-icons';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useFormik } from 'formik';
+import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
-import secureApi from '@/services/service';
-import { useQuery } from '@tanstack/react-query';
+
 import SkeletonList from '@/components/feedback/SkeletonList';
+import secureApi from '@/services/service';
+import { useAuthStore } from '@/stores/authStore';
+
 import { dataDashboard } from '@/types/types';
 import HandleError from '@/utils/handleError';
-import {
-  BottomSheetModal,
-  BottomSheetBackdrop,
-  BottomSheetTextInput,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import { Toast } from 'toastify-react-native';
 
 const validationSchema = yup.object().shape({
   password: yup.string().min(6, 'Minimal 6 karakter').required('Password harus diisi'),
@@ -62,11 +63,6 @@ export default function Profile() {
       setIsLoading(false);
     }
   };
-  // Server state via react-query
-  // const { data, isLoading, refetch } = useQuery<dataDashboard>({
-  //   queryKey: ['dashboard'],
-  //   queryFn: fetchDashboard,
-  // });
 
   useEffect(() => {
     fetchDashboard();
@@ -129,7 +125,7 @@ export default function Profile() {
             { text: 'Logout', onPress: () => logout() },
           ]);
         }, 400);
-      } catch (error: any) {
+      } catch (error: unknown) {
         HandleError(error);
       } finally {
         setSubmitting(false);

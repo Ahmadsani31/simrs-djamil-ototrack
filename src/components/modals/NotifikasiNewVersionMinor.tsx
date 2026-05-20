@@ -1,7 +1,8 @@
-import { Modal, Text, TouchableHighlight, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Updates from 'expo-updates';
+import React, { useEffect, useState } from 'react';
+import { Modal, Text, TouchableHighlight, View } from 'react-native';
+
 import { logger } from '@/utils/logger';
 
 export default function NotifikasiNewVersionMinor() {
@@ -34,7 +35,7 @@ export default function NotifikasiNewVersionMinor() {
   }
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
+    <Modal animationType="slide" transparent visible={visible}>
       <View className="flex-1 items-center justify-end bg-black/50">
         <View className="w-full rounded-t-lg bg-white">
           <View className="rounded-t-lg bg-gray-200 p-5">

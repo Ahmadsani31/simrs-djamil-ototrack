@@ -96,14 +96,11 @@ export function useDatePicker(options: UseDatePickerOptions = {}): DatePickerSta
     [onPick]
   );
 
-  const openWithCallback = useCallback(
-    (nextMode: DatePickerMode, cb: (date: Date) => void) => {
-      setMode(nextMode);
-      setOnPick(() => cb);
-      setVisible(true);
-    },
-    []
-  );
+  const openWithCallback = useCallback((nextMode: DatePickerMode, cb: (date: Date) => void) => {
+    setMode(nextMode);
+    setOnPick(() => cb);
+    setVisible(true);
+  }, []);
 
   return { visible, value, mode, open, dismiss, handleChange, openWithCallback };
 }

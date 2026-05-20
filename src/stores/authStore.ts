@@ -1,8 +1,10 @@
-import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
-import { LoginData, LoginSSOData, User } from '@/types/types';
-import { restApi } from '@/services/auth';
+import axios from 'axios';
 import { router } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { create } from 'zustand';
+
+import { restApi } from '@/services/auth';
+import { LoginData, LoginSSOData, User } from '@/types/types';
 
 interface AuthState {
   token: string | null;
@@ -15,6 +17,20 @@ interface AuthState {
   checkAuth: () => Promise<void>;
 }
 
+const resolveLoginError = (error: unknown, fallback: string): string => {
+  if (axios.isAxiosError(error)) {
+    if (error.response?.data) {
+      const message = (error.response.data as { message?: string }).message;
+      return message ?? fallback;
+    }
+    if (error.request) {
+      return 'Tidak bisa terhubung ke server. Cek koneksi kamu.';
+    }
+  }
+  if (error instanceof Error) return error.message;
+  return fallback;
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   user: null,
@@ -22,8 +38,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   errorLogin: null,
 
   login: async (data: LoginData) => {
-    // console.log('Login function called with data:', JSON.stringify(data));
-
     set({ isLoading: true, errorLogin: null });
 
     try {
@@ -31,38 +45,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       const token = response.data.token;
       const user = response.data.user;
 
-      // console.log('Login successful :', user);
-      // console.log('Token :', token);
-
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return user;
-    } catch (error: any) {
-      // Alert.alert('Warning!', error.message as string);
-      // console.log('Login error:', error.message as string);
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Username atau password salah';
-        set({
-          errorLogin: msg,
-          isLoading: false,
-        });
-      } else if (error.request) {
-        set({
-          errorLogin: 'Tidak bisa terhubung ke server. Cek koneksi kamu.',
-          isLoading: false,
-        });
-      } else {
-        set({
-          errorLogin: error.message,
-          isLoading: false,
-        });
-      }
+    } catch (error: unknown) {
+      set({
+        errorLogin: resolveLoginError(error, 'Username atau password salah'),
+        isLoading: false,
+      });
       return false;
     }
   },
-  loginSSO: async (data: LoginSSOData) => {
-    // console.log('Login function called with data:', JSON.stringify(data));
 
+  loginSSO: async (data: LoginSSOData) => {
     set({ isLoading: true, errorLogin: null });
 
     try {
@@ -73,26 +68,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       await SecureStore.setItemAsync('token', token);
       set({ token, user, isLoading: false });
       return true;
-    } catch (error: any) {
-      // Alert.alert('Warning!', error.message as string);
-      // console.log('Login error:', error.message as string);
-      if (error.response && error.response.data) {
-        const msg = error.response.data.message || 'Email tidak terdaftar';
-        set({
-          errorLogin: msg,
-          isLoading: false,
-        });
-      } else if (error.request) {
-        set({
-          errorLogin: 'Tidak bisa terhubung ke server. Cek koneksi kamu.',
-          isLoading: false,
-        });
-      } else {
-        set({
-          errorLogin: error.message,
-          isLoading: false,
-        });
-      }
+    } catch (error: unknown) {
+      set({
+        errorLogin: resolveLoginError(error, 'Email tidak terdaftar'),
+        isLoading: false,
+      });
       return false;
     }
   },
@@ -118,19 +98,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       const token = await SecureStore.getItemAsync('token');
-      // console.log('Check auth token:', token);
       if (token) {
         const response = await restApi.cekLogin(token);
         const user = response.data.user;
-        // console.log('Check auth successful:', token, user);
-
         set({ token, user, isLoading: false });
       } else {
-        // console.log('token not found');
         set({ isLoading: false });
       }
-    } catch (error: any) {
-      // console.log('Check User error:', JSON.stringify(error.response?.data?.message));
+    } catch {
       await SecureStore.deleteItemAsync('token');
       set({ token: null, user: null, isLoading: false });
     }

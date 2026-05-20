@@ -1,3 +1,5 @@
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
@@ -10,11 +12,10 @@ import {
   Linking,
   Modal,
 } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Toast } from 'toastify-react-native';
+
 import ButtonCostum from '@/components/forms/ButtonCostum';
 import { colors } from '@/constants/colors';
-import { Toast } from 'toastify-react-native';
 const { width, height } = Dimensions.get('window');
 const SCAN_SIZE = width * 0.7;
 const SCAN_PADDING = 20;
@@ -79,7 +80,7 @@ export default function BarcodeScannerCamera({
   if (!permission) {
     // Camera permissions are still loading.
     return (
-      <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onVisible}>
+      <Modal animationType="slide" transparent visible={visible} onRequestClose={onVisible}>
         <View className="flex-1 justify-center bg-black/30">
           <View className="w-full flex-1 items-center justify-center bg-white">
             <Text className="text-xl font-medium">Requesting camera permission...</Text>
@@ -96,7 +97,7 @@ export default function BarcodeScannerCamera({
 
   if (permission.status === 'denied') {
     return (
-      <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onVisible}>
+      <Modal animationType="slide" transparent visible={visible} onRequestClose={onVisible}>
         <View className="flex-1 justify-center bg-black/30">
           <View className="w-full flex-1 items-center justify-center bg-white">
             <Text className="text-center text-xl font-bold text-red-500">
@@ -116,7 +117,7 @@ export default function BarcodeScannerCamera({
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onVisible}>
+      <Modal animationType="slide" transparent visible={visible} onRequestClose={onVisible}>
         <View className="flex-1 justify-center bg-black/30">
           <View className="w-full flex-1 items-center justify-center bg-white">
             <Text className="text-xl font-medium">We need your permission to show the camera</Text>
@@ -132,13 +133,13 @@ export default function BarcodeScannerCamera({
   }
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onVisible}>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={onVisible}>
       <View className="flex-1 justify-end bg-black/30">
         <View
           style={{
             height: height - 100,
           }}
-          className={`items-center rounded-t-2xl bg-gray-500`}>
+          className="items-center rounded-t-2xl bg-gray-500">
           <TouchableOpacity
             className="mb-10 h-10 w-full flex-row items-center justify-center rounded-t-2xl bg-gray-200"
             onPress={onVisible}>

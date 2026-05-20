@@ -1,15 +1,16 @@
-import { View, Text, TouchableOpacity, ScrollView, RefreshControl, Alert } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '@/stores/authStore';
+import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { Image } from 'expo-image';
-import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { PieChart } from 'react-native-gifted-charts';
-import secureApi from '@/services/service';
-import { useCallback, useEffect, useState } from 'react';
-import SkeletonList from '@/components/feedback/SkeletonList';
 import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, RefreshControl, Alert } from 'react-native';
+import { PieChart } from 'react-native-gifted-charts';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
 import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
+import { useAuthStore } from '@/stores/authStore';
 
 type PieItem = {
   value: number;
@@ -100,7 +101,7 @@ export default function Profile() {
         </View>
 
         {/* Chart Card (overlaps header) */}
-        <View className="-mt-8 mx-4 rounded-2xl bg-white p-5 shadow-sm">
+        <View className="mx-4 -mt-8 rounded-2xl bg-white p-5 shadow-sm">
           <View className="mb-3 flex-row items-center gap-2">
             <MaterialCommunityIcons name="chart-donut" size={20} color={colors.brand} />
             <Text className="text-base font-bold text-gray-800">Pemakaian Kendaraan</Text>
@@ -175,9 +176,7 @@ export default function Profile() {
         {/* Footer */}
         <View className="mt-8 items-center pb-6">
           <Text className="text-xs text-gray-400">Pencatatan Kendaraan Operasional</Text>
-          <Text className="mt-0.5 text-sm font-bold text-gray-500">
-            RSUP DR. M. DJAMIL PADANG
-          </Text>
+          <Text className="mt-0.5 text-sm font-bold text-gray-500">RSUP DR. M. DJAMIL PADANG</Text>
           <Text className="mt-3 text-[10px] text-gray-300">
             Version {Constants.expoConfig?.version}
           </Text>

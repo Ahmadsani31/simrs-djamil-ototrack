@@ -1,3 +1,8 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Formik, FormikValues } from 'formik';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -7,26 +12,20 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
 import * as yup from 'yup';
-import { colors } from '@/constants/colors';
-import { useLoadingStore } from '@/stores/loadingStore';
 
-import { useQuery } from '@tanstack/react-query';
 import SkeletonList from '@/components/feedback/SkeletonList';
-import { dataDetail } from '@/types/types';
-
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
+import { colors } from '@/constants/colors';
+import secureApi from '@/services/service';
+
+
+import { useLoadingStore } from '@/stores/loadingStore';
+import { dataDetail } from '@/types/types';
 import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
-import dayjs from 'dayjs';
-import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import HandleError from '@/utils/handleError';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   spidometer: yup.number().required('Spidometer wajib diisi (required)'),
@@ -38,8 +37,8 @@ const validationSchema = yup.object().shape({
 const fetchData = async (reservasi_id: string, user_id: string) => {
   const response = await secureApi.get(`/reservasi/cek_data_aktif_admin`, {
     params: {
-      reservasi_id: reservasi_id,
-      user_id: user_id,
+      reservasi_id,
+      user_id,
     },
   });
   return response.data;
@@ -48,7 +47,6 @@ const fetchData = async (reservasi_id: string, user_id: string) => {
 export default function PengembalianManualScreen() {
   const { reservasi_id, user_id } = useLocalSearchParams();
 
-  const insets = useSafeAreaInsets();
   const { data, isLoading, error, isError } = useQuery<dataDetail>({
     queryKey: ['dataPengembalian', reservasi_id, user_id],
     queryFn: () => fetchData(reservasi_id.toString(), user_id.toString()),
@@ -78,15 +76,12 @@ export default function PengembalianManualScreen() {
         type: 'image/jpeg',
       } as any);
 
-      // console.log('formData', JSON.stringify(formData));
       // return;
       await secureApi.postForm('/reservasi/pengembalian_manual', formData);
-      // console.log('response ', JSON.stringify(response.data));
 
       // await SecureStore.deleteItemAsync('pemakaianAktif');
-      // console.log(response.message);
       router.dismissTo('(tabs-admin)');
-    } catch (error: any) {
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -98,7 +93,7 @@ export default function PengembalianManualScreen() {
       className=" bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">
@@ -141,7 +136,7 @@ export default function PengembalianManualScreen() {
                     <InputFile
                       label="Upload file"
                       onChangeFile={(e) => setFieldValue('fileUpload', e)}
-                      placeholder={'Chose file'}
+                      placeholder="Chose file"
                       error={touched.fileUpload ? errors.fileUpload : undefined}
                     />
 

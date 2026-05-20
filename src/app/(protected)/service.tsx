@@ -1,3 +1,8 @@
+import { Picker } from '@react-native-picker/picker';
+import { useQuery } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Formik, FormikValues } from 'formik';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   BackHandler,
@@ -8,25 +13,20 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
+import * as yup from 'yup';
+
+import SkeletonList from '@/components/feedback/SkeletonList';
+import ButtonCostum from '@/components/forms/ButtonCostum';
+import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
-import ButtonCostum from '@/components/forms/ButtonCostum';
-import secureApi from '@/services/service';
-import { Formik, FormikValues } from 'formik';
-import * as yup from 'yup';
 import { colors } from '@/constants/colors';
 import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
 import { useLoadingStore } from '@/stores/loadingStore';
-import { useQuery } from '@tanstack/react-query';
-import SkeletonList from '@/components/feedback/SkeletonList';
 import { dataDetail } from '@/types/types';
-import { Picker } from '@react-native-picker/picker';
-import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import HandleError from '@/utils/handleError';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const validationSchema = yup.object().shape({
   keterangan: yup.string().required('Keterangan harus diisi'),
@@ -41,15 +41,9 @@ const fetchData = async (uuid: string) => {
 };
 
 export default function ServiceScreen() {
-  const insets = useSafeAreaInsets();
-
   const { uuid } = useLocalSearchParams();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
-
-  useEffect(() => {
-    refetch();
-  }, [uuid]);
 
   const { data, isLoading, error, isError, refetch } = useQuery<dataDetail>({
     queryKey: ['dataDetail', uuid],
@@ -100,16 +94,11 @@ export default function ServiceScreen() {
     formData.append('kendaraan_id', data?.id || '');
 
     try {
-      // console.log('formData', formData);
       const response = await secureApi.postForm('/service/store', formData);
 
-      // console.log('response ', JSON.stringify(response));
-
       // await SecureStore.setItemAsync('pemakaianAktif', JSON.stringify(response.data));
-      // console.log(response.message);
       router.dismissTo('/(protected)/(tabs)/(pemiliharaan)');
-    } catch (error: any) {
-      // console.log(error.response.data);
+    } catch (error: unknown) {
       HandleError(error);
     } finally {
       setLoading(false);
@@ -134,7 +123,7 @@ export default function ServiceScreen() {
       className="bg-slate-300"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : insets.bottom}>
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="absolute h-80 w-full rounded-bl-[50] rounded-br-[50]  bg-brand" />
         <View className="m-4 rounded-lg bg-white p-4">

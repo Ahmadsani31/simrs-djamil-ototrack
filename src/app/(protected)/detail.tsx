@@ -86,6 +86,12 @@ export default function DetailScreen() {
       });
       return;
     }
+
+    // Mulai tracking dulu — kalau user tolak permission, jangan create trip
+    // di server (akan jadi data tanpa rute).
+    const trackingStarted = await startTracking();
+    if (!trackingStarted) return;
+
     try {
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());
@@ -100,12 +106,13 @@ export default function DetailScreen() {
       } as any);
 
       const response = await secureApi.postForm('/reservasi/save_detail', formData);
-      await startTracking();
       await SecureStore.setItemAsync('DataAktif', JSON.stringify(response.data));
       router.dismissTo('/(protected)/(tabs)');
     } catch (error: unknown) {
+      // Kalau POST gagal padahal tracking sudah jalan: stop tracking biar
+      // tidak ada GPS service yang berjalan untuk trip yang gagal dibuat.
+      await stopTracking();
       HandleError(error);
-    } finally {
     }
   };
 

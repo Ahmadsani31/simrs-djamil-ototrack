@@ -23,7 +23,7 @@ import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
 import { reLocation } from '@/hooks/locationRequired';
-import { getStoredCoords } from '@/lib/secureStorage';
+import { getCoordsForUpload } from '@/lib/secureStorage';
 import secureApi from '@/services/service';
 import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
@@ -79,7 +79,7 @@ export default function PengembalianScreen() {
       return;
     }
     try {
-      const asyncCoords = await getStoredCoords();
+      const asyncCoords = await getCoordsForUpload();
 
       const formData = new FormData();
       formData.append('latitude', coordinate.lat.toString());

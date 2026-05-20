@@ -68,25 +68,32 @@ export default function RootLayout() {
   useEffect(() => {
     (async () => {
       try {
-        // Request location permission
+        // Foreground location: needed for QR scan flow + ad-hoc coordinate
+        // capture in detail/pengembalian. Background permission is deferred
+        // to `startTracking()` (only requested when driver actually starts a
+        // pemakaian) so first-launch onboarding only asks for what's needed
+        // right now.
         const { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
-        const bgStatus = await Location.requestBackgroundPermissionsAsync();
-        if (locationStatus !== 'granted' || bgStatus.status !== 'granted') {
-          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses lokasi untuk digunakan.');
-          return;
+        if (locationStatus !== 'granted') {
+          Alert.alert(
+            'Izin lokasi diperlukan',
+            'Aplikasi membutuhkan akses lokasi untuk merekam koordinat saat memulai/mengembalikan kendaraan. Aktifkan izin di pengaturan.'
+          );
         }
 
-        // Request camera permission
+        // Camera: dipakai di banyak alur (QR scan, foto spidometer, struk).
         const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
         if (cameraStatus !== 'granted') {
-          Alert.alert('Izin diperlukan', 'Aplikasi memerlukan akses kamera untuk digunakan.');
-          return;
+          Alert.alert(
+            'Izin kamera diperlukan',
+            'Aplikasi membutuhkan akses kamera untuk scan QR dan foto spidometer.'
+          );
         }
 
-        // Jika semua izin disetujui
         setIsReady(true);
       } catch (error) {
         logger.error('Error requesting permissions:', error);
+        setIsReady(true);
       }
     })();
     registerForPushNotificationsAsync();

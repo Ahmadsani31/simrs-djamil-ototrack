@@ -15,6 +15,7 @@ import {
 import Animated, {
   cancelAnimation,
   Easing,
+  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -30,6 +31,12 @@ interface Props {
   onScan: (data: string) => void;
   visible: boolean;
   onVisible: () => void;
+  /**
+   * True saat parent sedang memvalidasi hasil scan ke server. Scanner akan
+   * menampilkan overlay loading dan mencegah re-scan sampai parent reset
+   * state ini. Set false setelah API call selesai (sukses atau gagal).
+   */
+  validating?: boolean;
 }
 
 const openAppSettings = () => {
@@ -92,7 +99,12 @@ function PermissionState({
   );
 }
 
-export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Props) {
+export default function BarcodeScannerCamera({
+  onScan,
+  visible,
+  onVisible,
+  validating = false,
+}: Props) {
   const [scanned, setScanned] = useState(false);
   const [flashlight, setFlashlight] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
@@ -120,6 +132,25 @@ export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Pro
       cancelAnimation(scanLineY);
     };
   }, [visible, scanLineY]);
+
+  // Saat parent selesai validasi (validating: true → false) dan modal masih
+  // terbuka, reset state biar user bisa scan ulang tanpa close-buka modal.
+  useEffect(() => {
+    if (!visible) return;
+    if (!validating && scanned) {
+      setScanned(false);
+      scanLineY.value = 0;
+      scanLineY.value = withRepeat(
+        withSequence(
+          withTiming(SCAN_SIZE - 4, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0, { duration: 1800, easing: Easing.inOut(Easing.ease) })
+        ),
+        -1,
+        false
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validating]);
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     if (scanned) return;
@@ -204,7 +235,11 @@ export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Pro
 
   // ---- Scanner UI ----
   return (
-    <Modal animationType="slide" visible={visible} onRequestClose={onVisible} statusBarTranslucent>
+    <Modal
+      animationType="slide"
+      visible={visible}
+      onRequestClose={validating ? undefined : onVisible}
+      statusBarTranslucent>
       <StatusBar barStyle="light-content" backgroundColor="black" />
 
       <View className="flex-1 bg-black">
@@ -247,10 +282,11 @@ export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Pro
             </View>
             <TouchableOpacity
               activeOpacity={0.7}
+              disabled={validating}
               onPress={onVisible}
-              className="rounded-full bg-white/15 p-2.5"
+              className={`rounded-full p-2.5 ${validating ? 'bg-white/5' : 'bg-white/15'}`}
               hitSlop={8}>
-              <Feather name="x" size={20} color="white" />
+              <Feather name="x" size={20} color={validating ? 'rgba(255,255,255,0.4)' : 'white'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -330,8 +366,73 @@ export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Pro
             )}
           </View>
         </View>
+
+        {/* Validating overlay — block UI saat parent verifikasi QR ke server */}
+        {validating ? <ValidatingOverlay /> : null}
       </View>
     </Modal>
+  );
+}
+
+/**
+ * Animated overlay yang muncul saat parent sedang memvalidasi QR ke server.
+ * Tiga lingkaran konsentris pulse dengan staggered delay → kasih perasaan
+ * proses sedang berjalan, bukan freeze.
+ */
+function ValidatingOverlay() {
+  const ring1 = useSharedValue(0);
+  const ring2 = useSharedValue(0);
+  const ring3 = useSharedValue(0);
+
+  useEffect(() => {
+    const cfg = { duration: 1500, easing: Easing.out(Easing.ease) };
+    ring1.value = withRepeat(withTiming(1, cfg), -1, false);
+    ring2.value = withRepeat(
+      withSequence(withTiming(0, { duration: 500 }), withTiming(1, cfg)),
+      -1,
+      false
+    );
+    ring3.value = withRepeat(
+      withSequence(withTiming(0, { duration: 1000 }), withTiming(1, cfg)),
+      -1,
+      false
+    );
+    return () => {
+      cancelAnimation(ring1);
+      cancelAnimation(ring2);
+      cancelAnimation(ring3);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const ringStyle = (sv: SharedValue<number>) => ({
+    transform: [{ scale: 1 + sv.value * 1.4 }],
+    opacity: 0.4 - sv.value * 0.4,
+  });
+
+  const ring1Style = useAnimatedStyle(() => ringStyle(ring1));
+  const ring2Style = useAnimatedStyle(() => ringStyle(ring2));
+  const ring3Style = useAnimatedStyle(() => ringStyle(ring3));
+
+  return (
+    <View style={[StyleSheet.absoluteFill, styles.validatingOverlay]}>
+      <View style={styles.validatingPanel}>
+        {/* Pulsing rings */}
+        <View style={styles.ringStage}>
+          <Animated.View style={[styles.ring, ring1Style]} />
+          <Animated.View style={[styles.ring, ring2Style]} />
+          <Animated.View style={[styles.ring, ring3Style]} />
+          <View style={styles.ringCore}>
+            <Feather name="check" size={28} color="white" />
+          </View>
+        </View>
+
+        <Text className="mt-6 text-base font-bold text-white">Memvalidasi QR...</Text>
+        <Text className="mt-1 text-xs text-white/70">
+          Mohon tunggu, kami sedang memverifikasi kendaraan
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -400,6 +501,36 @@ const styles = StyleSheet.create({
   successOverlay: {
     position: 'absolute',
     inset: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  validatingOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  validatingPanel: {
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  ringStage: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ring: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#10b981',
+  },
+  ringCore: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#10b981',
     alignItems: 'center',
     justifyContent: 'center',
   },

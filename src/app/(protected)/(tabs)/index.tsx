@@ -38,6 +38,7 @@ export default function IndexScreen() {
   const trackingHealth = useTrackingHealth();
   const [jenisAksi, setJenisAksi] = useState('');
   const [barcodeScanner, setBarcodeScanner] = useState(false);
+  const [validatingScan, setValidatingScan] = useState(false);
   const [rawData, setRawData] = useState<rawData>();
   const [rawDataService, setRawDataService] = useState<rawData[]>();
   const [refreshing, setRefreshing] = useState(false);
@@ -79,10 +80,14 @@ export default function IndexScreen() {
   };
 
   const handleScan = async (data: string) => {
-    setBarcodeScanner(false);
+    // Tetap render scanner modal selama validasi — ini biarkan pengguna lihat
+    // overlay loading di atas camera, bukan UI kosong.
+    setValidatingScan(true);
     try {
       const res = await secureApi.get(`reservasi/qrcode`, { params: { uniqued_id: data } });
       if (res.status === true) {
+        setBarcodeScanner(false);
+        setValidatingScan(false);
         if (jenisAksi === 'daily') {
           router.push({ pathname: '/(protected)/detail', params: { uuid: data } });
         } else if (jenisAksi === 'service') {
@@ -90,8 +95,14 @@ export default function IndexScreen() {
         } else {
           Toast.show({ type: 'error', text1: 'Perhatian', text2: 'QRCode tidak valid' });
         }
+      } else {
+        // Server response valid tapi data flagged invalid — biarkan scanner
+        // tetap terbuka supaya user bisa coba scan ulang.
+        setValidatingScan(false);
+        Toast.show({ type: 'error', text1: 'Perhatian', text2: 'QRCode tidak valid' });
       }
     } catch (error: unknown) {
+      setValidatingScan(false);
       HandleError(error);
     }
   };
@@ -191,8 +202,12 @@ export default function IndexScreen() {
       {barcodeScanner && (
         <BarcodeScannerCamera
           onScan={handleScan}
-          onVisible={() => setBarcodeScanner(false)}
+          onVisible={() => {
+            setBarcodeScanner(false);
+            setValidatingScan(false);
+          }}
           visible={barcodeScanner}
+          validating={validatingScan}
         />
       )}
     </SafeAreaView>

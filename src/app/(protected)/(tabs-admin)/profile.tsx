@@ -36,12 +36,27 @@ export default function Profile() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await secureApi.get(`dashboard/kendaraan_terpakai`);
-      const chart: PieItem[] = response.data.map((item: PieItem) => ({
+      const response = await secureApi.get(`dashboard/kendaraan_terpakai_admin`);
+
+      const raw: PieItem[] = response.data ?? [];
+
+      // Cari index item dengan value terbesar — itu yang akan di-`focused`.
+      // Server kadang kirim `focused: true` di item pertama, override supaya
+      // pie chart men-highlight item dengan pemakaian terbanyak.
+      let maxIdx = -1;
+      let maxVal = -Infinity;
+      raw.forEach((item, idx) => {
+        if (item.value > maxVal) {
+          maxVal = item.value;
+          maxIdx = idx;
+        }
+      });
+
+      const chart: PieItem[] = raw.map((item, idx) => ({
         value: item.value,
         color: item.color,
         gradientCenterColor: item.gradientCenterColor,
-        focused: item.focused ?? false,
+        focused: idx === maxIdx,
         label: item.label ?? '',
       }));
       setPieData(chart);
@@ -116,7 +131,7 @@ export default function Profile() {
                 donut
                 showGradient
                 sectionAutoFocus
-                radius={90}
+                radius={100}
                 innerRadius={50}
                 innerCircleColor={colors.brand}
                 centerLabelComponent={() => (

@@ -15,7 +15,6 @@ import {
 import Animated, {
   cancelAnimation,
   Easing,
-  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -405,14 +404,18 @@ function ValidatingOverlay() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const ringStyle = (sv: SharedValue<number>) => ({
-    transform: [{ scale: 1 + sv.value * 1.4 }],
-    opacity: 0.4 - sv.value * 0.4,
-  });
-
-  const ring1Style = useAnimatedStyle(() => ringStyle(ring1));
-  const ring2Style = useAnimatedStyle(() => ringStyle(ring2));
-  const ring3Style = useAnimatedStyle(() => ringStyle(ring3));
+  const ring1Style = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + ring1.value * 1.4 }],
+    opacity: 0.4 - ring1.value * 0.4,
+  }));
+  const ring2Style = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + ring2.value * 1.4 }],
+    opacity: 0.4 - ring2.value * 0.4,
+  }));
+  const ring3Style = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + ring3.value * 1.4 }],
+    opacity: 0.4 - ring3.value * 0.4,
+  }));
 
   return (
     <View style={[StyleSheet.absoluteFill, styles.validatingOverlay]}>

@@ -30,6 +30,12 @@ Repo-specific notes for OpenCode. The README is a leftover starter-template desc
 - To remove a package, **edit `package.json` manually** and run `npm install`. Avoid `npm uninstall <pkg>`: in this repo it has been observed to rewrite unrelated `expo*` versions during full resolution and leave the lockfile in an unbuildable state.
 - `expo doctor` exclusions live under `expo.doctor.reactNativeDirectoryCheck.exclude` in `package.json`. Currently excludes only `uri-scheme`.
 - Never add `expo-modules-core` directly — `expo-doctor` will flag it. Types are exported transitively via `expo`.
+- Hidden peer deps that **must stay** even though no `import` exists in `src/`:
+  - `expo-linear-gradient` + `react-native-svg` — runtime peers of `react-native-gifted-charts` (PieChart/BarChart load them lazily).
+  - `react-native-worklets` — required peer of `react-native-reanimated`.
+  - `react-native-screens` + `react-native-safe-area-context` — peers of `expo-router`.
+  - `expo-linking` — required peer of `expo-router`.
+  Don't blindly trust a static import grep when pruning deps; always run `npx expo-doctor` after.
 
 ## SDK 55 gotchas (post-upgrade from SDK 53)
 

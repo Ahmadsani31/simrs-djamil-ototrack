@@ -8,6 +8,7 @@ import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
@@ -205,6 +206,12 @@ export default function PengembalianServiceScreen() {
                   }}
                 />
               )}
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Menyelesaikan pemeliharaan..."
+                accent="#f59e0b"
+              />
             </>
           )}
         </Formik>

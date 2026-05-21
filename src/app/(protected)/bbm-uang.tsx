@@ -3,12 +3,23 @@ import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
@@ -111,7 +122,9 @@ export default function BbmUangScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Formik<FormValues>
         initialValues={{
           uriSpidometer: '',
@@ -198,8 +211,8 @@ export default function BbmUangScreen() {
                   <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => setPickerVisible(true)}
-                    className={`flex-row items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 ${
-                      touched.typeBbm && errors.typeBbm ? 'border-red-400' : 'border-gray-300'
+                    className={`flex-row items-center justify-between rounded-lg border bg-gray-50 px-4 py-3 ${
+                      touched.typeBbm && errors.typeBbm ? 'border-red-400' : 'border-gray-500'
                     }`}>
                     <View className="flex-1 flex-row items-center gap-2">
                       {values.typeBbm ? (
@@ -213,7 +226,7 @@ export default function BbmUangScreen() {
                       ) : null}
                       <Text
                         className={`text-base ${
-                          values.typeBbm ? 'text-gray-800' : 'text-gray-400'
+                          values.typeBbm ? 'text-gray-800' : 'text-gray-500'
                         }`}>
                         {values.typeBbm || 'Pilih jenis BBM'}
                       </Text>
@@ -330,6 +343,12 @@ export default function BbmUangScreen() {
                 </Pressable>
               </Pressable>
             </Modal>
+
+            <SubmitOverlay
+              visible={isSubmitting}
+              message="Menyimpan pengisian BBM..."
+              accent="#f97316"
+            />
           </>
         )}
       </Formik>
@@ -342,6 +361,6 @@ export default function BbmUangScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

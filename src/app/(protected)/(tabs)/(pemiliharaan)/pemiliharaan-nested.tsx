@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 
 import ButtonCostum from '@/components/forms/ButtonCostum';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import InputArea from '@/components/forms/InputArea';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
@@ -316,6 +317,17 @@ export default function PemiliharaanNestedScreen() {
           onPress={() => handleCloseImage()}
         />
       )}
+
+      <SubmitOverlay
+        visible={loadingPage}
+        message="Memuat data pemeliharaan..."
+        hint="Mengambil informasi kendaraan"
+      />
+      <SubmitOverlay
+        visible={loadingSubmit}
+        message="Menyimpan foto aktivitas..."
+        accent="#14b8a6"
+      />
     </View>
   );
 }

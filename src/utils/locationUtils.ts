@@ -72,7 +72,8 @@ export async function startTracking(): Promise<boolean> {
     showsBackgroundLocationIndicator: true,
     foregroundService: {
       notificationTitle: 'Oto RS-Djamil',
-      notificationBody: 'Aplikasi sedang memantau lokasi Anda dalam pemakaian kendaraan',
+      notificationBody:
+        'Tracking aktif.Aplikasi sedang memantau lokasi Anda dalam pemakaian kendaraan',
       notificationColor: colors.brand,
       killServiceOnDestroy: false,
     },

@@ -4,11 +4,20 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Image as ImageExpo } from 'expo-image';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
 import ModalCamera from '@/components/modals/ModalCamera';
@@ -121,7 +130,9 @@ export default function BbmVoucherScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -250,6 +261,12 @@ export default function BbmVoucherScreen() {
                   }}
                 />
               )}
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Menyimpan pengisian BBM..."
+                accent="#f97316"
+              />
             </>
           )}
         </Formik>
@@ -263,6 +280,6 @@ export default function BbmVoucherScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

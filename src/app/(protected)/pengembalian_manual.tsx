@@ -7,6 +7,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import InputDate from '@/components/forms/InputDate';
@@ -97,80 +98,88 @@ export default function PengembalianManualScreen() {
             touched,
             isSubmitting,
           }) => (
-            <ScrollView
-              contentContainerStyle={{ paddingBottom: 24 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}>
-              <VehicleHeaderCard
-                variant="pengembalian"
-                label="Pengembalian Manual (Admin)"
-                name={data?.name}
-                noPolisi={data?.no_polisi}
+            <>
+              <ScrollView
+                contentContainerStyle={{ paddingBottom: 24 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <VehicleHeaderCard
+                  variant="pengembalian"
+                  label="Pengembalian Manual (Admin)"
+                  name={data?.name}
+                  noPolisi={data?.no_polisi}
+                />
+
+                <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
+                  <View className="rounded-full bg-amber-100 p-1.5">
+                    <Feather name="shield" size={14} color="#d97706" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
+                    <Text className="mt-0.5 text-[11px] text-amber-600/80">
+                      Pengembalian manual digunakan saat driver tidak dapat mengembalikan kendaraan
+                      sendiri. Isi semua field dengan teliti.
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                  <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                    <Feather name="edit-3" size={16} color="#205781" />
+                    <Text className="text-base font-bold text-gray-800">Detail Pengembalian</Text>
+                  </View>
+
+                  <CustomNumberInput
+                    className="bg-gray-50"
+                    placeholder="Angka spidometer kendaraan"
+                    value={values.spidometer}
+                    label="Spidometer"
+                    error={touched.spidometer ? errors.spidometer : undefined}
+                    onFormattedValue={handleChange('spidometer')}
+                  />
+                  <InputDate
+                    label="Waktu Pengembalian"
+                    onChangeDate={(e) => setFieldValue('tanggal', e)}
+                    onResetDate={() => setFieldValue('tanggal', '')}
+                    value={values.tanggal}
+                    error={touched.tanggal ? errors.tanggal : undefined}
+                  />
+                  <InputFile
+                    label="Upload Foto Bukti"
+                    onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                    placeholder="Pilih file dari galeri"
+                    error={touched.fileUpload ? errors.fileUpload : undefined}
+                  />
+                  <InputArea
+                    className="bg-gray-50"
+                    label="Keterangan"
+                    placeholder="Alasan pengembalian manual"
+                    value={values.keterangan}
+                    error={touched.keterangan ? errors.keterangan : undefined}
+                    onChangeText={handleChange('keterangan')}
+                  />
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    disabled={isSubmitting}
+                    onPress={() => handleSubmit()}
+                    className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                      isSubmitting ? 'bg-sky-300' : 'bg-sky-500'
+                    }`}>
+                    <MaterialCommunityIcons name="car-arrow-right" size={18} color="white" />
+                    <Text className="text-base font-bold text-white">
+                      {isSubmitting ? 'Memproses...' : 'Kembalikan Kendaraan'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Memproses pengembalian..."
+                accent="#0ea5e9"
               />
-
-              <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
-                <View className="rounded-full bg-amber-100 p-1.5">
-                  <Feather name="shield" size={14} color="#d97706" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
-                  <Text className="mt-0.5 text-[11px] text-amber-600/80">
-                    Pengembalian manual digunakan saat driver tidak dapat mengembalikan kendaraan
-                    sendiri. Isi semua field dengan teliti.
-                  </Text>
-                </View>
-              </View>
-
-              <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
-                <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
-                  <Feather name="edit-3" size={16} color="#205781" />
-                  <Text className="text-base font-bold text-gray-800">Detail Pengembalian</Text>
-                </View>
-
-                <CustomNumberInput
-                  className="bg-gray-50"
-                  placeholder="Angka spidometer kendaraan"
-                  value={values.spidometer}
-                  label="Spidometer"
-                  error={touched.spidometer ? errors.spidometer : undefined}
-                  onFormattedValue={handleChange('spidometer')}
-                />
-                <InputDate
-                  label="Waktu Pengembalian"
-                  onChangeDate={(e) => setFieldValue('tanggal', e)}
-                  onResetDate={() => setFieldValue('tanggal', '')}
-                  value={values.tanggal}
-                  error={touched.tanggal ? errors.tanggal : undefined}
-                />
-                <InputFile
-                  label="Upload Foto Bukti"
-                  onChangeFile={(e) => setFieldValue('fileUpload', e)}
-                  placeholder="Pilih file dari galeri"
-                  error={touched.fileUpload ? errors.fileUpload : undefined}
-                />
-                <InputArea
-                  className="bg-gray-50"
-                  label="Keterangan"
-                  placeholder="Alasan pengembalian manual"
-                  value={values.keterangan}
-                  error={touched.keterangan ? errors.keterangan : undefined}
-                  onChangeText={handleChange('keterangan')}
-                />
-
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  disabled={isSubmitting}
-                  onPress={() => handleSubmit()}
-                  className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
-                    isSubmitting ? 'bg-sky-300' : 'bg-sky-500'
-                  }`}>
-                  <MaterialCommunityIcons name="car-arrow-right" size={18} color="white" />
-                  <Text className="text-base font-bold text-white">
-                    {isSubmitting ? 'Memproses...' : 'Kembalikan Kendaraan'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+            </>
           )}
         </Formik>
       )}

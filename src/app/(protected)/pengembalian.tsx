@@ -4,11 +4,20 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
 import ModalCamera from '@/components/modals/ModalCamera';
@@ -98,7 +107,9 @@ export default function PengembalianScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -136,11 +147,8 @@ export default function PengembalianScreen() {
                   </View>
                   <View className="flex-1">
                     <Text className="text-xs font-semibold text-sky-700">
-                      Tracking akan dihentikan
-                    </Text>
-                    <Text className="mt-0.5 text-[11px] text-sky-600/80">
-                      Rute perjalanan akan dikirim ke server. Pastikan foto spidometer akhir & angka
-                      diisi dengan benar.
+                      Tracking akan dihentikan setelah kendaraan dikembalikan. Pastikan foto
+                      spidometer akhir & angka diisi dengan benar.
                     </Text>
                   </View>
                 </View>
@@ -200,6 +208,12 @@ export default function PengembalianScreen() {
                   }}
                 />
               )}
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Mengembalikan kendaraan..."
+                accent="#0ea5e9"
+              />
             </>
           )}
         </Formik>
@@ -213,6 +227,6 @@ export default function PengembalianScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

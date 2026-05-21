@@ -8,6 +8,7 @@ import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import InputDate from '@/components/forms/InputDate';
@@ -111,98 +112,106 @@ export default function PengembalianServiceManualScreen() {
             errors,
             isSubmitting,
           }) => (
-            <ScrollView
-              contentContainerStyle={{ paddingBottom: 24 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}>
-              <VehicleHeaderCard
-                variant="pemeliharaan"
-                label="Selesai Pemeliharaan (Admin)"
-                name={data?.name}
-                noPolisi={data?.no_polisi}
-                subtitle={data?.jenis_kerusakan}
+            <>
+              <ScrollView
+                contentContainerStyle={{ paddingBottom: 24 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <VehicleHeaderCard
+                  variant="pemeliharaan"
+                  label="Selesai Pemeliharaan (Admin)"
+                  name={data?.name}
+                  noPolisi={data?.no_polisi}
+                  subtitle={data?.jenis_kerusakan}
+                />
+
+                {data?.lokasi || data?.keterangan ? (
+                  <View className="mx-4 mb-3 rounded-xl bg-white p-3 shadow-sm">
+                    {data?.lokasi ? (
+                      <View className="mb-1 flex-row items-start gap-2">
+                        <Feather name="map-pin" size={12} color="#64748b" />
+                        <Text className="flex-1 text-xs text-gray-600">{data.lokasi}</Text>
+                      </View>
+                    ) : null}
+                    {data?.keterangan ? (
+                      <View className="flex-row items-start gap-2">
+                        <Feather name="message-square" size={12} color="#64748b" />
+                        <Text className="flex-1 text-xs text-gray-600">{data.keterangan}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                ) : null}
+
+                <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
+                  <View className="rounded-full bg-amber-100 p-1.5">
+                    <Feather name="shield" size={14} color="#d97706" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
+                    <Text className="mt-0.5 text-[11px] text-amber-600/80">
+                      Selesaikan pemeliharaan secara manual jika driver tidak dapat menyelesaikan
+                      sendiri.
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                  <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                    <MaterialCommunityIcons name="receipt" size={16} color="#205781" />
+                    <Text className="text-base font-bold text-gray-800">Detail Penyelesaian</Text>
+                  </View>
+
+                  <CustomNumberInput
+                    className="bg-gray-50"
+                    placeholder="Masukan nominal"
+                    label="Biaya Pemeliharaan (Rp)"
+                    value={values.nominal}
+                    error={touched.nominal ? errors.nominal : undefined}
+                    onFormattedValue={handleChange('nominal')}
+                  />
+                  <InputDate
+                    label="Tanggal Penyelesaian"
+                    onChangeDate={(e) => setFieldValue('tanggal', e)}
+                    onResetDate={() => setFieldValue('tanggal', '')}
+                    value={values.tanggal}
+                    error={touched.tanggal ? errors.tanggal : undefined}
+                  />
+                  <InputFile
+                    label="Upload Foto Bukti / Struk"
+                    onChangeFile={(e) => setFieldValue('fileUpload', e)}
+                    placeholder="Pilih file dari galeri"
+                    error={touched.fileUpload ? errors.fileUpload : undefined}
+                  />
+                  <InputArea
+                    className="bg-gray-50"
+                    label="Keterangan"
+                    placeholder="Catatan tambahan tentang pemeliharaan"
+                    value={values.keterangan}
+                    onChangeText={handleChange('keterangan')}
+                    error={touched.keterangan ? errors.keterangan : undefined}
+                  />
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    disabled={isSubmitting}
+                    onPress={() => handleSubmit()}
+                    className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                      isSubmitting ? 'bg-amber-300' : 'bg-amber-500'
+                    }`}>
+                    <MaterialCommunityIcons name="check-circle" size={18} color="white" />
+                    <Text className="text-base font-bold text-white">
+                      {isSubmitting ? 'Memproses...' : 'Selesaikan Pemeliharaan'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Memproses pemeliharaan..."
+                accent="#f59e0b"
               />
-
-              {data?.lokasi || data?.keterangan ? (
-                <View className="mx-4 mb-3 rounded-xl bg-white p-3 shadow-sm">
-                  {data?.lokasi ? (
-                    <View className="mb-1 flex-row items-start gap-2">
-                      <Feather name="map-pin" size={12} color="#64748b" />
-                      <Text className="flex-1 text-xs text-gray-600">{data.lokasi}</Text>
-                    </View>
-                  ) : null}
-                  {data?.keterangan ? (
-                    <View className="flex-row items-start gap-2">
-                      <Feather name="message-square" size={12} color="#64748b" />
-                      <Text className="flex-1 text-xs text-gray-600">{data.keterangan}</Text>
-                    </View>
-                  ) : null}
-                </View>
-              ) : null}
-
-              <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
-                <View className="rounded-full bg-amber-100 p-1.5">
-                  <Feather name="shield" size={14} color="#d97706" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
-                  <Text className="mt-0.5 text-[11px] text-amber-600/80">
-                    Selesaikan pemeliharaan secara manual jika driver tidak dapat menyelesaikan
-                    sendiri.
-                  </Text>
-                </View>
-              </View>
-
-              <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
-                <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
-                  <MaterialCommunityIcons name="receipt" size={16} color="#205781" />
-                  <Text className="text-base font-bold text-gray-800">Detail Penyelesaian</Text>
-                </View>
-
-                <CustomNumberInput
-                  className="bg-gray-50"
-                  placeholder="Masukan nominal"
-                  label="Biaya Pemeliharaan (Rp)"
-                  value={values.nominal}
-                  error={touched.nominal ? errors.nominal : undefined}
-                  onFormattedValue={handleChange('nominal')}
-                />
-                <InputDate
-                  label="Tanggal Penyelesaian"
-                  onChangeDate={(e) => setFieldValue('tanggal', e)}
-                  onResetDate={() => setFieldValue('tanggal', '')}
-                  value={values.tanggal}
-                  error={touched.tanggal ? errors.tanggal : undefined}
-                />
-                <InputFile
-                  label="Upload Foto Bukti / Struk"
-                  onChangeFile={(e) => setFieldValue('fileUpload', e)}
-                  placeholder="Pilih file dari galeri"
-                  error={touched.fileUpload ? errors.fileUpload : undefined}
-                />
-                <InputArea
-                  className="bg-gray-50"
-                  label="Keterangan"
-                  placeholder="Catatan tambahan tentang pemeliharaan"
-                  value={values.keterangan}
-                  onChangeText={handleChange('keterangan')}
-                  error={touched.keterangan ? errors.keterangan : undefined}
-                />
-
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  disabled={isSubmitting}
-                  onPress={() => handleSubmit()}
-                  className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
-                    isSubmitting ? 'bg-amber-300' : 'bg-amber-500'
-                  }`}>
-                  <MaterialCommunityIcons name="check-circle" size={18} color="white" />
-                  <Text className="text-base font-bold text-white">
-                    {isSubmitting ? 'Memproses...' : 'Selesaikan Pemeliharaan'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+            </>
           )}
         </Formik>
       )}

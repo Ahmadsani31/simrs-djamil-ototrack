@@ -24,6 +24,7 @@ import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import secureApi from '@/services/service';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -311,6 +312,8 @@ export default function Profile() {
           </View>
         </BottomSheetView>
       </BottomSheetModal>
+
+      <SubmitOverlay visible={submitting} message="Memperbarui password..." accent="#14b8a6" />
     </SafeAreaView>
   );
 }

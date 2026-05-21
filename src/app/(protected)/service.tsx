@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   BackHandler,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -17,6 +19,7 @@ import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
@@ -120,7 +123,9 @@ export default function ServiceScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={6} />
@@ -178,10 +183,10 @@ export default function ServiceScreen() {
                     <TouchableOpacity
                       activeOpacity={0.7}
                       onPress={() => setPickerVisible(true)}
-                      className={`flex-row items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 ${
+                      className={`flex-row items-center justify-between rounded-xl border  bg-gray-50 px-4 py-3 ${
                         touched.jenis_kerusakan && errors.jenis_kerusakan
                           ? 'border-red-400'
-                          : 'border-gray-300'
+                          : 'border-gray-500'
                       }`}>
                       <View className="flex-1 flex-row items-center gap-2">
                         {values.jenis_kerusakan ? (
@@ -196,7 +201,7 @@ export default function ServiceScreen() {
                         ) : null}
                         <Text
                           className={`text-base ${
-                            values.jenis_kerusakan ? 'text-gray-800' : 'text-gray-400'
+                            values.jenis_kerusakan ? 'text-gray-800' : 'text-gray-500'
                           }`}>
                           {values.jenis_kerusakan || 'Pilih jenis pemeliharaan'}
                         </Text>
@@ -306,10 +311,16 @@ export default function ServiceScreen() {
                   </Pressable>
                 </Pressable>
               </Modal>
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Menyimpan pemeliharaan..."
+                accent="#f59e0b"
+              />
             </>
           )}
         </Formik>
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

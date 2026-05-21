@@ -4,11 +4,20 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
@@ -22,6 +31,7 @@ import { useLocationStore } from '@/stores/locationStore';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
 import { startTracking, stopTracking } from '@/utils/locationUtils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type FormValues = {
   kegiatan: string;
@@ -43,6 +53,7 @@ const fetchData = async (uuid: string) => {
 export default function DetailScreen() {
   const { uuid } = useLocalSearchParams();
   const { clearCoordinates } = useLocationStore();
+  const insets = useSafeAreaInsets();
 
   const [cameraVisible, setCameraVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -110,7 +121,9 @@ export default function DetailScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -221,11 +234,17 @@ export default function DetailScreen() {
                   }}
                 />
               )}
+
+              <SubmitOverlay
+                visible={isSubmitting}
+                message="Memulai pemakaian..."
+                hint="Mengaktifkan tracking & menyimpan data"
+                accent="#10b981"
+              />
             </>
           )}
         </Formik>
       )}
-
       {previewUri && (
         <ModalPreviewImage
           title="Foto Spidometer"
@@ -234,6 +253,6 @@ export default function DetailScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

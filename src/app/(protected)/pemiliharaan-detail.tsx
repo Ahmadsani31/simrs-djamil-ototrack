@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   BackHandler,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -17,6 +19,7 @@ import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
 import SkeletonList from '@/components/feedback/SkeletonList';
+import SubmitOverlay from '@/components/feedback/SubmitOverlay';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
@@ -26,6 +29,7 @@ import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import { dataDetail } from '@/types/types';
 import HandleError from '@/utils/handleError';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type FormValues = {
   jenis_kerusakan: string;
@@ -60,6 +64,7 @@ const JENIS_KERUSAKAN = [
 
 export default function PemiliharaanDetailScreen() {
   const { uuid } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
   const [pickerVisible, setPickerVisible] = useState(false);
 
@@ -120,194 +125,207 @@ export default function PemiliharaanDetailScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
-      {isLoading ? (
-        <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
-          <SkeletonList loop={6} />
-        </View>
-      ) : (
-        <Formik<FormValues>
-          initialValues={{ jenis_kerusakan: '', lokasi: '', spidometer: '', keterangan: '' }}
-          validationSchema={validationSchema}
-          onSubmit={async (values) => await handleSubmitDetail(values)}>
-          {({
-            handleChange,
-            handleSubmit,
-            setFieldValue,
-            values,
-            errors,
-            touched,
-            isSubmitting,
-          }) => (
-            <>
-              <ScrollView
-                contentContainerStyle={{ paddingBottom: 24 }}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}>
-                <VehicleHeaderCard
-                  variant="pemeliharaan"
-                  label="Mulai Pemeliharaan (Admin)"
-                  name={data?.name}
-                  noPolisi={data?.no_polisi}
-                />
-
-                <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
-                  <View className="rounded-full bg-amber-100 p-1.5">
-                    <Feather name="shield" size={14} color="#d97706" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
-                    <Text className="mt-0.5 text-[11px] text-amber-600/80">
-                      Buat data pemeliharaan baru atas nama driver. Pastikan informasi sesuai dengan
-                      kondisi kendaraan.
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
-                  <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
-                    <Feather name="edit-3" size={16} color="#205781" />
-                    <Text className="text-base font-bold text-gray-800">Detail Pemeliharaan</Text>
-                  </View>
-
-                  <View className="mb-4">
-                    <Text className="mb-1 text-sm font-semibold text-gray-700">
-                      Jenis Pemeliharaan
-                    </Text>
-                    <TouchableOpacity
-                      activeOpacity={0.7}
-                      onPress={() => setPickerVisible(true)}
-                      className={`flex-row items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 ${
-                        touched.jenis_kerusakan && errors.jenis_kerusakan
-                          ? 'border-red-400'
-                          : 'border-gray-300'
-                      }`}>
-                      <View className="flex-1 flex-row items-center gap-2">
-                        {values.jenis_kerusakan ? (
-                          <MaterialCommunityIcons
-                            name={
-                              (JENIS_KERUSAKAN.find((j) => j.value === values.jenis_kerusakan)
-                                ?.icon ?? 'wrench') as keyof typeof MaterialCommunityIcons.glyphMap
-                            }
-                            size={16}
-                            color="#205781"
-                          />
-                        ) : null}
-                        <Text
-                          className={`text-base ${
-                            values.jenis_kerusakan ? 'text-gray-800' : 'text-gray-400'
-                          }`}>
-                          {values.jenis_kerusakan || 'Pilih jenis pemeliharaan'}
-                        </Text>
-                      </View>
-                      <Feather name="chevron-down" size={18} color="#94a3b8" />
-                    </TouchableOpacity>
-                    {touched.jenis_kerusakan && errors.jenis_kerusakan ? (
-                      <Text className="mt-1 text-xs text-red-500">{errors.jenis_kerusakan}</Text>
-                    ) : null}
-                  </View>
-
-                  <Input
-                    label="Lokasi"
-                    placeholder="Lokasi / alamat pemeliharaan"
-                    value={values.lokasi}
-                    onChangeText={handleChange('lokasi')}
-                    error={touched.lokasi ? errors.lokasi : undefined}
-                    className="bg-gray-50"
-                  />
-                  <CustomNumberInput
-                    className="bg-gray-50"
-                    placeholder="Angka spidometer kendaraan"
-                    value={values.spidometer}
-                    label="Spidometer"
-                    error={touched.spidometer ? errors.spidometer : undefined}
-                    onFormattedValue={handleChange('spidometer')}
-                  />
-                  <InputArea
-                    className="bg-gray-50"
-                    label="Keterangan"
-                    placeholder="Detail kerusakan / keterangan tambahan"
-                    value={values.keterangan}
-                    error={touched.keterangan ? errors.keterangan : undefined}
-                    onChangeText={handleChange('keterangan')}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: insets.bottom + 36 }}
+        keyboardShouldPersistTaps="handled">
+        {isLoading ? (
+          <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
+            <SkeletonList loop={6} />
+          </View>
+        ) : (
+          <Formik<FormValues>
+            initialValues={{ jenis_kerusakan: '', lokasi: '', spidometer: '', keterangan: '' }}
+            validationSchema={validationSchema}
+            onSubmit={async (values) => await handleSubmitDetail(values)}>
+            {({
+              handleChange,
+              handleSubmit,
+              setFieldValue,
+              values,
+              errors,
+              touched,
+              isSubmitting,
+            }) => (
+              <>
+                <ScrollView
+                  contentContainerStyle={{ paddingBottom: 24 }}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}>
+                  <VehicleHeaderCard
+                    variant="pemeliharaan"
+                    label="Mulai Pemeliharaan (Admin)"
+                    name={data?.name}
+                    noPolisi={data?.no_polisi}
                   />
 
-                  <TouchableOpacity
-                    activeOpacity={0.85}
-                    disabled={isSubmitting}
-                    onPress={() => handleSubmit()}
-                    className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
-                      isSubmitting ? 'bg-amber-300' : 'bg-amber-500'
-                    }`}>
-                    <MaterialCommunityIcons name="wrench" size={18} color="white" />
-                    <Text className="text-base font-bold text-white">
-                      {isSubmitting ? 'Memproses...' : 'Mulai Pemeliharaan'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
-
-              <Modal
-                visible={pickerVisible}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setPickerVisible(false)}>
-                <Pressable
-                  className="flex-1 justify-end bg-black/50"
-                  onPress={() => setPickerVisible(false)}>
-                  <Pressable
-                    className="overflow-hidden rounded-t-3xl bg-white"
-                    onPress={() => undefined}>
-                    <View className="flex-row items-center justify-between border-b border-slate-100 px-5 py-4">
-                      <Text className="text-base font-bold text-gray-800">
-                        Pilih Jenis Pemeliharaan
-                      </Text>
-                      <TouchableOpacity onPress={() => setPickerVisible(false)} hitSlop={10}>
-                        <Feather name="x" size={20} color="#64748b" />
-                      </TouchableOpacity>
+                  <View className="mx-4 mb-3 flex-row items-start gap-2 rounded-xl bg-amber-50 p-3">
+                    <View className="rounded-full bg-amber-100 p-1.5">
+                      <Feather name="shield" size={14} color="#d97706" />
                     </View>
-                    <ScrollView className="max-h-[420px]">
-                      {JENIS_KERUSAKAN.map((item) => {
-                        const selected = values.jenis_kerusakan === item.value;
-                        return (
-                          <TouchableOpacity
-                            key={item.value}
-                            activeOpacity={0.7}
-                            onPress={() => {
-                              setFieldValue('jenis_kerusakan', item.value);
-                              setPickerVisible(false);
-                            }}
-                            className={`flex-row items-center gap-3 px-5 py-3.5 ${
-                              selected ? 'bg-amber-50' : ''
+                    <View className="flex-1">
+                      <Text className="text-xs font-semibold text-amber-700">Mode Admin</Text>
+                      <Text className="mt-0.5 text-[11px] text-amber-600/80">
+                        Buat data pemeliharaan baru atas nama driver. Pastikan informasi sesuai
+                        dengan kondisi kendaraan.
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="mx-4 rounded-2xl bg-white p-5 shadow-sm">
+                    <View className="mb-4 flex-row items-center gap-2 border-b border-slate-100 pb-3">
+                      <Feather name="edit-3" size={16} color="#205781" />
+                      <Text className="text-base font-bold text-gray-800">Detail Pemeliharaan</Text>
+                    </View>
+
+                    <View className="mb-4">
+                      <Text className="mb-1 text-sm font-semibold text-gray-700">
+                        Jenis Pemeliharaan
+                      </Text>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => setPickerVisible(true)}
+                        className={`flex-row items-center justify-between rounded-xl border bg-gray-50 px-4 py-3 ${
+                          touched.jenis_kerusakan && errors.jenis_kerusakan
+                            ? 'border-red-400'
+                            : 'border-gray-300'
+                        }`}>
+                        <View className="flex-1 flex-row items-center gap-2">
+                          {values.jenis_kerusakan ? (
+                            <MaterialCommunityIcons
+                              name={
+                                (JENIS_KERUSAKAN.find((j) => j.value === values.jenis_kerusakan)
+                                  ?.icon ??
+                                  'wrench') as keyof typeof MaterialCommunityIcons.glyphMap
+                              }
+                              size={16}
+                              color="#205781"
+                            />
+                          ) : null}
+                          <Text
+                            className={`text-base ${
+                              values.jenis_kerusakan ? 'text-gray-800' : 'text-gray-400'
                             }`}>
-                            <View
-                              className={`rounded-full p-2 ${
-                                selected ? 'bg-amber-100' : 'bg-slate-100'
+                            {values.jenis_kerusakan || 'Pilih jenis pemeliharaan'}
+                          </Text>
+                        </View>
+                        <Feather name="chevron-down" size={18} color="#94a3b8" />
+                      </TouchableOpacity>
+                      {touched.jenis_kerusakan && errors.jenis_kerusakan ? (
+                        <Text className="mt-1 text-xs text-red-500">{errors.jenis_kerusakan}</Text>
+                      ) : null}
+                    </View>
+
+                    <Input
+                      label="Lokasi"
+                      placeholder="Lokasi / alamat pemeliharaan"
+                      value={values.lokasi}
+                      onChangeText={handleChange('lokasi')}
+                      error={touched.lokasi ? errors.lokasi : undefined}
+                      className="bg-gray-50"
+                    />
+                    <CustomNumberInput
+                      className="bg-gray-50"
+                      placeholder="Angka spidometer kendaraan"
+                      value={values.spidometer}
+                      label="Spidometer"
+                      error={touched.spidometer ? errors.spidometer : undefined}
+                      onFormattedValue={handleChange('spidometer')}
+                    />
+                    <InputArea
+                      className="bg-gray-50"
+                      label="Keterangan"
+                      placeholder="Detail kerusakan / keterangan tambahan"
+                      value={values.keterangan}
+                      error={touched.keterangan ? errors.keterangan : undefined}
+                      onChangeText={handleChange('keterangan')}
+                    />
+
+                    <TouchableOpacity
+                      activeOpacity={0.85}
+                      disabled={isSubmitting}
+                      onPress={() => handleSubmit()}
+                      className={`mt-3 flex-row items-center justify-center gap-2 rounded-xl py-3.5 ${
+                        isSubmitting ? 'bg-amber-300' : 'bg-amber-500'
+                      }`}>
+                      <MaterialCommunityIcons name="wrench" size={18} color="white" />
+                      <Text className="text-base font-bold text-white">
+                        {isSubmitting ? 'Memproses...' : 'Mulai Pemeliharaan'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+
+                <Modal
+                  visible={pickerVisible}
+                  transparent
+                  animationType="fade"
+                  onRequestClose={() => setPickerVisible(false)}>
+                  <Pressable
+                    className="flex-1 justify-end bg-black/50"
+                    onPress={() => setPickerVisible(false)}>
+                    <Pressable
+                      className="overflow-hidden rounded-t-3xl bg-white"
+                      onPress={() => undefined}>
+                      <View className="flex-row items-center justify-between border-b border-slate-100 px-5 py-4">
+                        <Text className="text-base font-bold text-gray-800">
+                          Pilih Jenis Pemeliharaan
+                        </Text>
+                        <TouchableOpacity onPress={() => setPickerVisible(false)} hitSlop={10}>
+                          <Feather name="x" size={20} color="#64748b" />
+                        </TouchableOpacity>
+                      </View>
+                      <ScrollView className="max-h-[420px]">
+                        {JENIS_KERUSAKAN.map((item) => {
+                          const selected = values.jenis_kerusakan === item.value;
+                          return (
+                            <TouchableOpacity
+                              key={item.value}
+                              activeOpacity={0.7}
+                              onPress={() => {
+                                setFieldValue('jenis_kerusakan', item.value);
+                                setPickerVisible(false);
+                              }}
+                              className={`flex-row items-center gap-3 px-5 py-3.5 ${
+                                selected ? 'bg-amber-50' : ''
                               }`}>
-                              <MaterialCommunityIcons
-                                name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                                size={16}
-                                color={selected ? '#d97706' : '#64748b'}
-                              />
-                            </View>
-                            <Text
-                              className={`flex-1 text-sm ${
-                                selected ? 'font-bold text-amber-700' : 'text-gray-700'
-                              }`}>
-                              {item.label}
-                            </Text>
-                            {selected ? <Feather name="check" size={18} color="#d97706" /> : null}
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </ScrollView>
+                              <View
+                                className={`rounded-full p-2 ${
+                                  selected ? 'bg-amber-100' : 'bg-slate-100'
+                                }`}>
+                                <MaterialCommunityIcons
+                                  name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                                  size={16}
+                                  color={selected ? '#d97706' : '#64748b'}
+                                />
+                              </View>
+                              <Text
+                                className={`flex-1 text-sm ${
+                                  selected ? 'font-bold text-amber-700' : 'text-gray-700'
+                                }`}>
+                                {item.label}
+                              </Text>
+                              {selected ? <Feather name="check" size={18} color="#d97706" /> : null}
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </ScrollView>
+                    </Pressable>
                   </Pressable>
-                </Pressable>
-              </Modal>
-            </>
-          )}
-        </Formik>
-      )}
-    </KeyboardAwareScreen>
+                </Modal>
+
+                <SubmitOverlay
+                  visible={isSubmitting}
+                  message="Menyimpan pemeliharaan..."
+                  accent="#f59e0b"
+                />
+              </>
+            )}
+          </Formik>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

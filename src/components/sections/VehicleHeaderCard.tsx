@@ -35,16 +35,7 @@ export default function VehicleHeaderCard({ variant, label, name, noPolisi, subt
   const cfg = variantConfig[variant];
 
   return (
-    <View className="mx-4 mb-3 mt-4 overflow-hidden rounded-2xl bg-white shadow-sm">
-      <View
-        className="flex-row items-center gap-2 px-4 py-2.5"
-        style={{ backgroundColor: colors.brand }}>
-        <View className="rounded-full bg-white/20 p-1.5">
-          <MaterialCommunityIcons name={cfg.icon} size={14} color="white" />
-        </View>
-        <Text className="text-xs font-medium text-white/90">{label ?? cfg.label}</Text>
-      </View>
-
+    <View className="mx-4 mb-3 mt-2 overflow-hidden rounded-2xl bg-white shadow-sm">
       <View className="px-4 py-4">
         <Text className="text-2xl font-bold text-gray-800">{name || '-'}</Text>
         <View className="mt-1 flex-row items-center gap-2">

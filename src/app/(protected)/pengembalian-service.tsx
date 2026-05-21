@@ -5,8 +5,6 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -22,6 +20,7 @@ import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
+import KeyboardAwareScreen from '@/components/layout/KeyboardAwareScreen';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import HandleError from '@/utils/handleError';
@@ -105,10 +104,7 @@ export default function PengembalianServiceScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-100"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+    <KeyboardAwareScreen className="flex-1 bg-slate-100">
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -129,7 +125,7 @@ export default function PengembalianServiceScreen() {
           }) => (
             <>
               <ScrollView
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+                contentContainerStyle={{ paddingBottom: 24 }}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}>
                 <VehicleHeaderCard
@@ -228,6 +224,6 @@ export default function PengembalianServiceScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAvoidingView>
+    </KeyboardAwareScreen>
   );
 }

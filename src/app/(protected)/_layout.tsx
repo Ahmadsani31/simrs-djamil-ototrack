@@ -9,7 +9,7 @@ import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { colors } from '@/constants/colors';
 
 const BrandHeaderLeft = () => (
-  <View className="w-52 flex-row items-center gap-1 rounded-lg bg-white p-1">
+  <View className="mb-8 w-60 flex-row items-center gap-1 rounded-lg bg-white p-1">
     <Image
       style={{ width: 63, height: 40 }}
       source={require('@asset/images/logo/logo-kemenkes.png')}
@@ -19,7 +19,7 @@ const BrandHeaderLeft = () => (
 );
 
 const BackHeaderRight = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity className="rounded-full bg-white p-1" onPress={onPress}>
+  <TouchableOpacity className="mb-8 rounded-full bg-white p-1" onPress={onPress}>
     <Ionicons name="arrow-back-circle" size={24} color="red" />
   </TouchableOpacity>
 );

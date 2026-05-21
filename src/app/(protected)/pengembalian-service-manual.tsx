@@ -5,8 +5,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Formik, FormikValues } from 'formik';
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -21,6 +19,7 @@ import InputArea from '@/components/forms/InputArea';
 import InputDate from '@/components/forms/InputDate';
 import InputFile from '@/components/forms/InputFile';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
+import KeyboardAwareScreen from '@/components/layout/KeyboardAwareScreen';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import HandleError from '@/utils/handleError';
@@ -99,10 +98,7 @@ export default function PengembalianServiceManualScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-100"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+    <KeyboardAwareScreen className="flex-1 bg-slate-100">
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -122,7 +118,7 @@ export default function PengembalianServiceManualScreen() {
             isSubmitting,
           }) => (
             <ScrollView
-              contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+              contentContainerStyle={{ paddingBottom: 24 }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
               <VehicleHeaderCard
@@ -216,6 +212,6 @@ export default function PengembalianServiceManualScreen() {
           )}
         </Formik>
       )}
-    </KeyboardAvoidingView>
+    </KeyboardAwareScreen>
   );
 }

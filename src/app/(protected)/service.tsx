@@ -6,9 +6,7 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   BackHandler,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -23,6 +21,7 @@ import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import Input from '@/components/forms/Input';
 import InputArea from '@/components/forms/InputArea';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
+import KeyboardAwareScreen from '@/components/layout/KeyboardAwareScreen';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import { dataDetail } from '@/types/types';
@@ -121,10 +120,7 @@ export default function ServiceScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-100"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+    <KeyboardAwareScreen className="flex-1 bg-slate-100">
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={6} />
@@ -145,7 +141,7 @@ export default function ServiceScreen() {
           }) => (
             <>
               <ScrollView
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+                contentContainerStyle={{ paddingBottom: 24 }}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}>
                 <VehicleHeaderCard
@@ -314,6 +310,6 @@ export default function ServiceScreen() {
           )}
         </Formik>
       )}
-    </KeyboardAvoidingView>
+    </KeyboardAwareScreen>
   );
 }

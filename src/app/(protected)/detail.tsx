@@ -4,15 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
@@ -20,6 +12,7 @@ import SkeletonList from '@/components/feedback/SkeletonList';
 import CustomNumberInput from '@/components/forms/CustomNumberInput';
 import InputArea from '@/components/forms/InputArea';
 import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
+import KeyboardAwareScreen from '@/components/layout/KeyboardAwareScreen';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
@@ -117,10 +110,7 @@ export default function DetailScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-100"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+    <KeyboardAwareScreen className="flex-1 bg-slate-100">
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -141,7 +131,7 @@ export default function DetailScreen() {
           }) => (
             <>
               <ScrollView
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+                contentContainerStyle={{ paddingBottom: 24 }}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}>
                 <VehicleHeaderCard
@@ -244,6 +234,6 @@ export default function DetailScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAvoidingView>
+    </KeyboardAwareScreen>
   );
 }

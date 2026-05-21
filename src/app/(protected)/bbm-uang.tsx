@@ -5,9 +5,7 @@ import { Formik } from 'formik';
 import { useState } from 'react';
 import {
   Alert,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -22,6 +20,7 @@ import PhotoCaptureField from '@/components/forms/PhotoCaptureField';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import VehicleHeaderCard from '@/components/sections/VehicleHeaderCard';
+import KeyboardAwareScreen from '@/components/layout/KeyboardAwareScreen';
 import { reLocation } from '@/hooks/locationRequired';
 import secureApi from '@/services/service';
 import { dataDetail } from '@/types/types';
@@ -120,10 +119,7 @@ export default function BbmUangScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-100"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+    <KeyboardAwareScreen className="flex-1 bg-slate-100">
       <Formik<FormValues>
         initialValues={{
           uriSpidometer: '',
@@ -137,7 +133,7 @@ export default function BbmUangScreen() {
         {({ handleSubmit, values, errors, touched, setFieldValue, isSubmitting }) => (
           <>
             <ScrollView
-              contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
+              contentContainerStyle={{ paddingBottom: 24 }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
               <VehicleHeaderCard
@@ -354,6 +350,6 @@ export default function BbmUangScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAvoidingView>
+    </KeyboardAwareScreen>
   );
 }

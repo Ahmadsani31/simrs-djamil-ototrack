@@ -24,7 +24,7 @@ export const PrivateRoute = ({ children }: PrivateRouteProps) => {
   }
 
   return (
-    <View className="flex-1" style={{ paddingTop: insets.top + 12 }}>
+    <View className="flex-1" style={{ paddingTop: insets.top }}>
       {children}
     </View>
   );

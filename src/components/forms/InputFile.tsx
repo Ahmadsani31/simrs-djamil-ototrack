@@ -1,5 +1,5 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
@@ -40,8 +40,10 @@ export default function InputFile({ label, onChangeFile, placeholder, error }: I
           format: SaveFormat.JPEG,
         });
 
-        const fileInfo = await FileSystem.getInfoAsync(compressedImage.uri);
-        const compressedSize = fileInfo.exists ? (fileInfo.size ?? 0) : 0;
+        // SDK 55: pakai File class baru, bukan getInfoAsync (deprecated).
+        // `File.size` mengembalikan null kalau file tidak ada / tidak bisa dibaca.
+        const fileRef = new File(compressedImage.uri);
+        const compressedSize = fileRef.exists ? (fileRef.size ?? 0) : 0;
         logger.log('Compressed size (bytes):', compressedSize);
 
         onChangeFile(compressedImage?.uri);

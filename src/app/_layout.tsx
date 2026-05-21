@@ -169,7 +169,7 @@ export default function RootLayout() {
           />
           <NotifikasiNewVersion />
           <NotifikasiNewVersionMinor />
-          <ToastManager useModal={false} />
+          <ToastManager useModal={true} />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>

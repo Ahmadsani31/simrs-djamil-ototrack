@@ -108,6 +108,8 @@ export default function IndexScreen() {
         text2: res?.message || 'QRCode tidak dikenali, silakan coba lagi.',
       });
     } catch (error: unknown) {
+      console.log(error);
+
       setValidatingScan(false);
 
       // Error response 4xx/5xx dari server (axios throw di sini).

@@ -43,7 +43,7 @@ export default function InputDate({ label, value, onChangeDate, onResetDate, err
           value={picker.value}
           mode={picker.mode}
           presentation="dialog"
-          display="spinner"
+          display="default"
           is24Hour
           maximumDate={new Date()}
           onValueChange={picker.handleChange}

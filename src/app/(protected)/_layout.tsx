@@ -9,12 +9,12 @@ import { PrivateRoute } from '@/components/layout/PrivateRoute';
 import { colors } from '@/constants/colors';
 
 const BrandHeaderLeft = () => (
-  <View className="w-44 flex-row items-center gap-1 rounded-lg bg-white p-1">
+  <View className="w-52 flex-row items-center gap-1 rounded-lg bg-white p-1">
     <Image
-      style={{ width: 53, height: 30 }}
+      style={{ width: 63, height: 40 }}
       source={require('@asset/images/logo/logo-kemenkes.png')}
     />
-    <Text className="font-bold">Oto RS-Djamil</Text>
+    <Text className="text-xl font-bold">Oto RS-Djamil</Text>
   </View>
 );
 

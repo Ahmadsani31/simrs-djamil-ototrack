@@ -157,7 +157,7 @@ export default function BarcodeScannerCamera({ onScan, visible, onVisible }: Pro
   }));
 
   // ---- Permission states ----
-  if (!permission) {
+  if (!permission?.granted && permission?.status !== 'denied') {
     return (
       <PermissionState
         visible={visible}

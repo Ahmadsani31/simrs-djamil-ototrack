@@ -1,23 +1,23 @@
-import { AntDesign } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image as ImageLocal, ScrollView, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Image as ImageLocal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 
-import ButtonCostum from '@/components/forms/ButtonCostum';
 import SubmitOverlay from '@/components/feedback/SubmitOverlay';
+import ButtonCostum from '@/components/forms/ButtonCostum';
 import InputArea from '@/components/forms/InputArea';
 import ModalCamera from '@/components/modals/ModalCamera';
 import ModalPreviewImage from '@/components/modals/ModalPreviewImage';
 import { ModalRN } from '@/components/modals/ModalRN';
 import PageServiceListImage from '@/components/sections/PageServiceListImage';
 import { colors } from '@/constants/colors';
-import secureApi from '@/services/service';
 import { reLocation } from '@/hooks/locationRequired';
+import secureApi from '@/services/service';
 import HandleError from '@/utils/handleError';
 
 type rawData = {
@@ -40,9 +40,7 @@ type propsUseQuery = {
 const fetchDataLog = async (service_id: number) => {
   try {
     const response = await secureApi.get(`/service/list_images`, {
-      params: {
-        service_id,
-      },
+      params: { service_id },
     });
     return response.data;
   } catch {
@@ -69,11 +67,8 @@ export default function PemiliharaanNestedScreen() {
       setLoadingPage(true);
       try {
         const response = await secureApi.get(`/service/data_aktif`, {
-          params: {
-            service_id,
-          },
+          params: { service_id },
         });
-
         setRow(response.data);
       } catch {
         // ignore — error sudah di-handle global lewat secureApi interceptor
@@ -91,41 +86,40 @@ export default function PemiliharaanNestedScreen() {
   };
 
   const handleSubmit = async () => {
+    if (!imgUrl) {
+      Toast.show({
+        type: 'error',
+        text1: 'Foto belum diambil',
+        text2: 'Foto aktivitas harus dilampirkan sebagai bukti',
+      });
+      return;
+    }
+    if (!note.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Keterangan kosong',
+        text2: 'Tulis keterangan singkat tentang aktivitas',
+      });
+      return;
+    }
+
     setLoadingSubmit(true);
     const coordinate = await reLocation.getCoordinate();
-
-    if (!coordinate?.lat && coordinate?.long) {
-      Alert.alert('Peringatan!', 'Error device location', [{ text: 'Tutup', onPress: () => null }]);
-      return;
-    }
-
-    if (imgUrl == null || imgUrl == null) {
+    if (!coordinate?.lat || !coordinate?.long) {
       Toast.show({
         type: 'error',
-        text1: 'Warning!',
-        text2: 'Foto lokasi dan foto struck harus diisi',
-        useModal: true,
+        text1: 'Lokasi tidak terdeteksi',
+        text2: 'Aktifkan GPS dan coba lagi.',
       });
       setLoadingSubmit(false);
       return;
     }
 
-    if (note === null || note === '') {
-      Toast.show({
-        type: 'error',
-        text1: 'Warning!',
-        text2: 'Keterangan harus diisi',
-        useModal: true,
-      });
-      setLoadingSubmit(false);
-      return;
-    }
     try {
       const formData = new FormData();
-
-      formData.append('latitude', coordinate?.lat?.toString() || '');
-      formData.append('longitude', coordinate?.long.toString() || '');
-      formData.append('service_id', row?.id.toString() || '');
+      formData.append('latitude', coordinate.lat.toString());
+      formData.append('longitude', coordinate.long.toString());
+      formData.append('service_id', row?.id.toString() ?? '');
       formData.append('keterangan', note);
       formData.append('fileImage', {
         uri: imgUrl,
@@ -134,7 +128,6 @@ export default function PemiliharaanNestedScreen() {
       } as any);
 
       await secureApi.postForm('/service/image_store', formData);
-
       handleDialogBBM();
       refetch();
     } catch (error: unknown) {
@@ -164,31 +157,83 @@ export default function PemiliharaanNestedScreen() {
   });
 
   return (
-    <View className="flex-1 gap-4 bg-slate-300 px-4 pb-4" style={{ paddingTop: insets.top + 16 }}>
-      <TouchableOpacity onPress={() => router.push('/')}>
-        <View className="flex-row items-center justify-center gap-2 rounded-lg bg-stone-800 p-2">
-          <AntDesign name="left" size={24} color="white" />
-          <Text className="text-white">Kembali</Text>
-        </View>
-      </TouchableOpacity>
-      <View className="rounded-lg bg-amber-200 p-4">
-        <Text className="text-center">Kendaraan</Text>
-        <Text className="text-center text-4xl font-bold">{row?.name}</Text>
-        <Text className="mb-2 text-center text-xl font-medium">{row?.no_polisi}</Text>
-        <Text className="mb-2 text-center font-medium">
-          {dayjs(row?.created_at).format('dddd ,DD MMMM YYYY | HH:mm')}
-        </Text>
-        <View className=" rounded-lg bg-gray-100 p-1 px-3">
-          <Text className="text-center text-xl font-bold">{row?.jenis_kerusakan}</Text>
-          <Text className="text-center font-medium">{row?.keterangan}</Text>
-          <Text className="text-center">Lokasi : </Text>
-          <Text className="text-center font-medium">{row?.lokasi}</Text>
+    <View className="flex-1 bg-slate-100">
+      {/* Brand header */}
+      <View className="bg-brand px-4 pb-12" style={{ paddingTop: insets.top + 12 }}>
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+            hitSlop={8}
+            className="rounded-full bg-white/15 p-2">
+            <Feather name="arrow-left" size={18} color="white" />
+          </TouchableOpacity>
+          <View className="flex-1">
+            <Text className="text-base font-bold text-white">Detail Pemeliharaan</Text>
+            <Text className="mt-0.5 text-xs text-white/70">Aktivitas pemeliharaan kendaraan</Text>
+          </View>
         </View>
       </View>
-      <View className="rounded-lg bg-white p-4">
-        <View className="flex items-center justify-center gap-4 rounded-lg bg-white">
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}>
+        {/* Vehicle card overlapping header */}
+        <View className="mx-4 -mt-7 overflow-hidden rounded-2xl bg-white shadow-sm">
+          <View className="flex-row items-center gap-2 bg-amber-500 px-4 py-2.5">
+            <View className="rounded-full bg-white/20 p-1.5">
+              <MaterialCommunityIcons name="car-cog" size={14} color="white" />
+            </View>
+            <Text className="text-xs font-medium text-white/90">Pemeliharaan Aktif</Text>
+            <View className="flex-1" />
+            {row?.created_at ? (
+              <View className="flex-row items-center gap-1 rounded-full bg-white/20 px-2 py-0.5">
+                <Feather name="clock" size={10} color="white" />
+                <Text className="text-[10px] font-medium text-white">
+                  {dayjs(row.created_at).format('DD MMM, HH:mm')}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View className="px-4 py-4">
+            <Text className="text-2xl font-bold text-gray-800">{row?.name || '-'}</Text>
+            <View className="mt-1 flex-row items-center gap-2">
+              <View className="rounded-md bg-amber-500 px-2 py-0.5">
+                <Text className="text-xs font-bold uppercase tracking-wider text-white">
+                  {row?.no_polisi || '-'}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Damage info */}
+          <View className="border-t border-slate-100 bg-slate-50 px-4 py-3">
+            <View className="mb-2 flex-row items-center gap-2">
+              <MaterialCommunityIcons name="wrench" size={14} color="#d97706" />
+              <Text className="text-xs font-bold uppercase tracking-wider text-amber-700">
+                {row?.jenis_kerusakan || '-'}
+              </Text>
+            </View>
+            {row?.keterangan ? (
+              <View className="mb-1.5 flex-row items-start gap-2">
+                <Feather name="message-square" size={12} color="#64748b" />
+                <Text className="flex-1 text-xs text-gray-600">{row.keterangan}</Text>
+              </View>
+            ) : null}
+            {row?.lokasi ? (
+              <View className="flex-row items-start gap-2">
+                <Feather name="map-pin" size={12} color="#64748b" />
+                <Text className="flex-1 text-xs text-gray-600">{row.lokasi}</Text>
+              </View>
+            ) : null}
+          </View>
+        </View>
+
+        {/* Action cards */}
+        <View className="mx-4 mt-4 gap-3">
           <TouchableOpacity
-            className="w-full rounded-lg bg-slate-200 p-2"
+            activeOpacity={0.85}
             onPress={() =>
               router.push({
                 pathname: 'pengembalian-service',
@@ -197,79 +242,120 @@ export default function PemiliharaanNestedScreen() {
                   kendaraan_id: row?.kendaraan_id,
                 },
               })
-            }>
-            <View className="w-full flex-row items-center gap-5">
-              <Image
-                style={{ width: 60, height: 60 }}
-                source={require('@asset/images/done-service.png')}
-              />
-              <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold">Selesai Pemeliharaan</Text>
-                <Text className="text-sm">
-                  Klik disini untuk memproses mengembalikan kendaraan / pemeliharaan kendaraan telah
-                  selesai
+            }
+            className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            <View className="flex-row items-center gap-3 p-4">
+              <View className="rounded-xl bg-emerald-50 p-3">
+                <Image
+                  style={{ width: 44, height: 44 }}
+                  source={require('@asset/images/done-service.png')}
+                  contentFit="contain"
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-base font-bold text-gray-800">Selesai Pemeliharaan</Text>
+                <Text className="mt-0.5 text-xs text-gray-500">
+                  Proses pengembalian kendaraan setelah pemeliharaan tuntas
                 </Text>
               </View>
+              <Feather name="chevron-right" size={20} color="#cbd5e1" />
             </View>
           </TouchableOpacity>
+
           <TouchableOpacity
-            className="w-full rounded-lg bg-teal-200 p-2"
-            onPress={() => setModalVisible(true)}>
-            <View className="w-full flex-row items-center gap-5">
-              <Image
-                style={{ width: 60, height: 60 }}
-                source={require('@asset/images/camera.png')}
-              />
-              <View className="w-72 text-wrap">
-                <Text className="text-xl font-bold">Foto Aktivitas</Text>
-                <Text className="text-sm">
-                  Klik disini untuk pengambilan gambar waktu pemeliharaan / foto struk pembelian
-                  barang
+            activeOpacity={0.85}
+            onPress={() => setModalVisible(true)}
+            className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            <View className="flex-row items-center gap-3 p-4">
+              <View className="rounded-xl bg-teal-50 p-3">
+                <Image
+                  style={{ width: 44, height: 44 }}
+                  source={require('@asset/images/camera.png')}
+                  contentFit="contain"
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-base font-bold text-gray-800">Tambah Foto Aktivitas</Text>
+                <Text className="mt-0.5 text-xs text-gray-500">
+                  Foto kegiatan pemeliharaan / struk pembelian sparepart
                 </Text>
               </View>
+              <Feather name="chevron-right" size={20} color="#cbd5e1" />
             </View>
           </TouchableOpacity>
         </View>
-      </View>
-      <PageServiceListImage
-        items={fetch_service ?? []}
-        isLoading={isLoading}
-        onPress={(e) => handleOpenPreviewImage(e)}
-      />
+
+        {/* Photo log */}
+        <View className="mx-4 mt-4">
+          <View className="mb-3 flex-row items-center gap-2">
+            <Feather name="image" size={16} color="#205781" />
+            <Text className="text-sm font-bold text-gray-800">Riwayat Foto Aktivitas</Text>
+            {(fetch_service?.length ?? 0) > 0 ? (
+              <View className="rounded-full bg-brand px-2 py-0.5">
+                <Text className="text-[10px] font-bold text-white">{fetch_service?.length}</Text>
+              </View>
+            ) : null}
+          </View>
+          <PageServiceListImage
+            items={fetch_service ?? []}
+            isLoading={isLoading}
+            onPress={(e) => handleOpenPreviewImage(e)}
+          />
+        </View>
+      </ScrollView>
+
+      {/* Photo upload sheet */}
       {isModalVisible && (
         <ModalRN visible={isModalVisible} onClose={handleDialogBBM}>
           <ModalRN.Header>
-            <Text className="text-center text-xl font-bold">
-              Foto Aktivitas Pemiliharan Kendaraan
-            </Text>
-            <Text className="text-center">
-              Silahkan foto aktivitas atau struck dari pemeliharaan Kendaraan, untuk sebagai bukti
+            <View className="flex-row items-center gap-2">
+              <View className="rounded-full bg-teal-100 p-1.5">
+                <Feather name="camera" size={14} color="#0d9488" />
+              </View>
+              <Text className="text-base font-bold text-gray-800">Foto Aktivitas</Text>
+            </View>
+            <Text className="mt-1 text-xs text-gray-500">
+              Lampirkan foto aktivitas / struk pembelian sebagai bukti pemeliharaan
             </Text>
           </ModalRN.Header>
           <ModalRN.Content>
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
               <View className="mb-4">
-                <Text className="font-bold">Foto</Text>
+                <Text className="mb-2 text-sm font-semibold text-gray-700">Foto</Text>
                 {!imgUrl ? (
-                  <>
-                    <TouchableOpacity
-                      className="my-2 flex-row items-center justify-center rounded-lg bg-indigo-500 p-2"
-                      onPress={() => setDialogCamera(true)}>
-                      <AntDesign name="camera" size={28} />
-                      <Text className="ms-2 font-bold text-white">Ambil Gambar</Text>
-                    </TouchableOpacity>
-                  </>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => setDialogCamera(true)}
+                    className="flex-row items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-slate-50 py-5">
+                    <View className="rounded-full bg-white p-2">
+                      <Feather name="camera" size={20} color="#205781" />
+                    </View>
+                    <Text className="text-sm font-medium text-gray-600">
+                      Ketuk untuk ambil foto
+                    </Text>
+                  </TouchableOpacity>
                 ) : (
-                  <View className="w-full rounded-lg bg-black">
+                  <View className="overflow-hidden rounded-xl border border-gray-200 bg-white">
                     <ImageLocal
                       source={{ uri: imgUrl }}
-                      className="aspect-[3/4] w-full rounded-lg"
+                      className="aspect-[4/3] w-full"
+                      resizeMode="cover"
                     />
-                    <TouchableOpacity
-                      className="absolute right-2 top-2 rounded-full bg-white p-1"
-                      onPress={() => setImgUrl(null)}>
-                      <AntDesign name="close-circle" size={32} color="red" />
-                    </TouchableOpacity>
+                    <View className="flex-row items-center justify-between border-t border-gray-100 bg-slate-50 px-3 py-2">
+                      <View className="flex-row items-center gap-2">
+                        <Feather name="check-circle" size={14} color="#10b981" />
+                        <Text className="text-xs font-medium text-emerald-600">
+                          Foto siap dikirim
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => setImgUrl(null)}
+                        className="flex-row items-center gap-1 rounded-md bg-red-50 px-2 py-1">
+                        <Feather name="trash-2" size={12} color="#ef4444" />
+                        <Text className="text-xs font-medium text-red-500">Ulangi</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 )}
               </View>
@@ -277,9 +363,9 @@ export default function PemiliharaanNestedScreen() {
               <InputArea
                 className="bg-gray-50"
                 label="Keterangan"
-                placeholder="keteragan..."
+                placeholder="Catatan singkat tentang aktivitas..."
                 value={note}
-                onChangeText={(note) => setNote(note)}
+                onChangeText={(n) => setNote(n)}
               />
             </ScrollView>
           </ModalRN.Content>
@@ -287,7 +373,7 @@ export default function PemiliharaanNestedScreen() {
             <View className="flex-row gap-2">
               <ButtonCostum
                 classname={colors.warning}
-                title="Exit"
+                title="Batal"
                 loading={loadingSubmit}
                 onPress={handleDialogBBM}
               />
@@ -311,7 +397,7 @@ export default function PemiliharaanNestedScreen() {
       )}
       {previewImage && (
         <ModalPreviewImage
-          title="Preview Image"
+          title="Foto Aktivitas"
           imgUrl={imgPreviewUrl || ''}
           visible={previewImage}
           onPress={() => handleCloseImage()}

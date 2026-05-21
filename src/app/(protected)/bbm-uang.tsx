@@ -3,15 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import {
-  Alert,
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 

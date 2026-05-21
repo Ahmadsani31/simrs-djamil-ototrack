@@ -4,13 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import {
-  Alert,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 

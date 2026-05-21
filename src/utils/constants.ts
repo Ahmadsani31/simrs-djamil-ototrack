@@ -12,4 +12,3 @@ export const APPEL_CLIENT_ID = process.env.EXPO_PUBLIC_APPLE_CLIENT_ID!;
 export const API_URL =
   process.env.EXPO_PUBLIC_API_URL ?? 'https://backoffice.rsdjamil.co.id/pencatatan-kendaraan/api';
 export const URL_PLAY_STORE = 'https://play.google.com/store/apps/details?id=' + ApplicationSchame;
-

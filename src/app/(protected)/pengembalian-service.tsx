@@ -3,7 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Formik } from 'formik';
 import { useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
 
@@ -99,7 +107,9 @@ export default function PengembalianServiceScreen() {
   };
 
   return (
-    <KeyboardAwareScreen className="flex-1 bg-slate-100">
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {isLoading ? (
         <View className="m-4 rounded-2xl bg-white p-4 shadow-sm">
           <SkeletonList loop={5} />
@@ -225,6 +235,6 @@ export default function PengembalianServiceScreen() {
           onPress={() => setPreviewUri(null)}
         />
       )}
-    </KeyboardAwareScreen>
+    </KeyboardAvoidingView>
   );
 }

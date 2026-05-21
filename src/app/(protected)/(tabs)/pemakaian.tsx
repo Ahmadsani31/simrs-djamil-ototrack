@@ -91,7 +91,7 @@ export default function PemakaianScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => (
-      <View className="mx-4 mb-3 overflow-hidden rounded-2xl bg-white shadow-sm">
+      <View className="mx-4 mb-3 overflow-hidden rounded-xl bg-white shadow-sm">
         {/* Header bar */}
         <View className="flex-row items-center justify-between bg-brand px-4 py-2.5">
           <Text className="text-xs font-medium text-white">
@@ -116,13 +116,12 @@ export default function PemakaianScreen() {
               </Text>
               <Text className="text-xs text-gray-400">{item.no_polisi}</Text>
             </View>
-            <View className="rounded-lg bg-slate-100 px-3 py-1.5">
-              <Text className="text-xs font-medium text-gray-600" numberOfLines={1}>
-                {item.kegiatan}
-              </Text>
-            </View>
           </View>
-
+          <View className="mb-3 rounded-lg bg-slate-100 px-3 py-1.5">
+            <Text className="text-xs font-medium text-gray-600" numberOfLines={1}>
+              {item.kegiatan}
+            </Text>
+          </View>
           {/* Stats row */}
           <View className="mb-3 flex-row gap-2">
             <View className="flex-1 rounded-xl bg-slate-50 p-2.5">

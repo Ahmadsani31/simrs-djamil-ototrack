@@ -159,7 +159,7 @@ export default function PemiliharaanNestedScreen() {
   return (
     <View className="flex-1 bg-slate-100">
       {/* Brand header */}
-      <View className="bg-brand px-4 pb-12" style={{ paddingTop: insets.top + 12 }}>
+      <View className="bg-brand px-4 pb-8" style={{ paddingTop: insets.top }}>
         <View className="flex-row items-center gap-3">
           <TouchableOpacity
             activeOpacity={0.7}
@@ -169,7 +169,7 @@ export default function PemiliharaanNestedScreen() {
             <Feather name="arrow-left" size={18} color="white" />
           </TouchableOpacity>
           <View className="flex-1">
-            <Text className="text-base font-bold text-white">Detail Pemeliharaan</Text>
+            <Text className="text-2xl font-bold text-white">Detail Pemeliharaan</Text>
             <Text className="mt-0.5 text-xs text-white/70">Aktivitas pemeliharaan kendaraan</Text>
           </View>
         </View>
@@ -179,7 +179,7 @@ export default function PemiliharaanNestedScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}>
         {/* Vehicle card overlapping header */}
-        <View className="mx-4 -mt-7 overflow-hidden rounded-2xl bg-white shadow-sm">
+        <View className="mx-4 mt-5 overflow-hidden rounded-2xl bg-white shadow-sm">
           <View className="flex-row items-center gap-2 bg-amber-500 px-4 py-2.5">
             <View className="rounded-full bg-white/20 p-1.5">
               <MaterialCommunityIcons name="car-cog" size={14} color="white" />

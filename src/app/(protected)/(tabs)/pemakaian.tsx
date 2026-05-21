@@ -175,71 +175,67 @@ export default function PemakaianScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: 0 }} edges={['bottom']}>
-      <View className="flex-1 bg-slate-200">
-        {/* Header */}
-        <View className="bg-brand px-4 pb-14" style={{ paddingTop: insets.top + 12 }}>
-          <View className="flex-row items-center gap-2">
-            <Feather name="list" size={20} color="white" />
-            <Text className="text-lg font-bold text-white">Riwayat Pemakaian</Text>
-          </View>
-          <Text className="mt-0.5 text-sm text-white/60">Pemakaian kendaraan operasional</Text>
+      {/* Header */}
+      <View className="bg-brand px-4 pb-10" style={{ paddingTop: insets.top }}>
+        <View className="flex-row items-center gap-2">
+          <Feather name="list" size={20} color="white" />
+          <Text className="text-2xl font-bold text-white">Riwayat Pemakaian</Text>
         </View>
-
-        {/* Date filter */}
-        <Pressable
-          onPress={showDatePicker}
-          className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
-          <Feather name="calendar" size={18} color="#94a3b8" />
-          <Text className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
-            {dateInput
-              ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
-              : 'Filter berdasarkan tanggal...'}
-          </Text>
-          {dateInput ? (
-            <TouchableOpacity onPress={clearDate} hitSlop={8}>
-              <Feather name="x-circle" size={18} color="#94a3b8" />
-            </TouchableOpacity>
-          ) : (
-            <Feather name="chevron-down" size={18} color="#94a3b8" />
-          )}
-        </Pressable>
-
-        <FlatList
-          data={flatData}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          refreshControl={
-            <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
-          }
-          contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
-          showsVerticalScrollIndicator={false}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-          }}
-          onEndReachedThreshold={0.5}
-          removeClippedSubviews
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
-          windowSize={7}
-          ListEmptyComponent={
-            isLoading ? null : (
-              <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
-                <MaterialCommunityIcons name="car-off" size={48} color="#cbd5e1" />
-                <Text className="mt-3 text-center text-gray-400">
-                  Belum ada pemakaian kendaraan
-                </Text>
-              </View>
-            )
-          }
-          ListFooterComponent={
-            isLoading || isFetchingNextPage ? (
-              <View className="mx-4">
-                <SkeletonList loop={3} />
-              </View>
-            ) : null
-          }
-        />
+        <Text className="mt-0.5 text-sm text-white/60">Pemakaian kendaraan operasional</Text>
       </View>
+
+      {/* Date filter */}
+      <Pressable
+        onPress={showDatePicker}
+        className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
+        <Feather name="calendar" size={18} color="#94a3b8" />
+        <Text className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
+          {dateInput
+            ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
+            : 'Filter berdasarkan tanggal...'}
+        </Text>
+        {dateInput ? (
+          <TouchableOpacity onPress={clearDate} hitSlop={8}>
+            <Feather name="x-circle" size={18} color="#94a3b8" />
+          </TouchableOpacity>
+        ) : (
+          <Feather name="chevron-down" size={18} color="#94a3b8" />
+        )}
+      </Pressable>
+
+      <FlatList
+        data={flatData}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
+        }
+        contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
+        showsVerticalScrollIndicator={false}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        }}
+        onEndReachedThreshold={0.5}
+        removeClippedSubviews
+        initialNumToRender={6}
+        maxToRenderPerBatch={6}
+        windowSize={7}
+        ListEmptyComponent={
+          isLoading ? null : (
+            <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
+              <MaterialCommunityIcons name="car-off" size={48} color="#cbd5e1" />
+              <Text className="mt-3 text-center text-gray-400">Belum ada pemakaian kendaraan</Text>
+            </View>
+          )
+        }
+        ListFooterComponent={
+          isLoading || isFetchingNextPage ? (
+            <View className="mx-4">
+              <SkeletonList loop={3} />
+            </View>
+          ) : null
+        }
+      />
 
       {modalVisible && (
         <ModalPreviewImage

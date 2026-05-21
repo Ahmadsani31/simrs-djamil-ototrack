@@ -10,7 +10,7 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 
 import BarcodeScannerCamera from '@/components/scanner/BarcodeScannerCamera';
@@ -105,12 +105,15 @@ export default function IndexScreen() {
   };
 
   return (
-    <View className="flex-1 bg-slate-200">
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
       {/* Header */}
-      <View className="bg-brand px-4 pb-10" style={{ paddingTop: insets.top + 12 }}>
+      <View className="bg-brand px-4 pb-10 " style={{ paddingTop: insets.top }}>
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-lg font-bold text-white">Dashboard</Text>
+            <View className="flex-row items-center gap-2">
+              <MaterialCommunityIcons name="view-dashboard-outline" size={20} color="white" />
+              <Text className="text-2xl font-bold text-white">Dashboard</Text>
+            </View>
             <Text className="text-xs text-white/60">Pencatatan Kendaraan Operasional</Text>
           </View>
           <TouchableOpacity
@@ -192,6 +195,6 @@ export default function IndexScreen() {
           visible={barcodeScanner}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }

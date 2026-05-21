@@ -248,99 +248,97 @@ export default function IndexScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-      <View className="flex-1 bg-slate-200">
-        {/* Header */}
-        <View className="bg-brand px-4 pb-14" style={{ paddingTop: insets.top + 12 }}>
-          <View className="flex-row items-center gap-2">
-            <MaterialCommunityIcons name="car-wrench" size={20} color="white" />
-            <Text className="text-lg font-bold text-white">Pemeliharaan</Text>
-          </View>
-          <Text className="mt-0.5 text-sm text-white/60">Riwayat pemeliharaan kendaraan</Text>
+      {/* Header */}
+      <View className="bg-brand px-4 pb-10" style={{ paddingTop: insets.top }}>
+        <View className="flex-row items-center gap-2">
+          <MaterialCommunityIcons name="car-wrench" size={20} color="white" />
+          <Text className="text-2xl font-bold text-white">Pemeliharaan</Text>
         </View>
+        <Text className="mt-0.5 text-sm text-white/60">Riwayat pemeliharaan kendaraan</Text>
+      </View>
 
-        {/* Active services OR date filter + history list */}
-        {activeServices && activeServices.length > 0 ? (
+      {/* Active services OR date filter + history list */}
+      {activeServices && activeServices.length > 0 ? (
+        <FlatList
+          data={activeServices}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => renderActiveCard(item, index)}
+          contentContainerStyle={{ paddingBottom: 80, paddingTop: 8 }}
+          className="-mt-7"
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
+          windowSize={5}
+          ListHeaderComponent={
+            <View className="mx-4 mb-3">
+              <View className="rounded-xl bg-amber-50 p-3">
+                <Text className="text-center text-sm font-medium text-amber-700">
+                  {activeServices.length} kendaraan sedang dalam pemeliharaan
+                </Text>
+              </View>
+            </View>
+          }
+        />
+      ) : (
+        <>
+          {/* Date filter */}
+          <Pressable
+            onPress={showDatePicker}
+            className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
+            <Feather name="calendar" size={18} color="#94a3b8" />
+            <Text
+              className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
+              {dateInput
+                ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
+                : 'Filter berdasarkan tanggal...'}
+            </Text>
+            {dateInput ? (
+              <TouchableOpacity onPress={clearDate} hitSlop={8}>
+                <Feather name="x-circle" size={18} color="#94a3b8" />
+              </TouchableOpacity>
+            ) : (
+              <Feather name="chevron-down" size={18} color="#94a3b8" />
+            )}
+          </Pressable>
+
           <FlatList
-            data={activeServices}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item, index }) => renderActiveCard(item, index)}
-            contentContainerStyle={{ paddingBottom: 80, paddingTop: 8 }}
-            className="-mt-7"
+            data={flatData}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderHistoryItem}
+            refreshControl={
+              <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
+            }
+            contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+            }}
+            onEndReachedThreshold={0.5}
             removeClippedSubviews
-            initialNumToRender={4}
-            maxToRenderPerBatch={4}
-            windowSize={5}
-            ListHeaderComponent={
-              <View className="mx-4 mb-3">
-                <View className="rounded-xl bg-amber-50 p-3">
-                  <Text className="text-center text-sm font-medium text-amber-700">
-                    {activeServices.length} kendaraan sedang dalam pemeliharaan
+            initialNumToRender={6}
+            maxToRenderPerBatch={6}
+            windowSize={7}
+            ListEmptyComponent={
+              isLoading ? null : (
+                <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
+                  <MaterialCommunityIcons name="wrench-outline" size={48} color="#cbd5e1" />
+                  <Text className="mt-3 text-center text-gray-400">
+                    Belum ada data pemeliharaan
                   </Text>
                 </View>
-              </View>
+              )
+            }
+            ListFooterComponent={
+              isLoading || isFetchingNextPage ? (
+                <View className="mx-4">
+                  <SkeletonList loop={3} />
+                </View>
+              ) : null
             }
           />
-        ) : (
-          <>
-            {/* Date filter */}
-            <Pressable
-              onPress={showDatePicker}
-              className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-5 shadow-sm">
-              <Feather name="calendar" size={18} color="#94a3b8" />
-              <Text
-                className={`ml-2 flex-1 text-sm ${dateInput ? 'text-gray-800' : 'text-gray-400'}`}>
-                {dateInput
-                  ? dayjs(dateInput).format('dddd, DD MMMM YYYY')
-                  : 'Filter berdasarkan tanggal...'}
-              </Text>
-              {dateInput ? (
-                <TouchableOpacity onPress={clearDate} hitSlop={8}>
-                  <Feather name="x-circle" size={18} color="#94a3b8" />
-                </TouchableOpacity>
-              ) : (
-                <Feather name="chevron-down" size={18} color="#94a3b8" />
-              )}
-            </Pressable>
-
-            <FlatList
-              data={flatData}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderHistoryItem}
-              refreshControl={
-                <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
-              }
-              contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
-              showsVerticalScrollIndicator={false}
-              onEndReached={() => {
-                if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-              }}
-              onEndReachedThreshold={0.5}
-              removeClippedSubviews
-              initialNumToRender={6}
-              maxToRenderPerBatch={6}
-              windowSize={7}
-              ListEmptyComponent={
-                isLoading ? null : (
-                  <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
-                    <MaterialCommunityIcons name="wrench-outline" size={48} color="#cbd5e1" />
-                    <Text className="mt-3 text-center text-gray-400">
-                      Belum ada data pemeliharaan
-                    </Text>
-                  </View>
-                )
-              }
-              ListFooterComponent={
-                isLoading || isFetchingNextPage ? (
-                  <View className="mx-4">
-                    <SkeletonList loop={3} />
-                  </View>
-                ) : null
-              }
-            />
-          </>
-        )}
-      </View>
+        </>
+      )}
 
       {modalVisible && (
         <ModalPreviewImage

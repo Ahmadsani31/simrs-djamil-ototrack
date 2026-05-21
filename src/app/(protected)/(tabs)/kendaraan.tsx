@@ -83,65 +83,63 @@ export default function KendaraanScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-      <View className="flex-1 bg-slate-200">
-        {/* Header */}
-        <View className="bg-brand px-4 pb-14" style={{ paddingTop: insets.top + 12 }}>
-          <View className="flex-row items-center gap-2">
-            <MaterialCommunityIcons name="car-multiple" size={20} color="white" />
-            <Text className="text-lg font-bold text-white">Daftar Kendaraan</Text>
-          </View>
-          <Text className="mt-0.5 text-sm text-white/60">
-            {data?.length ?? 0} kendaraan terdaftar
-          </Text>
+      {/* Header */}
+      <View className="bg-brand px-4 pb-10" style={{ paddingTop: insets.top }}>
+        <View className="flex-row items-center gap-2">
+          <MaterialCommunityIcons name="car-multiple" size={20} color="white" />
+          <Text className="text-2xl font-bold text-white">Daftar Kendaraan</Text>
         </View>
-
-        {/* Search */}
-        <View className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-2 shadow-sm">
-          <Feather name="search" size={18} color="#94a3b8" />
-          <TextInput
-            className="ml-2 flex-1 text-sm text-gray-800"
-            placeholder="Cari model atau nomor polisi..."
-            placeholderTextColor="#94a3b8"
-            value={search}
-            onChangeText={setSearch}
-            autoCorrect={false}
-          />
-          {search.length > 0 && (
-            <TouchableOpacity onPress={() => setSearch('')} hitSlop={8}>
-              <Feather name="x-circle" size={18} color="#94a3b8" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          refreshControl={
-            <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
-          }
-          contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
-          showsVerticalScrollIndicator={false}
-          removeClippedSubviews
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          windowSize={11}
-          ListEmptyComponent={
-            isLoading ? (
-              <View className="mx-4">
-                <SkeletonList loop={8} />
-              </View>
-            ) : (
-              <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
-                <MaterialCommunityIcons name="car-off" size={48} color="#cbd5e1" />
-                <Text className="mt-3 text-center text-gray-400">
-                  {search ? 'Tidak ditemukan' : 'Belum ada kendaraan terdaftar'}
-                </Text>
-              </View>
-            )
-          }
-        />
+        <Text className="mt-0.5 text-sm text-white/60">
+          {data?.length ?? 0} kendaraan terdaftar
+        </Text>
       </View>
+
+      {/* Search */}
+      <View className="mx-4 -mt-7 mb-3 flex-row items-center rounded-xl bg-white px-3 py-2 shadow-sm">
+        <Feather name="search" size={18} color="#94a3b8" />
+        <TextInput
+          className="ml-2 flex-1 text-sm text-gray-800"
+          placeholder="Cari model atau nomor polisi..."
+          placeholderTextColor="#94a3b8"
+          value={search}
+          onChangeText={setSearch}
+          autoCorrect={false}
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')} hitSlop={8}>
+            <Feather name="x-circle" size={18} color="#94a3b8" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching || isLoading} onRefresh={refetch} />
+        }
+        contentContainerStyle={{ paddingBottom: 80, paddingTop: 4 }}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={11}
+        ListEmptyComponent={
+          isLoading ? (
+            <View className="mx-4">
+              <SkeletonList loop={8} />
+            </View>
+          ) : (
+            <View className="mx-4 mt-8 items-center rounded-2xl bg-white p-8">
+              <MaterialCommunityIcons name="car-off" size={48} color="#cbd5e1" />
+              <Text className="mt-3 text-center text-gray-400">
+                {search ? 'Tidak ditemukan' : 'Belum ada kendaraan terdaftar'}
+              </Text>
+            </View>
+          )
+        }
+      />
     </SafeAreaView>
   );
 }

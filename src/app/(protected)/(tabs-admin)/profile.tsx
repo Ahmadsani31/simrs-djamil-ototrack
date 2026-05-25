@@ -36,7 +36,7 @@ export default function Profile() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await secureApi.get(`dashboard/kendaraan_terpakai_admin`);
+      const response = await secureApi.get(`user/kendaraan_terpakai_admin`);
 
       const raw: PieItem[] = response.data ?? [];
 

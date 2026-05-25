@@ -29,6 +29,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import * as yup from 'yup';
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 import Input from '@/components/forms/Input';
 import { useAuthStore } from '@/stores/authStore';
@@ -254,6 +255,7 @@ export default function LoginScreen() {
             <Text className="mt-0.5 text-[10px] text-white/30">
               Version {Constants.expoConfig?.version}
             </Text>
+            <Text className="mt-0.5 text-[10px] text-white/30">{apiUrl}</Text>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
